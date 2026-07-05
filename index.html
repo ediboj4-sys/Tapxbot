@@ -18,7 +18,7 @@
 body{
   background: linear-gradient(135deg, #0a4d2c 0%, #1a7a4d 50%, #0d3a24 100%);
   background-image: 
-    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><filter id="shadow"><feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/></filter></defs><path d="M0,600 Q300,550 600,580 T1200,600 L1200,800 L0,800 Z" fill="%23073d1f" opacity="0.4"/><ellipse cx="150" cy="400" rx="80" ry="200" fill="%23155e3b" opacity="0.3" filter="url(%23shadow)"/><ellipse cx="1050" cy="450" rx="100" ry="220" fill="%231a7a4d" opacity="0.25" filter="url(%23shadow)"/><path d="M50,300 Q100,200 150,300" stroke="%23228B4C" stroke-width="8" fill="none" opacity="0.4" filter="url(%23shadow)"/><path d="M1100,250 Q1150,180 1180,260" stroke="%232BAA6F" stroke-width="6" fill="none" opacity="0.4" filter="url(%23shadow)"/></svg>'),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><filter id="shadow"><feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/></filter></defs></svg>'),
     radial-gradient(ellipse at 20% 80%, rgba(34, 139, 76, 0.2) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(26, 122, 77, 0.2) 0%, transparent 50%);
   background-size: cover, 100% 100%, 100% 100%;
@@ -197,71 +197,7 @@ input,select{
   background:#00e0ff;
 }
 
-/* JOIN POPUP */
-#joinPopup{
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:rgba(0,0,0,0.85);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  z-index:9999;
-  text-align:center;
-}
-#joinPopup button{
-  padding:14px 20px;
-  border:none;
-  border-radius:12px;
-  background:#00e0ff;
-  color:#000;
-  font-weight:bold;
-  margin: 10px;
-}
-
-.floating-text {
-  position: fixed;
-  pointer-events: none;
-  font-weight: bold;
-  font-size: 24px;
-  color: #00e0ff;
-  text-shadow: 0 0 10px rgba(0, 224, 255, 0.8);
-  z-index: 1000;
-}
-
-.nav-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 10px;
-  margin-top: 20px;
-  padding-bottom: 20px;
-}
-
-.nav-btn {
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  background: #101b2d;
-  color: #00e0ff;
-  border: 1px solid #1f2d44;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: bold;
-  transition: all 0.2s;
-}
-
-.nav-btn:active {
-  background: #00e0ff;
-  color: #000;
-}
-
-.nav-btn.active {
-  background: linear-gradient(45deg, #00e0ff, #0077ff);
-  color: white;
-}
-
-/* MISSIONS PAGE */
+/* MISSION CARD */
 .mission-card {
   background: linear-gradient(135deg, #1a2d45 0%, #0f1f35 100%);
   padding: 15px;
@@ -290,33 +226,9 @@ input,select{
   font-weight: bold;
   text-align: center;
   min-width: 80px;
-  font-size: 13px;
 }
 
-.progress-section {
-  background: #0f1f35;
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: #1b2a40;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 8px;
-}
-
-.progress-bar div {
-  height: 100%;
-  background: #00e0ff;
-  width: 0%;
-  transition: width 0.3s;
-}
-
-/* BOUNTY PAGE */
+/* BOUNTY CARD */
 .bounty-card {
   background: linear-gradient(135deg, #1a2d45 0%, #0f1f35 100%);
   padding: 15px;
@@ -362,36 +274,7 @@ input,select{
   font-size: 14px;
 }
 
-.leaderboard {
-  background: #0f1f35;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.leaderboard-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #1f2d44;
-}
-
-.leaderboard-item:last-child {
-  border-bottom: none;
-}
-
-.rank-badge {
-  background: linear-gradient(45deg, #FFD700, #FFA500);
-  color: #000;
-  padding: 4px 8px;
-  border-radius: 50%;
-  font-weight: bold;
-  min-width: 30px;
-  text-align: center;
-}
-
-/* WALLET PAGE */
+/* WALLET STYLES */
 .transaction-card {
   background: #0f1f35;
   padding: 12px;
@@ -445,126 +328,133 @@ input,select{
   opacity: 0.8;
 }
 
-.tab-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.tab-btn {
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-  background: #0f1f35;
-  color: #00e0ff;
-  border: 1px solid #1f2d44;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s;
-}
-
-.tab-btn.active {
-  background: linear-gradient(45deg, #00e0ff, #0077ff);
-  color: white;
-}
-
-/* PROFILE PAGE */
-.profile-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: linear-gradient(45deg, #00e0ff, #0077ff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 15px;
-  font-size: 50px;
-  box-shadow: 0 0 20px rgba(0, 224, 255, 0.5);
-}
-
-.username {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.usertag {
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.stat-box {
-  background: #0f1f35;
-  padding: 12px;
-  border-radius: 10px;
-  text-align: center;
-  border: 1px solid #1f2d44;
-}
-
-.stat-value {
-  font-size: 20px;
-  font-weight: bold;
-  color: #00e0ff;
-}
-
-.stat-label {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-top: 5px;
-}
-
-/* SETTINGS PAGE */
-.setting-item {
+/* PROGRESS SECTION */
+.progress-section {
   background: #0f1f35;
   padding: 12px;
   border-radius: 10px;
   margin-bottom: 10px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #1b2a40;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar div {
+  height: 100%;
+  background: #00e0ff;
+  width: 0%;
+  transition: width 0.3s;
+}
+
+/* LEADERBOARD */
+.leaderboard {
+  background: #0f1f35;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.leaderboard-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #1f2d44;
+  padding: 10px 0;
+  border-bottom: 1px solid #1f2d44;
 }
 
-.toggle-switch {
-  position: relative;
-  width: 50px;
-  height: 26px;
-  background: #1f2d44;
-  border-radius: 13px;
-  cursor: pointer;
-  transition: background 0.3s;
+.leaderboard-item:last-child {
+  border-bottom: none;
 }
 
-.toggle-switch.on {
-  background: #00e0ff;
-}
-
-.toggle-slider {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  background: white;
+.rank-badge {
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  color: #000;
+  padding: 4px 8px;
   border-radius: 50%;
-  transition: left 0.3s;
+  font-weight: bold;
+  min-width: 30px;
+  text-align: center;
 }
 
-.toggle-switch.on .toggle-slider {
-  left: 27px;
+/* NAV BUTTONS */
+.nav-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+  padding-bottom: 20px;
+  position: sticky;
+  bottom: 0;
+  background: rgba(10, 77, 44, 0.95);
+  padding: 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.nav-btn {
+  padding: 10px;
+  border: none;
+  border-radius: 12px;
+  background: #101b2d;
+  color: #00e0ff;
+  border: 1px solid #1f2d44;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.nav-btn.active {
+  background: linear-gradient(45deg, #00e0ff, #0077ff);
+  color: white;
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.5);
+}
+
+.nav-btn:active {
+  transform: scale(0.96);
+}
+
+/* JOIN POPUP */
+#joinPopup{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.85);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+#joinPopupContent{
+  background:#0f1f35;
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  max-width:90%;
+}
+
+#joinPopupContent h2{
+  margin-bottom:10px;
+  color:#00e0ff;
+}
+
+.popup-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(45deg,#00e0ff,#0077ff);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -572,127 +462,69 @@ input,select{
 <body>
 
 <div class="container">
-  <!-- HOME PAGE -->
-  <div id="homePage" class="page active">
+
+  <!-- ===== PAGE 1: EXPLORE ===== -->
+  <div id="explore-page" class="page active">
     <div class="header">
-      <div class="logo">⚡ Tap & Earn X</div>
-      <div class="level">Level <span id="level">1</span></div>
+      <div class="logo">🦁 TapXBot</div>
+      <div class="level" id="userLevel">Level 1</div>
     </div>
 
     <div class="balance-box">
-      <p>Total XP</p>
-      <h2 id="points">0</h2>
-      <div class="progress">
-        <div id="bar"></div>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <h3>👆 Total Taps</h3>
-        <p id="taps">0</p>
-      </div>
-      <div class="card">
-        <h3>🏆 Rank</h3>
-        <p id="rank">Starter</p>
-      </div>
-    </div>
-
-    <!-- LION TAP SECTION -->
-    <div class="section">
-      <h2>🎮 Tap The Lion</h2>
-      <div class="lion-tap-container">
-        <svg id="tapBtn" class="lion-head" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="lionGrad" cx="40%" cy="40%">
-              <stop offset="0%" style="stop-color:#D4A574;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#8B6F47;stop-opacity:1" />
-            </radialGradient>
-            <filter id="shadow">
-              <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.4"/>
-            </filter>
-          </defs>
-          
-          <circle cx="100" cy="100" r="95" fill="#C19A6B" filter="url(#shadow)"/>
-          <circle cx="100" cy="100" r="88" fill="#D2B48C"/>
-          
-          <path d="M 50 60 Q 40 50 35 65 Q 30 80 45 90" fill="#9B8860" opacity="0.6"/>
-          <path d="M 150 60 Q 160 50 165 65 Q 170 80 155 90" fill="#9B8860" opacity="0.6"/>
-          <path d="M 30 100 Q 20 95 15 110 Q 20 125 35 120" fill="#9B8860" opacity="0.6"/>
-          <path d="M 170 100 Q 180 95 185 110 Q 180 125 165 120" fill="#9B8860" opacity="0.6"/>
-          
-          <circle cx="100" cy="105" r="60" fill="url(#lionGrad)" filter="url(#shadow)"/>
-          <ellipse cx="100" cy="110" rx="50" ry="52" fill="#D4A574"/>
-          
-          <ellipse cx="100" cy="125" rx="35" ry="28" fill="#C9A96E"/>
-          <ellipse cx="100" cy="130" rx="25" ry="18" fill="#E8D5C4"/>
-          
-          <ellipse cx="100" cy="128" rx="8" ry="7" fill="#3D3D3D"/>
-          <ellipse cx="97" cy="127" rx="2" ry="2" fill="#000"/>
-          
-          <path d="M 100 128 Q 95 135 88 133" stroke="#3D3D3D" stroke-width="1.5" fill="none"/>
-          <path d="M 100 128 Q 105 135 112 133" stroke="#3D3D3D" stroke-width="1.5" fill="none"/>
-          
-          <circle cx="85" cy="95" r="6" fill="#FFF"/>
-          <circle cx="85" cy="95" r="4" fill="#FFD700"/>
-          <circle cx="83" cy="93" r="2.5" fill="#000"/>
-          <circle cx="84" cy="92" r="1" fill="#FFF" opacity="0.6"/>
-          
-          <circle cx="115" cy="95" r="6" fill="#FFF"/>
-          <circle cx="115" cy="95" r="4" fill="#FFD700"/>
-          <circle cx="117" cy="93" r="2.5" fill="#000"/>
-          <circle cx="116" cy="92" r="1" fill="#FFF" opacity="0.6"/>
-          
-          <path d="M 78 88 Q 85 85 92 87" stroke="#8B6F47" stroke-width="1.5" fill="none"/>
-          <path d="M 108 87 Q 115 85 122 88" stroke="#8B6F47" stroke-width="1.5" fill="none"/>
-          
-          <ellipse cx="65" cy="70" rx="12" ry="18" fill="#C19A6B"/>
-          <ellipse cx="65" cy="73" rx="6" ry="10" fill="#E8D5C4"/>
-          
-          <ellipse cx="135" cy="70" rx="12" ry="18" fill="#C19A6B"/>
-          <ellipse cx="135" cy="73" rx="6" ry="10" fill="#E8D5C4"/>
-          
-          <line x1="50" y1="105" x2="30" y2="100" stroke="#9B8860" stroke-width="1.5"/>
-          <line x1="50" y1="115" x2="30" y2="125" stroke="#9B8860" stroke-width="1.5"/>
-          <line x1="150" y1="105" x2="170" y2="100" stroke="#9B8860" stroke-width="1.5"/>
-          <line x1="150" y1="115" x2="170" y2="125" stroke="#9B8860" stroke-width="1.5"/>
-          
-          <circle cx="100" cy="100" r="65" fill="none" stroke="#FFD700" stroke-width="3" opacity="0.7"/>
-          <circle cx="100" cy="100" r="60" fill="none" stroke="#FFA500" stroke-width="1" opacity="0.5"/>
-        </svg>
-      </div>
-      <p style="text-align:center; margin-top:15px; font-size:14px; opacity:0.8;">Tap the lion to earn XP!</p>
-    </div>
-
-    <div class="section">
-      <h2>📺 Reward Ad</h2>
-      <button class="btn" id="rewardBtn">Watch Ad +10 XP</button>
-    </div>
-
-    <div class="section">
-      <h2>🎯 Task Center</h2>
-      <button class="btn" id="taskBtn">Complete Task +10 XP</button>
-    </div>
-
-    <div class="section">
-      <h2>🎁 Daily Reward</h2>
-      <button class="btn" id="dailyBtn">Start Daily Bonus</button>
-      <div id="dailyProgressBar">
+      <p>Balance</p>
+      <h2 id="userBalance">0</h2>
+      <p style="font-size: 14px; margin-top: 5px;">XP</p>
+      <div class="progress" id="levelProgress">
         <div></div>
       </div>
     </div>
 
-    <div class="section">
-      <h2>👥 Referral</h2>
-      <input id="refInput" readonly value="https://t.me/@TapXBot?start=12345">
-      <button class="btn" id="copyBtn">Copy Referral Link</button>
+    <div class="lion-tap-container">
+      <svg class="lion-head" id="lionHead" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="80" fill="#FFD700"/>
+        <circle cx="75" cy="85" r="15" fill="#000"/>
+        <circle cx="125" cy="85" r="15" fill="#000"/>
+        <circle cx="75" cy="87" r="8" fill="#fff"/>
+        <circle cx="125" cy="87" r="8" fill="#fff"/>
+        <ellipse cx="100" cy="110" rx="10" ry="15" fill="#000"/>
+        <path d="M 80 130 Q 100 140 120 130" stroke="#000" stroke-width="3" fill="none"/>
+        <circle cx="140" cy="60" r="20" fill="#FFD700" stroke="#FFA500" stroke-width="3"/>
+        <circle cx="160" cy="50" r="20" fill="#FFD700" stroke="#FFA500" stroke-width="3"/>
+        <circle cx="180" cy="70" r="20" fill="#FFD700" stroke="#FFA500" stroke-width="3"/>
+      </svg>
     </div>
+
+    <div class="section">
+      <h2>⚡ Quick Stats</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>💰 Earnings</h3>
+          <p id="totalEarnings">0 XP</p>
+        </div>
+        <div class="card">
+          <h3>🎯 Streak</h3>
+          <p id="currentStreak">0 days</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>📊 Daily Challenge</h2>
+      <p style="margin-bottom: 10px;">Tap 100 times today</p>
+      <div id="dailyProgressBar">
+        <div id="dailyProgress"></div>
+      </div>
+      <p style="font-size: 12px; margin-top: 8px; opacity: 0.7;" id="dailyCounter">0 / 100</p>
+    </div>
+
+    <button class="btn" onclick="showJoinPopup()">Join Community</button>
   </div>
 
-  <!-- MISSIONS PAGE -->
-  <div id="missionsPage" class="page">
+  <!-- ===== PAGE 2: MISSIONS ===== -->
+  <div id="missions-page" class="page">
     <div class="header">
-      <div class="logo">🎯 Missions</div>
+      <div class="logo">⚡ Missions</div>
+      <div class="level" id="userLevel2">Level 1</div>
     </div>
 
     <div class="section">
@@ -743,10 +575,11 @@ input,select{
     </div>
   </div>
 
-  <!-- BOUNTY PAGE -->
-  <div id="bountyPage" class="page">
+  <!-- ===== PAGE 3: BOUNTY ===== -->
+  <div id="bounty-page" class="page">
     <div class="header">
       <div class="logo">🏆 Bounty</div>
+      <div class="level" id="userLevel3">Level 1</div>
     </div>
 
     <div class="section">
@@ -772,481 +605,197 @@ input,select{
 
       <div class="bounty-card">
         <div class="bounty-header">
-          <div class="bounty-title">Social Butterfly</div>
-          <div class="bounty-rarity">RARE</div>
+          <div class="bounty-title">Referral Master</div>
+          <div class="bounty-rarity">LEGENDARY</div>
         </div>
-        <p class="bounty-description">Invite 10 friends to join</p>
-        <div class="bounty-reward">+3000 XP</div>
+        <p class="bounty-description">Invite 50 users</p>
+        <div class="bounty-reward">+25000 XP</div>
       </div>
-
-      <button class="btn">Claim Bounties</button>
     </div>
 
     <div class="section">
-      <h2>🏅 Top Earners</h2>
-      
+      <h2>🏅 Leaderboard</h2>
       <div class="leaderboard">
         <div class="leaderboard-item">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="rank-badge">1</div>
-            <span>@ShadowHunter</span>
-          </div>
-          <span style="font-weight: bold;">245,800 XP</span>
+          <span><span class="rank-badge">1</span> User123</span>
+          <span style="font-weight: bold;">1,250,000 XP</span>
         </div>
-
         <div class="leaderboard-item">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="rank-badge">2</div>
-            <span>@TapMaster</span>
-          </div>
-          <span style="font-weight: bold;">198,500 XP</span>
+          <span><span class="rank-badge">2</span> Player456</span>
+          <span style="font-weight: bold;">980,000 XP</span>
         </div>
-
         <div class="leaderboard-item">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="rank-badge">3</div>
-            <span>@XPCollector</span>
-          </div>
-          <span style="font-weight: bold;">187,200 XP</span>
-        </div>
-
-        <div class="leaderboard-item">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="rank-badge">4</div>
-            <span>@GoldenLion</span>
-          </div>
-          <span style="font-weight: bold;">156,400 XP</span>
-        </div>
-
-        <div class="leaderboard-item">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="rank-badge">5</div>
-            <span>@EagleEye</span>
-          </div>
-          <span style="font-weight: bold;">142,800 XP</span>
+          <span><span class="rank-badge">3</span> Tapper789</span>
+          <span style="font-weight: bold;">750,000 XP</span>
         </div>
       </div>
-
-      <button class="btn">View Full Leaderboard</button>
     </div>
   </div>
 
-  <!-- WALLET PAGE -->
-  <div id="walletPage" class="page">
+  <!-- ===== PAGE 4: WALLET ===== -->
+  <div id="wallet-page" class="page">
     <div class="header">
       <div class="logo">💰 Wallet</div>
+      <div class="level" id="userLevel4">Level 1</div>
     </div>
 
     <div class="balance-box">
       <p>Total Balance</p>
       <h2 id="walletBalance">0</h2>
-      <p style="margin-top: 10px; font-size: 14px;">XP Points</p>
+      <p style="font-size: 14px; margin-top: 5px;">XP</p>
     </div>
 
     <div class="section">
-      <h2>💳 Withdrawal</h2>
-      
-      <div class="tab-buttons">
-        <button class="tab-btn active">Crypto</button>
-        <button class="tab-btn">Bank</button>
-      </div>
-
-      <select id="cryptoMethod">
-        <option>USDT (TRC20)</option>
-        <option>USDT (ERC20)</option>
-        <option>Bitcoin</option>
-        <option>Ethereum</option>
-        <option>Litecoin</option>
-      </select>
-
-      <input id="walletAddress" placeholder="Enter wallet address" type="text">
-      <input id="withdrawAmount" placeholder="Amount (Min: 10,000 XP)" type="number">
-
-      <button class="btn" id="withdrawBtn">Request Withdrawal</button>
+      <h2>💸 Withdraw</h2>
+      <input type="text" placeholder="Enter wallet address" id="walletAddress"/>
+      <input type="number" placeholder="Amount to withdraw" id="withdrawAmount"/>
+      <button class="btn">Withdraw Now</button>
     </div>
 
     <div class="section">
-      <h2>📊 Transaction History</h2>
+      <h2>📝 Transaction History</h2>
       
       <div class="transaction-card">
         <div class="transaction-info">
-          <h4>Daily Bonus Claimed</h4>
-          <p>Today at 2:30 PM</p>
+          <h4>Daily Tap Reward</h4>
+          <p>Today at 10:30 AM</p>
           <div class="status-badge">Completed</div>
         </div>
-        <div class="transaction-amount amount-positive">+900 XP</div>
+        <div class="transaction-amount">
+          <span class="amount-positive">+100 XP</span>
+        </div>
       </div>
 
       <div class="transaction-card">
         <div class="transaction-info">
-          <h4>Ad Reward</h4>
-          <p>Today at 1:15 PM</p>
+          <h4>Referral Bonus</h4>
+          <p>Yesterday at 5:45 PM</p>
           <div class="status-badge">Completed</div>
         </div>
-        <div class="transaction-amount amount-positive">+10 XP</div>
+        <div class="transaction-amount">
+          <span class="amount-positive">+250 XP</span>
+        </div>
       </div>
 
       <div class="transaction-card">
         <div class="transaction-info">
-          <h4>Withdrawal Request</h4>
-          <p>Yesterday at 6:45 PM</p>
-          <div class="status-badge" style="background: #FF8C00;">Pending</div>
-        </div>
-        <div class="transaction-amount amount-negative">-50,000 XP</div>
-      </div>
-
-      <div class="transaction-card">
-        <div class="transaction-info">
-          <h4>Friend Referral Bonus</h4>
-          <p>2 days ago</p>
+          <h4>Withdrawal</h4>
+          <p>3 days ago at 2:15 PM</p>
           <div class="status-badge">Completed</div>
         </div>
-        <div class="transaction-amount amount-positive">+500 XP</div>
+        <div class="transaction-amount">
+          <span class="amount-negative">-1000 XP</span>
+        </div>
       </div>
     </div>
 
     <div class="section">
-      <h2>📋 Wallet Information</h2>
-      
-      <p style="margin-bottom: 10px; font-size: 14px;">Your Verified Addresses:</p>
-      <div class="wallet-address-box">
-        <strong>USDT Address:</strong><br>
-        TQmKDsnj8oLd7K3KcKYq5Ww8z7cGfYzLdP
-      </div>
-
-      <div class="wallet-address-box">
-        <strong>Bitcoin Address:</strong><br>
-        1A1z7agoat5fw6EDiM5i9nJ8d9cV98H5QP
-      </div>
+      <h2>🔐 Wallet Address</h2>
+      <div class="wallet-address-box" id="displayWalletAddress">0x1234567890abcdef...</div>
     </div>
   </div>
 
-  <!-- PROFILE PAGE -->
-  <div id="profilePage" class="page">
-    <div class="header">
-      <div class="logo">👤 Profile</div>
-    </div>
-
-    <div class="section">
-      <div class="profile-header">
-        <div class="avatar">👤</div>
-        <div class="username" id="profileUsername">Player123</div>
-        <div class="usertag">@Player123</div>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-value" id="profileXP">0</div>
-          <div class="stat-label">Total XP</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value" id="profileLevel">1</div>
-          <div class="stat-label">Level</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value" id="profileRank">Starter</div>
-          <div class="stat-label">Rank</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>📈 Statistics</h2>
-      
-      <div class="stat-box" style="margin-bottom: 10px;">
-        <p style="text-align: left; margin-bottom: 5px;">Total Taps</p>
-        <div class="stat-value" id="profileTaps">0</div>
-      </div>
-
-      <div class="stat-box" style="margin-bottom: 10px;">
-        <p style="text-align: left; margin-bottom: 5px;">Daily Streaks</p>
-        <div class="stat-value">0</div>
-      </div>
-
-      <div class="stat-box">
-        <p style="text-align: left; margin-bottom: 5px;">Friends Referred</p>
-        <div class="stat-value">0</div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>🎖️ Achievements</h2>
-      <p style="text-align: center; opacity: 0.7; padding: 20px;">No achievements yet. Keep grinding! 🚀</p>
-    </div>
-  </div>
-
-  <!-- SETTINGS PAGE -->
-  <div id="settingsPage" class="page">
-    <div class="header">
-      <div class="logo">⚙️ Settings</div>
-    </div>
-
-    <div class="section">
-      <h2>🔊 Sound & Notifications</h2>
-      
-      <div class="setting-item">
-        <div>
-          <p>Sound Effects</p>
-          <p style="font-size: 12px; opacity: 0.7;">Tap sounds</p>
-        </div>
-        <div class="toggle-switch on" id="soundToggle">
-          <div class="toggle-slider"></div>
-        </div>
-      </div>
-
-      <div class="setting-item">
-        <div>
-          <p>Push Notifications</p>
-          <p style="font-size: 12px; opacity: 0.7;">Daily reminders</p>
-        </div>
-        <div class="toggle-switch on" id="notifToggle">
-          <div class="toggle-slider"></div>
-        </div>
-      </div>
-
-      <div class="setting-item">
-        <div>
-          <p>Vibration</p>
-          <p style="font-size: 12px; opacity: 0.7;">Haptic feedback</p>
-        </div>
-        <div class="toggle-switch on" id="vibrationToggle">
-          <div class="toggle-slider"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>🎮 Game Settings</h2>
-      
-      <div class="setting-item">
-        <div>
-          <p>Auto-Click Mode</p>
-          <p style="font-size: 12px; opacity: 0.7;">Automatic tapping</p>
-        </div>
-        <div class="toggle-switch" id="autoClickToggle">
-          <div class="toggle-slider"></div>
-        </div>
-      </div>
-
-      <div class="setting-item">
-        <div>
-          <p>Show Floating Text</p>
-          <p style="font-size: 12px; opacity: 0.7;">+XP animations</p>
-        </div>
-        <div class="toggle-switch on" id="floatingTextToggle">
-          <div class="toggle-slider"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>👤 Account</h2>
-      <button class="btn">Change Username</button>
-      <button class="btn">Reset Progress</button>
-      <button class="btn" style="background: linear-gradient(45deg, #ff4444, #cc0000);">Logout</button>
-    </div>
-
-    <div class="section">
-      <h2>ℹ️ About</h2>
-      <p style="font-size: 14px; margin-bottom: 10px;">TapXBot v1.0</p>
-      <p style="font-size: 12px; opacity: 0.7;">A fun tapping game where you earn XP by tapping the lion and completing missions!</p>
-    </div>
-  </div>
-
-  <!-- NAVIGATION BUTTONS -->
+  <!-- ===== NAVIGATION BUTTONS ===== -->
   <div class="nav-buttons">
-    <button class="nav-btn active" onclick="showPage('homePage', this)">🏠 Home</button>
-    <button class="nav-btn" onclick="showPage('missionsPage', this)">🎯 Missions</button>
-    <button class="nav-btn" onclick="showPage('bountyPage', this)">🏆 Bounty</button>
-    <button class="nav-btn" onclick="showPage('walletPage', this)">💰 Wallet</button>
-    <button class="nav-btn" onclick="showPage('profilePage', this)">👤 Profile</button>
-    <button class="nav-btn" onclick="showPage('settingsPage', this)">⚙️ Settings</button>
+    <button class="nav-btn active" onclick="showPage('explore-page', 0)">🏠 Explore</button>
+    <button class="nav-btn" onclick="showPage('missions-page', 1)">⚡ Missions</button>
+    <button class="nav-btn" onclick="showPage('bounty-page', 2)">🏆 Bounty</button>
+    <button class="nav-btn" onclick="showPage('wallet-page', 3)">💰 Wallet</button>
   </div>
+
 </div>
 
 <!-- JOIN POPUP -->
 <div id="joinPopup">
-  <h2 style="margin-bottom:15px;">Join Our Channel</h2>
-  <button id="joinBtn">Join Channel +5 XP</button>
-  <button onclick="document.getElementById('joinPopup').style.display='none'" style="background: #666;">Skip</button>
+  <div id="joinPopupContent">
+    <h2>🎉 Welcome!</h2>
+    <p style="margin: 10px 0;">Join our community and start earning rewards</p>
+    <button class="popup-btn" onclick="closeJoinPopup()">Let's Go!</button>
+  </div>
 </div>
 
 <script>
-const tg = window.Telegram?.WebApp;
-tg?.expand?.();
+let userBalance = parseInt(localStorage.getItem('userBalance') || '0');
+let userLevel = parseInt(localStorage.getItem('userLevel') || '1');
+let totalTaps = parseInt(localStorage.getItem('totalTaps') || '0');
+let dailyTaps = parseInt(localStorage.getItem('dailyTaps') || '0');
+let completedMissions = parseInt(localStorage.getItem('completedMissions') || '0');
+let currentStreak = parseInt(localStorage.getItem('currentStreak') || '0');
 
-let xp = parseInt(localStorage.getItem('xp') || '0');
-let taps = parseInt(localStorage.getItem('taps') || '0');
-let lastDaily = parseInt(localStorage.getItem('daily') || '0');
-let dailyProgress = parseInt(localStorage.getItem('dailyProgress') || 0);
-
-const DAILY_BLOCKS = ["task-29806","task-29807","task-29808","task-29809"];
-
-function updateDailyBar(){
-  let percent = (dailyProgress / 4) * 100;
-  document.querySelector("#dailyProgressBar div").style.width = percent + "%";
-}
-
-function getRank() {
-  if (xp < 500) return "Starter";
-  if (xp < 1000) return "Novice";
-  if (xp < 2000) return "Elite";
-  if (xp < 5000) return "Champion";
-  return "Legend";
-}
-
-function update(){
-  document.getElementById('points').innerText = xp;
-  document.getElementById('walletBalance').innerText = xp.toLocaleString();
-  document.getElementById('profileXP').innerText = xp.toLocaleString();
-  document.getElementById('taps').innerText = taps;
-  document.getElementById('profileTaps').innerText = taps;
+// Update UI
+function updateUI() {
+  document.getElementById('userBalance').innerText = userBalance;
+  document.getElementById('walletBalance').innerText = userBalance;
+  document.getElementById('userLevel').innerText = 'Level ' + userLevel;
+  document.getElementById('userLevel2').innerText = 'Level ' + userLevel;
+  document.getElementById('userLevel3').innerText = 'Level ' + userLevel;
+  document.getElementById('userLevel4').innerText = 'Level ' + userLevel;
+  document.getElementById('totalEarnings').innerText = userBalance + ' XP';
+  document.getElementById('currentStreak').innerText = currentStreak + ' days';
+  document.getElementById('completedMissions').innerText = completedMissions;
   
-  let rank = getRank();
-  document.getElementById('rank').innerText = rank;
-  document.getElementById('profileRank').innerText = rank;
-
-  let level = Math.floor(xp / 500) + 1;
-  document.getElementById('level').innerText = level;
-  document.getElementById('profileLevel').innerText = level;
-
-  let progress = (xp % 500) / 500 * 100;
-  document.getElementById('bar').style.width = progress + '%';
-
-  localStorage.setItem('xp', xp);
-  localStorage.setItem('taps', taps);
-  localStorage.setItem('dailyProgress', dailyProgress);
-
-  updateDailyBar();
+  let dailyProgress = (dailyTaps / 100) * 100;
+  document.getElementById('dailyProgress').style.width = Math.min(dailyProgress, 100) + '%';
+  document.getElementById('dailyCounter').innerText = dailyTaps + ' / 100';
+  
+  let levelProgress = ((userBalance % 1000) / 1000) * 100;
+  document.querySelector('.progress div').style.width = levelProgress + '%';
 }
 
-function showPage(pageId, button) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
-  button.classList.add('active');
-}
-
-update();
-
-let rewardAd, taskAd;
-
-window.onload = () => {
-  if(typeof Adsgram !== 'undefined'){
-    rewardAd = Adsgram.init({ blockId:'29779' });
-    taskAd = Adsgram.init({ blockId:'29780' });
+// Lion head tap
+document.getElementById('lionHead').addEventListener('click', function() {
+  userBalance += 10;
+  totalTaps++;
+  dailyTaps++;
+  localStorage.setItem('userBalance', userBalance);
+  localStorage.setItem('totalTaps', totalTaps);
+  localStorage.setItem('dailyTaps', dailyTaps);
+  
+  if (userBalance % 1000 === 0) {
+    userLevel++;
+    localStorage.setItem('userLevel', userLevel);
   }
-};
-
-document.getElementById('tapBtn').onclick = function(e) {
-  xp += 1;
-  taps += 1;
   
-  const floatingText = document.createElement('div');
-  floatingText.className = 'floating-text';
-  floatingText.innerText = '+1 XP';
-  floatingText.style.left = e.pageX + 'px';
-  floatingText.style.top = e.pageY + 'px';
-  document.body.appendChild(floatingText);
-  
-  setTimeout(() => {
-    floatingText.style.opacity = '0';
-    floatingText.style.transform = 'translateY(-50px)';
-    floatingText.style.transition = 'all 0.5s ease-out';
-  }, 100);
-  
-  setTimeout(() => floatingText.remove(), 600);
-  
-  update();
-};
-
-document.getElementById('rewardBtn').onclick = async () => {
-  if(!rewardAd) return alert('Ad not ready');
-  try{
-    const res = await rewardAd.show();
-    if(res?.done){ xp += 10; update(); alert('Reward Added'); }
-  }catch(e){}
-};
-
-document.getElementById('taskBtn').onclick = async () => {
-  if(!taskAd) return alert('Task ad not ready');
-  try{
-    const res = await taskAd.show();
-    if(res?.done){ xp += 10; update(); alert('Task Completed'); }
-  }catch(e){}
-};
-
-document.getElementById('dailyBtn').onclick = async () => {
-  let now = Date.now();
-
-  if(now - lastDaily < 86400000 && dailyProgress === 4){
-    return alert('Come back tomorrow');
-  }
-
-  if(dailyProgress >= 4){
-    return alert('Already completed today');
-  }
-
-  if(typeof Adsgram === 'undefined') return alert('Ads not ready');
-
-  let block = DAILY_BLOCKS[dailyProgress];
-
-  let task = document.createElement("adsgram-task");
-  task.setAttribute("data-block-id", block);
-
-  document.getElementById('dailyBtn').parentNode.appendChild(task);
-
-  task.addEventListener("reward", () => {
-    dailyProgress++;
-    task.remove();
-
-    if(dailyProgress === 4){
-      xp += 900;
-      lastDaily = now;
-      dailyProgress = 0;
-      localStorage.setItem('daily', now);
-      alert("🎉 Daily bonus completed! +900 XP");
-    } else {
-      alert("Step " + dailyProgress + " completed!");
-    }
-
-    update();
-  });
-
-  if(typeof task.load === "function") task.load();
-};
-
-document.getElementById('joinBtn').onclick = () => {
-  xp += 5;
-  update();
-  document.getElementById("joinPopup").style.display = "none";
-  window.open("https://t.me/TapXBotOfficial","_blank");
-};
-
-document.getElementById('copyBtn').onclick = () => {
-  let input = document.getElementById('refInput');
-  input.select();
-  document.execCommand('copy');
-  alert('Referral link copied!');
-};
-
-document.getElementById('withdrawBtn').onclick = () => {
-  let amount = parseInt(document.getElementById('withdrawAmount').value);
-  if(!amount || amount < 10000) return alert('Minimum 10,000 XP');
-  if(xp < amount) return alert('Not enough XP');
-  xp -= amount;
-  update();
-  alert('Withdraw Sent');
-  document.getElementById('walletAddress').value = '';
-  document.getElementById('withdrawAmount').value = '';
-};
-
-document.querySelectorAll('.toggle-switch').forEach(toggle => {
-  toggle.onclick = function(e) {
-    e.stopPropagation();
-    this.classList.toggle('on');
-  };
+  updateUI();
 });
+
+// Page navigation
+function showPage(pageId, btnIndex) {
+  const pages = document.querySelectorAll('.page');
+  const navBtns = document.querySelectorAll('.nav-btn');
+  
+  pages.forEach(p => p.classList.remove('active'));
+  navBtns.forEach(b => b.classList.remove('active'));
+  
+  document.getElementById(pageId).classList.add('active');
+  navBtns[btnIndex].classList.add('active');
+}
+
+// Popup functions
+function showJoinPopup() {
+  document.getElementById('joinPopup').style.display = 'flex';
+}
+
+function closeJoinPopup() {
+  document.getElementById('joinPopup').style.display = 'none';
+}
+
+// Initialize
+updateUI();
+
+// Check daily reset
+const lastDate = localStorage.getItem('lastDate');
+const today = new Date().toDateString();
+if (lastDate !== today) {
+  if (dailyTaps > 0) {
+    currentStreak++;
+  }
+  dailyTaps = 0;
+  localStorage.setItem('lastDate', today);
+  localStorage.setItem('currentStreak', currentStreak);
+  localStorage.setItem('dailyTaps', dailyTaps);
+  updateUI();
+}
 </script>
 
 </body>
