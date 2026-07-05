@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bounty - Tap & Earn X</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background: linear-gradient(135deg, #0a4d2c 0%, #1a7a4d 50%, #0d3a24 100%);
+  background-attachment: fixed;
+  color:white;
+  font-family:Arial, sans-serif;
+  padding:18px;
+  min-height:100vh;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.logo{
+  font-size:26px;
+  font-weight:bold;
+  color:#00e0ff;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+}
+
+.section{
+  background:#101b2d;
+  padding:18px;
+  border-radius:20px;
+  margin-bottom:18px;
+  border:1px solid #1f2d44;
+}
+
+.bounty-card {
+  background: linear-gradient(135deg, #1a2d45 0%, #0f1f35 100%);
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 12px;
+  border: 2px solid #FFD700;
+}
+
+.bounty-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.bounty-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.bounty-rarity {
+  background: #FFD700;
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.bounty-description {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+.bounty-reward {
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: #000;
+  font-weight: bold;
+  text-align: center;
+  font-size: 14px;
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(45deg, #00e0ff, #0077ff);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.leaderboard {
+  background: #0f1f35;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #1f2d44;
+}
+
+.leaderboard-item:last-child {
+  border-bottom: none;
+}
+
+.rank-badge {
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 50%;
+  font-weight: bold;
+  min-width: 30px;
+  text-align: center;
+}
+
+.nav-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+  padding-bottom: 20px;
+}
+
+.nav-btn {
+  padding: 10px;
+  border: none;
+  border-radius: 12px;
+  background: #101b2d;
+  color: #00e0ff;
+  border: 1px solid #1f2d44;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.nav-btn:active {
+  background: #00e0ff;
+  color: #000;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="logo">🏆 Bounty</div>
+    <a href="index.html" style="color: #00e0ff; text-decoration: none; font-size: 18px;">←</a>
+  </div>
+
+  <div class="section">
+    <h2>⭐ Special Bounties</h2>
+    
+    <div class="bounty-card">
+      <div class="bounty-header">
+        <div class="bounty-title">Legendary Tapper</div>
+        <div class="bounty-rarity">RARE</div>
+      </div>
+      <p class="bounty-description">Reach 10,000 total taps</p>
+      <div class="bounty-reward">+5000 XP</div>
+    </div>
+
+    <div class="bounty-card">
+      <div class="bounty-header">
+        <div class="bounty-title">Wealth Accumulator</div>
+        <div class="bounty-rarity">EPIC</div>
+      </div>
+      <p class="bounty-description">Earn 50,000 XP total</p>
+      <div class="bounty-reward">+10000 XP</div>
+    </div>
+
+    <div class="bounty-card">
+      <div class="bounty-header">
+        <div class="bounty-title">Social Butterfly</div>
+        <div class="bounty-rarity">RARE</div>
+      </div>
+      <p class="bounty-description">Invite 10 friends to join</p>
+      <div class="bounty-reward">+3000 XP</div>
+    </div>
+
+    <button class="btn">Claim Bounties</button>
+  </div>
+
+  <div class="section">
+    <h2>🏅 Top Earners</h2>
+    
+    <div class="leaderboard">
+      <div class="leaderboard-item">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="rank-badge">1</div>
+          <span>@ShadowHunter</span>
+        </div>
+        <span style="font-weight: bold;">245,800 XP</span>
+      </div>
+
+      <div class="leaderboard-item">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="rank-badge">2</div>
+          <span>@TapMaster</span>
+        </div>
+        <span style="font-weight: bold;">198,500 XP</span>
+      </div>
+
+      <div class="leaderboard-item">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="rank-badge">3</div>
+          <span>@XPCollector</span>
+        </div>
+        <span style="font-weight: bold;">187,200 XP</span>
+      </div>
+
+      <div class="leaderboard-item">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="rank-badge">4</div>
+          <span>@GoldenLion</span>
+        </div>
+        <span style="font-weight: bold;">156,400 XP</span>
+      </div>
+
+      <div class="leaderboard-item">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="rank-badge">5</div>
+          <span>@EagleEye</span>
+        </div>
+        <span style="font-weight: bold;">142,800 XP</span>
+      </div>
+    </div>
+
+    <button class="btn">View Full Leaderboard</button>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn" onclick="location.href='index.html'">🏠 Explore</button>
+    <button class="nav-btn" onclick="location.href='missions.html'">🎯 Missions</button>
+    <button class="nav-btn" onclick="location.href='bounty.html'">🏆 Bounty</button>
+    <button class="nav-btn" onclick="location.href='wallet.html'">💰 Wallet</button>
+  </div>
+</div>
+
+</body>
+</html>

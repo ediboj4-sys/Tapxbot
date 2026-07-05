@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Wallet - Tap & Earn X</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background: linear-gradient(135deg, #0a4d2c 0%, #1a7a4d 50%, #0d3a24 100%);
+  background-attachment: fixed;
+  color:white;
+  font-family:Arial, sans-serif;
+  padding:18px;
+  min-height:100vh;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.logo{
+  font-size:26px;
+  font-weight:bold;
+  color:#00e0ff;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+}
+
+.balance-box{
+  background:linear-gradient(135deg,#00e0ff,#0077ff);
+  border-radius:24px;
+  padding:30px 20px;
+  text-align:center;
+  color:#fff;
+  margin-bottom:20px;
+  box-shadow: 0 8px 20px rgba(0, 224, 255, 0.3);
+}
+
+.balance-box h2{
+  font-size:50px;
+  margin-top:10px;
+}
+
+.section{
+  background:#101b2d;
+  padding:18px;
+  border-radius:20px;
+  margin-bottom:18px;
+  border:1px solid #1f2d44;
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(45deg, #00e0ff, #0077ff);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: #18263b;
+  color: white;
+  margin-top: 10px;
+}
+
+.transaction-card {
+  background: #0f1f35;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #1f2d44;
+}
+
+.transaction-info h4 {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.transaction-info p {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.transaction-amount {
+  text-align: right;
+}
+
+.amount-positive {
+  color: #00ff88;
+  font-weight: bold;
+}
+
+.amount-negative {
+  color: #ff4444;
+  font-weight: bold;
+}
+
+.status-badge {
+  background: #228B22;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.nav-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+  padding-bottom: 20px;
+}
+
+.nav-btn {
+  padding: 10px;
+  border: none;
+  border-radius: 12px;
+  background: #101b2d;
+  color: #00e0ff;
+  border: 1px solid #1f2d44;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.nav-btn:active {
+  background: #00e0ff;
+  color: #000;
+}
+
+.wallet-address-box {
+  background: #0f1f35;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 10px;
+  word-break: break-all;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.tab-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.tab-btn {
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #0f1f35;
+  color: #00e0ff;
+  border: 1px solid #1f2d44;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: linear-gradient(45deg, #00e0ff, #0077ff);
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="logo">💰 Wallet</div>
+    <a href="index.html" style="color: #00e0ff; text-decoration: none; font-size: 18px;">←</a>
+  </div>
+
+  <div class="balance-box">
+    <p>Total Balance</p>
+    <h2 id="balance">0</h2>
+    <p style="margin-top: 10px; font-size: 14px;">XP Points</p>
+  </div>
+
+  <div class="section">
+    <h2>💳 Withdrawal</h2>
+    
+    <div class="tab-buttons">
+      <button class="tab-btn active">Crypto</button>
+      <button class="tab-btn">Bank</button>
+    </div>
+
+    <select id="cryptoMethod">
+      <option>USDT (TRC20)</option>
+      <option>USDT (ERC20)</option>
+      <option>Bitcoin</option>
+      <option>Ethereum</option>
+      <option>Litecoin</option>
+    </select>
+
+    <input id="walletAddress" placeholder="Enter wallet address" type="text">
+    <input id="withdrawAmount" placeholder="Amount (Min: 10,000 XP)" type="number">
+
+    <button class="btn" id="withdrawBtn">Request Withdrawal</button>
+  </div>
+
+  <div class="section">
+    <h2>📊 Transaction History</h2>
+    
+    <div class="transaction-card">
+      <div class="transaction-info">
+        <h4>Daily Bonus Claimed</h4>
+        <p>Today at 2:30 PM</p>
+        <div class="status-badge">Completed</div>
+      </div>
+      <div class="transaction-amount amount-positive">+900 XP</div>
+    </div>
+
+    <div class="transaction-card">
+      <div class="transaction-info">
+        <h4>Ad Reward</h4>
+        <p>Today at 1:15 PM</p>
+        <div class="status-badge">Completed</div>
+      </div>
+      <div class="transaction-amount amount-positive">+10 XP</div>
+    </div>
+
+    <div class="transaction-card">
+      <div class="transaction-info">
+        <h4>Withdrawal Request</h4>
+        <p>Yesterday at 6:45 PM</p>
+        <div class="status-badge" style="background: #FF8C00;">Pending</div>
+      </div>
+      <div class="transaction-amount amount-negative">-50,000 XP</div>
+    </div>
+
+    <div class="transaction-card">
+      <div class="transaction-info">
+        <h4>Friend Referral Bonus</h4>
+        <p>2 days ago</p>
+        <div class="status-badge">Completed</div>
+      </div>
+      <div class="transaction-amount amount-positive">+500 XP</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>📋 Wallet Information</h2>
+    
+    <p style="margin-bottom: 10px; font-size: 14px;">Your Verified Addresses:</p>
+    <div class="wallet-address-box">
+      <strong>USDT Address:</strong><br>
+      TQmKDsnj8oLd7K3KcKYq5Ww8z7cGfYzLdP
+    </div>
+
+    <div class="wallet-address-box">
+      <strong>Bitcoin Address:</strong><br>
+      1A1z7agoat5fw6EDiM5i9nJ8d9cV98H5QP
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn" onclick="location.href='index.html'">🏠 Explore</button>
+    <button class="nav-btn" onclick="location.href='missions.html'">🎯 Missions</button>
+    <button class="nav-btn" onclick="location.href='bounty.html'">🏆 Bounty</button>
+    <button class="nav-btn" onclick="location.href='wallet.html'">💰 Wallet</button>
+  </div>
+</div>
+
+<script>
+let xp = parseInt(localStorage.getItem('xp') || '0');
+document.getElementById('balance').innerText = xp.toLocaleString();
+
+document.getElementById('withdrawBtn').onclick = () => {
+  let amount = parseInt(document.getElementById('withdrawAmount').value);
+  let address = document.getElementById('walletAddress').value;
+  let method = document.getElementById('cryptoMethod').value;
+
+  if (!address) return alert('Please enter a wallet address');
+  if (!amount || amount < 10000) return alert('Minimum withdrawal: 10,000 XP');
+  if (xp < amount) return alert('Not enough XP');
+
+  xp -= amount;
+  localStorage.setItem('xp', xp);
+  document.getElementById('balance').innerText = xp.toLocaleString();
+  document.getElementById('walletAddress').value = '';
+  document.getElementById('withdrawAmount').value = '';
+
+  alert('✅ Withdrawal request submitted!\n\nMethod: ' + method + '\nAmount: ' + amount + ' XP\n\nYou will receive the funds within 24 hours.');
+};
+</script>
+
+</body>
+</html>
