@@ -1,1062 +1,360 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Tap & Earn X - TapXBot</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tap & Earn X</title>
 
+<!-- Adsgram & Telegram (kept) -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-body{
-  background: linear-gradient(135deg, #0a4d2c 0%, #1a7a4d 50%, #0d3a24 100%);
-  background-image: 
-    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><filter id="shadow"><feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/></filter></defs></svg>'),
-    radial-gradient(ellipse at 20% 80%, rgba(34, 139, 76, 0.2) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(26, 122, 77, 0.2) 0%, transparent 50%);
-  background-size: cover, 100% 100%, 100% 100%;
-  background-attachment: fixed;
-  color:white;
-  font-family:Arial, sans-serif;
-  padding:18px;
-  min-height:100vh;
-}
-
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.page {
-  display: none;
-}
-
-.page.active {
-  display: block;
-}
-
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:20px;
-}
-
-.logo{
-  font-size:26px;
-  font-weight:bold;
-  color:#00e0ff;
-  text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
-}
-
-.level{
-  background:#132033;
-  padding:8px 14px;
-  border-radius:30px;
-  font-size:14px;
-}
-
-.balance-box{
-  background:linear-gradient(135deg,#00e0ff,#0077ff);
-  border-radius:24px;
-  padding:30px 20px;
-  text-align:center;
-  color:#fff;
-  margin-bottom:20px;
-  box-shadow: 0 8px 20px rgba(0, 224, 255, 0.3);
-}
-
-.balance-box h2{
-  font-size:50px;
-  margin-top:10px;
-}
-
-.progress{
-  width:100%;
-  height:10px;
-  background:rgba(255,255,255,0.2);
-  border-radius:30px;
-  overflow:hidden;
-  margin-top:15px;
-}
-
-.progress div{
-  width:0%;
-  height:100%;
-  background:#fff;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-  margin-bottom:20px;
-}
-
-.card{
-  background:#101b2d;
-  padding:18px;
-  border-radius:20px;
-  border:1px solid #1f2d44;
-}
-
-.card h3{
-  font-size:16px;
-  margin-bottom:10px;
-}
-
-.card p{
-  font-size:13px;
-  opacity:0.8;
-}
-
-.btn{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  margin-top:14px;
-  background:linear-gradient(45deg,#00e0ff,#0077ff);
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-  transition: all 0.2s;
-}
-
-.btn:active{
-  transform:scale(0.96);
-}
-
-.btn:hover {
-  box-shadow: 0 0 20px rgba(0, 224, 255, 0.5);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.section{
-  background:#101b2d;
-  padding:18px;
-  border-radius:20px;
-  margin-bottom:18px;
-  border:1px solid #1f2d44;
-}
-
-.section h2 {
-  margin-bottom: 15px;
-  font-size: 18px;
-}
-
-input,select{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  background:#18263b;
-  color:white;
-  margin-top:10px;
-}
-
-/* LION TAP CONTAINER */
-.lion-tap-container{
-  text-align: center;
-  margin: 30px 0;
-  perspective: 1000px;
-}
-
-.lion-head{
-  width: 250px;
-  height: 250px;
-  margin: 0 auto;
-  cursor: pointer;
-  transition: transform 0.1s;
-  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
-}
-
-.lion-head:active{
-  transform: scale(0.95);
-}
-
-/* DAILY PROGRESS BAR */
-#dailyProgressBar{
-  width:100%;
-  height:8px;
-  background:#1b2a40;
-  border-radius:20px;
-  overflow:hidden;
-  margin-top:10px;
-}
-
-#dailyProgressBar div{
-  height:100%;
-  width:0%;
-  background:#00e0ff;
-}
-
-/* MISSION CARD */
-.mission-card {
-  background: linear-gradient(135deg, #1a2d45 0%, #0f1f35 100%);
-  padding: 15px;
-  border-radius: 15px;
-  margin-bottom: 12px;
-  border: 1px solid #2a3d55;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.mission-info h3 {
-  font-size: 16px;
-  margin-bottom: 5px;
-}
-
-.mission-info p {
-  font-size: 13px;
-  opacity: 0.7;
-}
-
-.mission-reward {
-  background: linear-gradient(45deg, #00e0ff, #0077ff);
-  padding: 8px 14px;
-  border-radius: 10px;
-  font-weight: bold;
-  text-align: center;
-  min-width: 80px;
-}
-
-.mission-btn {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(45deg, #00e0ff, #0077ff);
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 10px;
-  font-size: 12px;
-  transition: all 0.2s;
-}
-
-.mission-btn:active {
-  transform: scale(0.96);
-}
-
-.mission-btn.completed {
-  background: #228B22;
-  cursor: default;
-}
-
-/* AD BUTTON */
-.ad-btn {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(45deg, #FFD700, #FFA500);
-  color: #000;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 10px;
-  font-size: 13px;
-  transition: all 0.2s;
-}
-
-.ad-btn:active {
-  transform: scale(0.96);
-}
-
-.ad-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* BOUNTY CARD */
-.bounty-card {
-  background: linear-gradient(135deg, #1a2d45 0%, #0f1f35 100%);
-  padding: 15px;
-  border-radius: 15px;
-  margin-bottom: 12px;
-  border: 2px solid #FFD700;
-}
-
-.bounty-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.bounty-title {
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.bounty-rarity {
-  background: #FFD700;
-  color: #000;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.bounty-description {
-  font-size: 13px;
-  opacity: 0.8;
-  margin-bottom: 10px;
-}
-
-.bounty-reward {
-  background: linear-gradient(45deg, #FFD700, #FFA500);
-  padding: 8px 12px;
-  border-radius: 10px;
-  color: #000;
-  font-weight: bold;
-  text-align: center;
-  font-size: 14px;
-}
-
-/* WALLET STYLES */
-.transaction-card {
-  background: #0f1f35;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #1f2d44;
-}
-
-.transaction-info h4 {
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-
-.transaction-info p {
-  font-size: 12px;
-  opacity: 0.7;
-}
-
-.transaction-amount {
-  text-align: right;
-}
-
-.amount-positive {
-  color: #00ff88;
-  font-weight: bold;
-}
-
-.amount-negative {
-  color: #ff4444;
-  font-weight: bold;
-}
-
-.status-badge {
-  background: #228B22;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  margin-top: 4px;
-}
-
-.wallet-address-box {
-  background: #0f1f35;
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: 10px;
-  word-break: break-all;
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-/* PROGRESS SECTION */
-.progress-section {
-  background: #0f1f35;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: #1b2a40;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 8px;
-}
-
-.progress-bar div {
-  height: 100%;
-  background: #00e0ff;
-  width: 0%;
-  transition: width 0.3s;
-}
-
-/* LEADERBOARD */
-.leaderboard {
-  background: #0f1f35;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.leaderboard-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #1f2d44;
-}
-
-.leaderboard-item:last-child {
-  border-bottom: none;
-}
-
-.rank-badge {
-  background: linear-gradient(45deg, #FFD700, #FFA500);
-  color: #000;
-  padding: 4px 8px;
-  border-radius: 50%;
-  font-weight: bold;
-  min-width: 30px;
-  text-align: center;
-}
-
-/* NAV BUTTONS */
-.nav-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 10px;
-  margin-top: 20px;
-  padding-bottom: 20px;
-  position: sticky;
-  bottom: 0;
-  background: rgba(10, 77, 44, 0.95);
-  padding: 10px;
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-}
-
-.nav-btn {
-  padding: 10px;
-  border: none;
-  border-radius: 12px;
-  background: #101b2d;
-  color: #00e0ff;
-  border: 1px solid #1f2d44;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: bold;
-  transition: all 0.2s;
-}
-
-.nav-btn.active {
-  background: linear-gradient(45deg, #00e0ff, #0077ff);
-  color: white;
-  box-shadow: 0 0 20px rgba(0, 224, 255, 0.5);
-}
-
-.nav-btn:active {
-  transform: scale(0.96);
-}
-
-/* POPUP */
-.popup{
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:rgba(0,0,0,0.85);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-
-.popup-content{
-  background:#0f1f35;
-  padding:30px;
-  border-radius:20px;
-  text-align:center;
-  max-width:90%;
-}
-
-.popup-content h2{
-  margin-bottom:10px;
-  color:#00e0ff;
-}
-
-.popup-btn{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  background:linear-gradient(45deg,#00e0ff,#0077ff);
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-  margin-top:10px;
-}
-
-.popup-btn.secondary {
-  background: #228B22;
-}
-
-.reward-popup {
-  animation: popupBounce 0.5s ease-out;
-}
-
-@keyframes popupBounce {
-  0% { transform: scale(0.8); opacity: 0; }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); opacity: 1; }
-}
+  :root{
+    --bg:#0b1720;
+    --panel:#0f1b24;
+    --card:#0d1922;
+    --blue-1:#0b3b74;
+    --blue-2:#083154;
+    --accent-green:#7bd400;
+    --accent-cyan:#00bcd4;
+    --muted:#9aa9bf;
+    --glass: rgba(255,255,255,0.02);
+    --radius:16px;
+    --text:#eaf6ff;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    min-height:100%;
+    background: linear-gradient(135deg, #0a4d2c 0%, #1a7a4d 50%, #0d3a24 100%);
+    background-image:
+      radial-gradient(ellipse at 20% 80%, rgba(34, 139, 76, 0.2) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(26, 122, 77, 0.2) 0%, transparent 50%),
+      linear-gradient(135deg, #0a4d2c 0%, #1a7a4d 50%, #0d3a24 100%);
+    background-attachment: fixed;
+    color:var(--text);
+    font-family:Inter,Arial,Helvetica,sans-serif;
+    padding:0;
+  }
+
+  .topbar{
+    background:#111212;
+    height:56px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 14px;
+    border-bottom:1px solid rgba(255,255,255,0.02);
+  }
+  .top-left{display:flex;align-items:center;gap:12px}
+  .envato{color:#8be56b;font-weight:800;font-size:16px}
+
+  .container{padding:18px; max-width:520px; margin:0 auto}
+
+  .header{display:flex;align-items:center;justify-content:space-between;margin-top:12px;margin-bottom:10px}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo .title{font-size:14px;color:#b9c6d3;font-weight:700}
+
+  .wallet-pill{background:linear-gradient(90deg,#0aa8dc,#1376d8);color:white;padding:8px 12px;border-radius:18px;font-weight:700;font-size:13px}
+
+  /* Booster pill (replaces buy button) */
+  .booster-pill{background:linear-gradient(90deg,#ffb84d,#ff8a00);color:#071214;padding:8px 12px;border-radius:18px;font-weight:800;cursor:pointer;border:none}
+  .booster-status{font-size:12px;color:var(--muted);margin-left:8px}
+
+  .balance-area{text-align:center;margin-top:10px}
+  .balance-top{display:flex;align-items:center;justify-content:center;gap:10px}
+  .coin-icon{width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#ffd24d,#ffb200);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,0.5)}
+  .points-large{font-size:36px;font-weight:800;margin-left:6px}
+  .points-suffix{color:#cbd6de;margin-left:8px;font-weight:700}
+
+  .income-bar{background:#1a2a33;border-radius:10px;margin:16px auto;padding:12px;width:100%;max-width:460px;color:#cbd6de;display:flex;align-items:center;justify-content:center;gap:18px}
+  .income-bar .label{font-weight:800;color:#fff}
+  .income-bar .value{color:#ffd24d;font-weight:900}
+
+  .avatar-wrap{display:flex;align-items:center;justify-content:center;margin-top:8px}
+  .big-circle{width:320px;height:320px;border-radius:50%;background:radial-gradient(circle at 40% 35%, rgba(10,60,120,0.65), rgba(3,22,45,0.85));display:flex;align-items:center;justify-content:center;position:relative;border:6px solid rgba(6,50,95,0.45);box-shadow:0 30px 60px rgba(0,0,0,0.6)}
+  .inner-ring{width:88%;height:88%;border-radius:50%;background:radial-gradient(circle at 35% 30%, rgba(0,0,0,0.15), transparent),linear-gradient(180deg,var(--blue-1),var(--blue-2));display:flex;align-items:center;justify-content:center}
+
+  .mascot{width:170px;height:170px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .mascot svg{width:100%;height:100%;filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));}
+
+  .orbit{position:absolute;border-radius:50%;pointer-events:none;border:1px solid rgba(0,140,255,0.08)}
+  .orbit.o1{width:380px;height:380px;opacity:0.06}
+  .orbit.o2{width:460px;height:460px;opacity:0.03}
+
+  .energy-wrap{margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .energy-bar{width:260px;height:14px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden}
+  .energy-bar > div{height:100%;width:60%;background:var(--accent-green);border-radius:10px}
+  .energy-text{font-weight:800;color:#fff}
+  .energy-count{color:var(--accent-green);margin-left:6px}
+
+  .icons-panel{background:#0b1720;margin-top:22px;padding:12px;border-radius:10px;display:flex;justify-content:center;gap:40px;box-shadow:0 10px 24px rgba(0,0,0,0.5)}
+  .icon{width:50px;height:60px;display:flex;align-items:center;justify-content:center;color:#2e5dc8;font-size:26px}
+
+  .plus-fly{position:absolute;color:var(--accent-green);font-weight:900;font-size:18px;pointer-events:none;animation:flyUp 900ms ease forwards;text-shadow:0 6px 18px rgba(0,0,0,0.6)}
+  @keyframes flyUp{0%{transform:translateY(0) scale(1);opacity:1}70%{transform:translateY(-40px) scale(1.05);opacity:1}100%{transform:translateY(-80px) scale(1);opacity:0}}
+
+  .pulse{position:absolute;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle, rgba(0,180,255,0.12), transparent 35%);animation:pulseOut 700ms ease;pointer-events:none}
+  @keyframes pulseOut{0%{transform:scale(0.6);opacity:0.9}100%{transform:scale(1.9);opacity:0}}
+
+  .actions{display:flex;gap:12px;justify-content:center;margin-top:18px}
+  .action-btn{background:linear-gradient(90deg,#083154,#084b6a);color:#bcd3df;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);font-weight:800}
+
+  @media(max-width:420px){.big-circle{width:260px;height:260px}.orbit.o1{width:300px;height:300px}.orbit.o2{width:360px;height:360px}.energy-bar{width:200px}}
 </style>
 </head>
-
 <body>
 
-<div class="container">
+  <div class="topbar">
+    <div class="top-left"><div class="envato">envato</div><div style="color:#cbd6de">market</div></div>
+    <!-- replaced Buy now with Booster button -->
+    <button id="boosterBtn" class="booster-pill">Booster</button>
+  </div>
 
-  <!-- ===== PAGE 1: EXPLORE ===== -->
-  <div id="explore-page" class="page active">
+  <div class="container">
     <div class="header">
-      <div class="logo">🦁 TapXBot</div>
-      <div class="level" id="userLevel">Level 1</div>
-    </div>
-
-    <div class="balance-box">
-      <p>Balance</p>
-      <h2 id="userBalance">0</h2>
-      <p style="font-size: 14px; margin-top: 5px;">XP</p>
-      <div class="progress" id="levelProgress">
-        <div></div>
+      <div class="logo"><div class="title">Tap & Earn X</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="wallet-pill" id="walletBtn">Withdraw</div>
+        <div class="booster-status" id="boosterStatus">0 / 40</div>
       </div>
     </div>
 
-    <div class="lion-tap-container">
-      <svg class="lion-head" id="lionHead" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="100" cy="100" r="80" fill="#FFD700"/>
-        <circle cx="75" cy="85" r="15" fill="#000"/>
-        <circle cx="125" cy="85" r="15" fill="#000"/>
-        <circle cx="75" cy="87" r="8" fill="#fff"/>
-        <circle cx="125" cy="87" r="8" fill="#fff"/>
-        <ellipse cx="100" cy="110" rx="10" ry="15" fill="#000"/>
-        <path d="M 80 130 Q 100 140 120 130" stroke="#000" stroke-width="3" fill="none"/>
-        <circle cx="140" cy="60" r="20" fill="#FFD700" stroke="#FFA500" stroke-width="3"/>
-        <circle cx="160" cy="50" r="20" fill="#FFD700" stroke="#FFA500" stroke-width="3"/>
-        <circle cx="180" cy="70" r="20" fill="#FFD700" stroke="#FFA500" stroke-width="3"/>
-      </svg>
-    </div>
-
-    <div class="section">
-      <h2>⚡ Quick Stats</h2>
-      <div class="grid">
-        <div class="card">
-          <h3>💰 Earnings</h3>
-          <p id="totalEarnings">0 XP</p>
-        </div>
-        <div class="card">
-          <h3>🎯 Streak</h3>
-          <p id="currentStreak">0 days</p>
+    <div class="balance-area">
+      <div class="balance-top">
+        <div class="coin-icon">💰</div>
+        <div style="display:flex;align-items:baseline;">
+          <div class="points-large" id="points">54.75</div>
+          <div class="points-suffix">thousand</div>
         </div>
       </div>
-    </div>
 
-    <div class="section">
-      <h2>📊 Daily Challenge</h2>
-      <p style="margin-bottom: 10px;">Tap 100 times today</p>
-      <div id="dailyProgressBar">
-        <div id="dailyProgress"></div>
+      <div class="income-bar">
+        <div class="label">INCOME:</div>
+        <div class="value">1 /tap</div>
+        <div style="color:var(--muted);">0 /sec</div>
       </div>
-      <p style="font-size: 12px; margin-top: 8px; opacity: 0.7;" id="dailyCounter">0 / 100</p>
+
+      <div class="avatar-wrap">
+        <div class="orbit o2"></div>
+        <div class="orbit o1"></div>
+        <div class="big-circle" id="bigCircle">
+          <div class="inner-ring">
+            <div class="mascot" id="mascotBtn" role="button" tabindex="0" aria-label="tap mascot">
+              <svg id="mascotImg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="100" cy="100" r="80" fill="#FFD700"/>
+                <circle cx="75" cy="85" r="15" fill="#000"/>
+                <circle cx="125" cy="85" r="15" fill="#000"/>
+                <circle cx="75" cy="87" r="8" fill="#fff"/>
+                <circle cx="125" cy="87" r="8" fill="#fff"/>
+                <ellipse cx="100" cy="110" rx="10" ry="15" fill="#000"/>
+                <path d="M 80 130 Q 100 140 120 130" stroke="#000" stroke-width="3" fill="none"/>
+                <circle cx="140" cy="60" r="20" fill="#FFD700" stroke="#FFA500" stroke-width="3"/>
+                <circle cx="160" cy="50" r="20" fill="#FFD700" stroke="#FFA500" stroke-width="3"/>
+                <circle cx="180" cy="70" r="20" fill="#FFD700" stroke="#FFA500" stroke-width="3"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="energy-wrap">
+        <div class="energy-bar"><div id="energyFill"></div></div>
+        <div class="energy-text">ENERGY: <span class="energy-count" id="energyVal">2971</span> per day</div>
+      </div>
+
+      <div class="icons-panel" aria-hidden>
+        <div class="icon">💼</div>
+        <div class="icon">🏆</div>
+        <div class="icon">🚀</div>
+      </div>
+
+      <div class="actions">
+        <button class="action-btn" id="rewardBtn">Watch Ad (Optional)</button>
+        <button class="action-btn" id="taskBtn">Task</button>
+        <button class="action-btn" id="openRef">Referral</button>
+      </div>
+
     </div>
 
-    <div class="section">
-      <h2>📺 Watch Ads</h2>
-      <button class="ad-btn" id="watchAdBtn" onclick="watchAd()">📺 Watch Ad (+100 XP)</button>
-      <p style="font-size: 12px; margin-top: 10px; opacity: 0.7;" id="adCooldown"></p>
+    <div style="margin-top:18px">
+      <div style="background:var(--card);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);">
+        <div style="font-weight:800;margin-bottom:8px">🎮 Tap System</div>
+        <button id="tapBtn" class="action-btn" style="width:100%;margin-top:6px">Tap +1 XP</button>
+      </div>
+
+      <div style="margin-top:12px;background:var(--card);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);">
+        <div style="font-weight:800;display:flex;justify-content:space-between;align-items:center">🎁 Optional Daily Bonus <span style="color:var(--muted);font-weight:700">(optional)</span></div>
+        <button id="dailyBtn" class="action-btn" style="width:100%;margin-top:10px">Start Optional Daily Bonus</button>
+        <div id="dailyProgressBar" style="margin-top:10px;height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden"><div style="height:100%;width:0%;background:var(--accent-green)"></div></div>
+      </div>
+
+      <div id="withdrawSection" style="margin-top:12px;background:var(--card);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);">
+        <div style="font-weight:800;">💳 Withdraw</div>
+        <select id="method" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)">
+          <option>USDT</option>
+          <option>Litecoin</option>
+          <option>Payeer</option>
+          <option>Bank</option>
+        </select>
+        <input id="wallet" placeholder="Wallet Address" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)">
+        <input id="amount" type="number" placeholder="Amount" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)">
+        <button id="withdrawBtn" class="action-btn" style="margin-top:8px">Withdraw XP</button>
+      </div>
+
     </div>
 
-    <button class="btn" onclick="showJoinPopup()">🔗 Join Community</button>
   </div>
 
-  <!-- ===== PAGE 2: MISSIONS ===== -->
-  <div id="missions-page" class="page">
-    <div class="header">
-      <div class="logo">⚡ Missions</div>
-      <div class="level" id="userLevel2">Level 1</div>
-    </div>
-
-    <div class="section">
-      <h2>🎯 Daily Missions</h2>
-      
-      <div class="mission-card">
-        <div class="mission-info">
-          <h3>Visit Twitter</h3>
-          <p>Follow us on Twitter</p>
-        </div>
-        <div class="mission-reward">+50 XP</div>
-      </div>
-      <button class="mission-btn" id="mission-1" onclick="completeMission(1, 50)">Complete</button>
-
-      <div class="mission-card">
-        <div class="mission-info">
-          <h3>Share on Telegram</h3>
-          <p>Share to 5 chats</p>
-        </div>
-        <div class="mission-reward">+100 XP</div>
-      </div>
-      <button class="mission-btn" id="mission-2" onclick="completeMission(2, 100)">Complete</button>
-
-      <div class="mission-card">
-        <div class="mission-info">
-          <h3>Invite 3 Friends</h3>
-          <p>Get referral rewards</p>
-        </div>
-        <div class="mission-reward">+200 XP</div>
-      </div>
-      <button class="mission-btn" id="mission-3" onclick="completeMission(3, 200)">Complete</button>
-
-      <div class="mission-card">
-        <div class="mission-info">
-          <h3>Watch Ad - Extra Reward</h3>
-          <p>Watch advertisement video</p>
-        </div>
-        <div class="mission-reward">+150 XP</div>
-      </div>
-      <button class="ad-btn" id="mission-ad" onclick="watchMissionAd()">📺 Watch Ad Now</button>
-
-      <button class="btn">View All Missions</button>
-    </div>
-
-    <div class="section">
-      <h2>📊 Progress</h2>
-      
-      <div class="progress-section">
-        <p>Weekly Challenges</p>
-        <div class="progress-bar">
-          <div id="weeklyProgress" style="width: 45%;"></div>
-        </div>
-        <p style="font-size: 12px; margin-top: 8px; opacity: 0.7;">45% Complete</p>
-      </div>
-
-      <div class="progress-section">
-        <p>Total Missions Completed</p>
-        <p style="font-size: 24px; font-weight: bold; margin-top: 8px;" id="completedMissions">0</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== PAGE 3: BOUNTY ===== -->
-  <div id="bounty-page" class="page">
-    <div class="header">
-      <div class="logo">🏆 Bounty</div>
-      <div class="level" id="userLevel3">Level 1</div>
-    </div>
-
-    <div class="section">
-      <h2>⭐ Special Bounties</h2>
-      
-      <div class="bounty-card">
-        <div class="bounty-header">
-          <div class="bounty-title">Legendary Tapper</div>
-          <div class="bounty-rarity">RARE</div>
-        </div>
-        <p class="bounty-description">Reach 10,000 total taps</p>
-        <div class="bounty-reward">+5000 XP</div>
-      </div>
-
-      <div class="bounty-card">
-        <div class="bounty-header">
-          <div class="bounty-title">Wealth Accumulator</div>
-          <div class="bounty-rarity">EPIC</div>
-        </div>
-        <p class="bounty-description">Earn 50,000 XP total</p>
-        <div class="bounty-reward">+10000 XP</div>
-      </div>
-
-      <div class="bounty-card">
-        <div class="bounty-header">
-          <div class="bounty-title">Referral Master</div>
-          <div class="bounty-rarity">LEGENDARY</div>
-        </div>
-        <p class="bounty-description">Invite 50 users</p>
-        <div class="bounty-reward">+25000 XP</div>
-      </div>
-
-      <div class="bounty-card">
-        <div class="bounty-header">
-          <div class="bounty-title">Ad Watcher</div>
-          <div class="bounty-rarity">EPIC</div>
-        </div>
-        <p class="bounty-description">Watch 20 ads</p>
-        <div class="bounty-reward">+5000 XP</div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>🏅 Leaderboard</h2>
-      <div class="leaderboard">
-        <div class="leaderboard-item">
-          <span><span class="rank-badge">1</span> User123</span>
-          <span style="font-weight: bold;">1,250,000 XP</span>
-        </div>
-        <div class="leaderboard-item">
-          <span><span class="rank-badge">2</span> Player456</span>
-          <span style="font-weight: bold;">980,000 XP</span>
-        </div>
-        <div class="leaderboard-item">
-          <span><span class="rank-badge">3</span> Tapper789</span>
-          <span style="font-weight: bold;">750,000 XP</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== PAGE 4: WALLET ===== -->
-  <div id="wallet-page" class="page">
-    <div class="header">
-      <div class="logo">💰 Wallet</div>
-      <div class="level" id="userLevel4">Level 1</div>
-    </div>
-
-    <div class="balance-box">
-      <p>Total Balance</p>
-      <h2 id="walletBalance">0</h2>
-      <p style="font-size: 14px; margin-top: 5px;">XP</p>
-    </div>
-
-    <div class="section">
-      <h2>💸 Withdraw</h2>
-      <input type="text" placeholder="Enter wallet address" id="walletAddress"/>
-      <input type="number" placeholder="Amount to withdraw" id="withdrawAmount"/>
-      <button class="btn">Withdraw Now</button>
-    </div>
-
-    <div class="section">
-      <h2>📝 Transaction History</h2>
-      
-      <div class="transaction-card">
-        <div class="transaction-info">
-          <h4>Daily Tap Reward</h4>
-          <p>Today at 10:30 AM</p>
-          <div class="status-badge">Completed</div>
-        </div>
-        <div class="transaction-amount">
-          <span class="amount-positive">+100 XP</span>
-        </div>
-      </div>
-
-      <div class="transaction-card">
-        <div class="transaction-info">
-          <h4>Referral Bonus</h4>
-          <p>Yesterday at 5:45 PM</p>
-          <div class="status-badge">Completed</div>
-        </div>
-        <div class="transaction-amount">
-          <span class="amount-positive">+250 XP</span>
-        </div>
-      </div>
-
-      <div class="transaction-card">
-        <div class="transaction-info">
-          <h4>Withdrawal</h4>
-          <p>3 days ago at 2:15 PM</p>
-          <div class="status-badge">Completed</div>
-        </div>
-        <div class="transaction-amount">
-          <span class="amount-negative">-1000 XP</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>🔐 Wallet Address</h2>
-      <div class="wallet-address-box" id="displayWalletAddress">0x1234567890abcdef...</div>
-    </div>
-  </div>
-
-  <!-- ===== NAVIGATION BUTTONS ===== -->
-  <div class="nav-buttons">
-    <button class="nav-btn active" onclick="showPage('explore-page', 0)">🏠 Explore</button>
-    <button class="nav-btn" onclick="showPage('missions-page', 1)">⚡ Missions</button>
-    <button class="nav-btn" onclick="showPage('bounty-page', 2)">🏆 Bounty</button>
-    <button class="nav-btn" onclick="showPage('wallet-page', 3)">💰 Wallet</button>
-  </div>
-
-</div>
-
-<!-- JOIN POPUP -->
-<div id="joinPopup" class="popup">
-  <div class="popup-content">
-    <h2>🎉 Join Our Community!</h2>
-    <p style="margin: 10px 0;">Connect with thousands of players</p>
-    <button class="popup-btn" onclick="joinChannel()">✅ Join Channel</button>
-    <button class="popup-btn secondary" onclick="closeJoinPopup()">Close</button>
-  </div>
-</div>
-
-<!-- REWARD POPUP -->
-<div id="rewardPopup" class="popup">
-  <div class="popup-content reward-popup">
-    <h2>🎉 +<span id="rewardAmount">100</span> XP!</h2>
-    <p style="margin: 10px 0;" id="rewardMessage">Reward earned!</p>
-    <button class="popup-btn" onclick="closeRewardPopup()">Awesome!</button>
+<div id="joinPopup" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9999;background:rgba(0,0,0,0.7)">
+  <div style="background:#071827;padding:16px;border-radius:10px;width:92%;max-width:420px;text-align:center;border:1px solid rgba(255,255,255,0.02)">
+    <h3>Join Our Channel</h3>
+    <div style="color:var(--muted);margin-bottom:12px">Get extra +5 XP for joining</div>
+    <button id="joinBtn" class="action-btn" style="background:linear-gradient(90deg,#00bcd4,#7bd400)">Join Channel +5 XP</button>
   </div>
 </div>
 
 <script>
-let userBalance = parseInt(localStorage.getItem('userBalance') || '0');
-let userLevel = parseInt(localStorage.getItem('userLevel') || '1');
-let totalTaps = parseInt(localStorage.getItem('totalTaps') || '0');
-let dailyTaps = parseInt(localStorage.getItem('dailyTaps') || '0');
-let completedMissions = parseInt(localStorage.getItem('completedMissions') || '0');
-let currentStreak = parseInt(localStorage.getItem('currentStreak') || '0');
-let adsWatched = parseInt(localStorage.getItem('adsWatched') || '0');
-let lastAdTime = parseInt(localStorage.getItem('lastAdTime') || '0');
-let completedTasksList = JSON.parse(localStorage.getItem('completedTasksList') || '[]');
+const tg = window.Telegram?.WebApp; try{tg?.expand?.();}catch(e){}
 
-const AD_COOLDOWN = 3600000; // 1 hour in milliseconds
-const AD_REWARD = 100;
+let xp = Number(localStorage.getItem('xp') || '54750');
+let taps = Number(localStorage.getItem('taps') || '0');
+let lastDaily = Number(localStorage.getItem('daily') || '0');
+let dailyProgress = Number(localStorage.getItem('dailyProgress') || '0');
 
-// Adsgram initialization
-if (window.Adsgram) {
-  window.Adsgram.init({ blockId: "YOUR_ADSGRAM_BLOCK_ID" }); // Replace with your block ID
+/* KEEP ALL ADSGRAM BLOCK IDS EXACTLY AS BEFORE */
+const DAILY_BLOCKS = ["task-36692","task-36709","task-36692","task-36709"];
+// existing ad ids used elsewhere: 36691, 36708, 36691
+
+// Booster/watch ad blocks we may rotate through (preserve IDs)
+const BOOST_AD_BLOCKS = ['36691','36708','36691'];
+
+let rewardAd, taskAd;
+let tapMultiplier = Number(localStorage.getItem('tapMultiplier') || '1');
+let boosterWatched = Number(localStorage.getItem('boosterWatched') || '0');
+
+function formatThousands(v){return (v/1000).toFixed(2).replace(/\.00$/,'');}
+
+const pointsEl = document.getElementById('points');
+const energyFill = document.getElementById('energyFill');
+const mascotBtn = document.getElementById('mascotBtn');
+const bigCircle = document.getElementById('bigCircle');
+const dailyBarInner = document.querySelector('#dailyProgressBar > div');
+const boosterStatusEl = document.getElementById('boosterStatus');
+
+function updateUI(){
+  pointsEl.innerText = formatThousands(xp);
+  const energyPerDay = Math.max(100, Math.floor(xp/20));
+  document.getElementById('energyVal').innerText = energyPerDay;
+  let pct = Math.min(100, Math.round((energyPerDay/5000)*100));
+  document.getElementById('energyFill').style.width = pct + '%';
+  document.getElementById('level') && (document.getElementById('level').innerText = Math.floor(xp/5000)+1);
+  localStorage.setItem('xp', xp);
+  localStorage.setItem('taps', taps);
+  localStorage.setItem('dailyProgress', dailyProgress);
+  localStorage.setItem('tapMultiplier', tapMultiplier);
+  localStorage.setItem('boosterWatched', boosterWatched);
+  boosterStatusEl.innerText = boosterWatched + ' / 40';
+  let dPct = Math.min(100, Math.round((dailyProgress/4)*100));
+  dailyBarInner.style.width = dPct + '%';
 }
+updateUI();
 
-// Preload ads
-function preloadAds() {
-  if (window.Adsgram) {
-    window.Adsgram.preloadAd();
+window.onload = function(){
+  if(typeof Adsgram !== 'undefined'){
+    rewardAd = Adsgram.init({ blockId:'36691' });
+    taskAd = Adsgram.init({ blockId:'36708' });
+    let joinAd = Adsgram.init({ blockId:'36708' });
+    joinAd.show().finally(()=>{ document.getElementById('joinPopup').style.display = 'flex'; });
   }
+};
+
+function showPlus(x,y,text='+1'){const el=document.createElement('div');el.className='plus-fly';el.style.left=x+'px';el.style.top=y+'px';el.innerText=text;document.body.appendChild(el);setTimeout(()=>el.remove(),900)}
+function pulseOn(target){const p=document.createElement('div');p.className='pulse';target.appendChild(p);setTimeout(()=>p.remove(),700)}
+
+function doTap(amount=1,targetEl=bigCircle){
+  const earned = amount * tapMultiplier;
+  xp += earned; taps += 1; updateUI();
+  targetEl.animate([{transform:'scale(1)'},{transform:'scale(0.97)'},{transform:'scale(1)'}],{duration:220,easing:'cubic-bezier(.2,.9,.3,1)'});
+  pulseOn(targetEl);
+  const r = targetEl.getBoundingClientRect();
+  showPlus(r.left + r.width/2 - 10, r.top + r.height/2 - 20, '+'+earned);
 }
 
-// Update UI
-function updateUI() {
-  document.getElementById('userBalance').innerText = userBalance;
-  document.getElementById('walletBalance').innerText = userBalance;
-  document.getElementById('userLevel').innerText = 'Level ' + userLevel;
-  document.getElementById('userLevel2').innerText = 'Level ' + userLevel;
-  document.getElementById('userLevel3').innerText = 'Level ' + userLevel;
-  document.getElementById('userLevel4').innerText = 'Level ' + userLevel;
-  document.getElementById('totalEarnings').innerText = userBalance + ' XP';
-  document.getElementById('currentStreak').innerText = currentStreak + ' days';
-  document.getElementById('completedMissions').innerText = completedMissions;
-  
-  let dailyProgress = (dailyTaps / 100) * 100;
-  document.getElementById('dailyProgress').style.width = Math.min(dailyProgress, 100) + '%';
-  document.getElementById('dailyCounter').innerText = dailyTaps + ' / 100';
-  
-  let levelProgress = ((userBalance % 1000) / 1000) * 100;
-  document.querySelector('.progress div').style.width = levelProgress + '%';
+mascotBtn.addEventListener('click', ()=> doTap(1,bigCircle));
+bigCircle.addEventListener('click', ()=> doTap(1,bigCircle));
+document.getElementById('tapBtn').addEventListener('click', ()=> doTap(1,bigCircle));
 
-  updateAdButton();
-}
-
-// Update ad button cooldown
-function updateAdButton() {
-  const btn = document.getElementById('watchAdBtn');
-  const cooldownText = document.getElementById('adCooldown');
-  const now = Date.now();
-  const timeSinceLastAd = now - lastAdTime;
-
-  if (timeSinceLastAd < AD_COOLDOWN) {
-    const remainingTime = Math.ceil((AD_COOLDOWN - timeSinceLastAd) / 60000);
-    btn.disabled = true;
-    cooldownText.innerText = `Next ad available in ${remainingTime} minutes`;
-  } else {
-    btn.disabled = false;
-    cooldownText.innerText = `Ads available! (Watched: ${adsWatched})`;
-  }
-}
-
-// Watch ad function
-function watchAd() {
-  if (window.Adsgram) {
-    window.Adsgram.showAd().then(() => {
-      rewardUser(AD_REWARD, 'Ad Watched');
-      adsWatched++;
-      lastAdTime = Date.now();
-      localStorage.setItem('adsWatched', adsWatched);
-      localStorage.setItem('lastAdTime', lastAdTime);
-      updateAdButton();
-    }).catch(error => {
-      console.log('Ad error:', error);
-      // Fallback reward even if ad fails
-      rewardUser(AD_REWARD, 'Ad Attempted');
-    });
-  } else {
-    // Fallback: reward without actual ad
-    rewardUser(AD_REWARD, 'Ad Reward');
-    adsWatched++;
-    lastAdTime = Date.now();
-    localStorage.setItem('adsWatched', adsWatched);
-    localStorage.setItem('lastAdTime', lastAdTime);
-    updateAdButton();
-  }
-}
-
-// Watch mission ad
-function watchMissionAd() {
-  if (completedTasksList.includes('mission-ad')) {
-    alert('You already completed this mission!');
-    return;
-  }
-
-  if (window.Adsgram) {
-    window.Adsgram.showAd().then(() => {
-      completeMission('mission-ad', 150);
-    }).catch(error => {
-      console.log('Ad error:', error);
-      completeMission('mission-ad', 150);
-    });
-  } else {
-    completeMission('mission-ad', 150);
-  }
-}
-
-// Complete mission
-function completeMission(missionId, reward) {
-  const missionKey = `mission-${missionId}`;
-  if (completedTasksList.includes(missionKey)) {
-    alert('You already completed this mission!');
-    return;
-  }
-
-  completedTasksList.push(missionKey);
-  completedMissions++;
-  userBalance += reward;
-
-  localStorage.setItem('completedTasksList', JSON.stringify(completedTasksList));
-  localStorage.setItem('completedMissions', completedMissions);
-  localStorage.setItem('userBalance', userBalance);
-
-  showRewardPopup(reward, `Mission ${missionId} completed!`);
-  updateMissionButtons();
-  updateUI();
-}
-
-// Show reward popup
-function showRewardPopup(amount, message) {
-  document.getElementById('rewardAmount').innerText = amount;
-  document.getElementById('rewardMessage').innerText = message;
-  document.getElementById('rewardPopup').style.display = 'flex';
-}
-
-// Close reward popup
-function closeRewardPopup() {
-  document.getElementById('rewardPopup').style.display = 'none';
-}
-
-// Reward user
-function rewardUser(amount, message) {
-  userBalance += amount;
-  localStorage.setItem('userBalance', userBalance);
-  showRewardPopup(amount, message);
-  updateUI();
-}
-
-// Update mission buttons
-function updateMissionButtons() {
-  for (let i = 1; i <= 3; i++) {
-    const btn = document.getElementById(`mission-${i}`);
-    if (completedTasksList.includes(`mission-${i}`)) {
-      btn.classList.add('completed');
-      btn.innerText = '✅ Completed';
-      btn.disabled = true;
-    }
-  }
-
-  const adBtn = document.getElementById('mission-ad');
-  if (completedTasksList.includes('mission-ad')) {
-    adBtn.classList.add('completed');
-    adBtn.innerText = '✅ Completed';
-    adBtn.disabled = true;
-  }
-}
-
-// Lion head tap
-document.getElementById('lionHead').addEventListener('click', function() {
-  userBalance += 10;
-  totalTaps++;
-  dailyTaps++;
-  localStorage.setItem('userBalance', userBalance);
-  localStorage.setItem('totalTaps', totalTaps);
-  localStorage.setItem('dailyTaps', dailyTaps);
-  
-  if (userBalance % 1000 === 0) {
-    userLevel++;
-    localStorage.setItem('userLevel', userLevel);
-    showRewardPopup(0, `You reached Level ${userLevel}!`);
-  }
-  
-  updateUI();
+// Watch ad / task buttons (keep behavior)
+document.getElementById('rewardBtn').addEventListener('click', async ()=>{
+  if(!rewardAd) return alert('Ad not ready');
+  try{const res = await rewardAd.show(); if(res?.done){ xp += 10; updateUI(); alert('Reward +10 XP'); }}catch(e){console.warn(e)}
 });
 
-// Page navigation
-function showPage(pageId, btnIndex) {
-  const pages = document.querySelectorAll('.page');
-  const navBtns = document.querySelectorAll('.nav-btn');
-  
-  pages.forEach(p => p.classList.remove('active'));
-  navBtns.forEach(b => b.classList.remove('active'));
-  
-  document.getElementById(pageId).classList.add('active');
-  navBtns[btnIndex].classList.add('active');
+document.getElementById('taskBtn').addEventListener('click', async ()=>{
+  if(!taskAd) return alert('Task ad not ready');
+  try{const res = await taskAd.show(); if(res?.done){ xp += 10; updateUI(); alert('Task Completed +10 XP'); }}catch(e){console.warn(e)}
+});
+
+// Booster flow: clicking boosterBtn shows a random ad from BOOST_AD_BLOCKS. Each completed ad increments boosterWatched.
+async function showRandomBoosterAd(){
+  if(typeof Adsgram === 'undefined') return alert('Ads not ready');
+  const pick = BOOST_AD_BLOCKS[Math.floor(Math.random()*BOOST_AD_BLOCKS.length)];
+  try{
+    const ad = Adsgram.init({ blockId: pick });
+    const res = await ad.show();
+    if(res?.done){
+      boosterWatched = (boosterWatched || 0) + 1;
+      // apply multiplier thresholds
+      if(boosterWatched >= 40) tapMultiplier = 4;
+      else if(boosterWatched >= 20) tapMultiplier = 2;
+      else tapMultiplier = 1;
+      updateUI();
+      alert('Booster ad watched ('+boosterWatched+'/40). Tap multiplier: x'+tapMultiplier);
+    }
+  }catch(e){ console.warn(e); }
 }
 
-// Popup functions
-function showJoinPopup() {
-  document.getElementById('joinPopup').style.display = 'flex';
-}
+document.getElementById('boosterBtn').addEventListener('click', ()=>{
+  // Open booster flow: watch one ad at a time. User must watch 20 for x2 and 40 for x4
+  showRandomBoosterAd();
+});
 
-function closeJoinPopup() {
-  document.getElementById('joinPopup').style.display = 'none';
-}
+// daily optional
+document.getElementById('dailyBtn').onclick = async ()=>{
+  let now = Date.now();
+  if(now - lastDaily < 86400000 && dailyProgress === 4) return alert('Come back tomorrow');
+  if(dailyProgress >= 4) return alert('Optional daily bonus already completed today');
+  if(typeof Adsgram === 'undefined') return alert('Ads not ready');
+  let block = DAILY_BLOCKS[dailyProgress];
+  let task = document.createElement('adsgram-task'); task.setAttribute('data-block-id', block);
+  document.getElementById('dailyBtn').parentNode.appendChild(task);
+  task.addEventListener('reward', ()=>{
+    dailyProgress++; task.remove();
+    if(dailyProgress === 4){ xp += 1500; lastDaily = now; dailyProgress = 0; localStorage.setItem('daily', now); alert('🎉 Optional daily bonus completed! +1500 XP'); }
+    else { alert('Optional bonus step '+dailyProgress+' completed!'); }
+    updateUI();
+  });
+  if(typeof task.load === 'function') task.load();
+};
 
-function joinChannel() {
-  if (window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.openLink('https://t.me/YOUR_CHANNEL'); // Replace with your channel
-  } else {
-    window.open('https://t.me/YOUR_CHANNEL', '_blank'); // Replace with your channel
-  }
-  closeJoinPopup();
-}
+// join popup
+document.getElementById('joinBtn').onclick = ()=>{ xp += 5; updateUI(); document.getElementById('joinPopup').style.display='none'; window.open('https://t.me/airdropesr','_blank'); };
 
-// Initialize
-updateUI();
-updateMissionButtons();
-preloadAds();
+// referral open
+document.getElementById('openRef').addEventListener('click', ()=>{ const url = 'https://t.me/@Vfrevbot?start=12345'; navigator.clipboard?.writeText(url).then(()=>alert('Referral link copied')); });
 
-// Update ad button every 30 seconds
-setInterval(updateAdButton, 30000);
+// withdraw
+document.getElementById('withdrawBtn').addEventListener('click', ()=>{ let amount = parseInt(document.getElementById('amount').value); if(!amount || amount < 10000) return alert('Minimum 10,000 XP'); if(xp < amount) return alert('Not enough XP'); xp -= amount; updateUI(); alert('Withdraw Sent'); });
 
-// Check daily reset
-const lastDate = localStorage.getItem('lastDate');
-const today = new Date().toDateString();
-if (lastDate !== today) {
-  if (dailyTaps > 0) {
-    currentStreak++;
-  }
-  dailyTaps = 0;
-  localStorage.setItem('lastDate', today);
-  localStorage.setItem('currentStreak', currentStreak);
-  localStorage.setItem('dailyTaps', dailyTaps);
-  updateUI();
-}
+// header withdraw scroll
+document.getElementById('walletBtn').addEventListener('click', ()=>{ const sec = document.getElementById('withdrawSection'); if(sec){ sec.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(()=>document.getElementById('amount').focus(),350); } });
+
+// keyboard accessibility
+mascotBtn.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); doTap(1,bigCircle); } });
+
 </script>
-
 </body>
 </html>
