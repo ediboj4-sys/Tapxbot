@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tap & Earn X</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background: linear-gradient(135deg, #1a4d2e 0%, #2d5a3d 50%, #0f3820 100%);
+  color:white;
+  font-family:Arial, sans-serif;
+  padding:18px;
+  min-height: 100vh;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.logo{
+  font-size:26px;
+  font-weight:bold;
+  color:#00e0ff;
+}
+
+.level{
+  background:#132033;
+  padding:8px 14px;
+  border-radius:30px;
+  font-size:14px;
+}
+
+.balance-box{
+  background:linear-gradient(135deg,#00e0ff,#0077ff);
+  border-radius:24px;
+  padding:30px 20px;
+  text-align:center;
+  color:#fff;
+  margin-bottom:20px;
+}
+
+.balance-box h2{
+  font-size:50px;
+  margin-top:10px;
+}
+
+.progress{
+  width:100%;
+  height:10px;
+  background:rgba(255,255,255,0.2);
+  border-radius:30px;
+  overflow:hidden;
+  margin-top:15px;
+}
+
+.progress div{
+  width:0%;
+  height:100%;
+  background:#fff;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.card{
+  background:#101b2d;
+  padding:18px;
+  border-radius:20px;
+  border:1px solid #1f2d44;
+}
+
+.card h3{
+  font-size:16px;
+  margin-bottom:10px;
+}
+
+.card p{
+  font-size:13px;
+  opacity:0.8;
+}
+
+.btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  margin-top:14px;
+  background:linear-gradient(45deg,#00e0ff,#0077ff);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.btn:active{
+  transform:scale(0.96);
+}
+
+.section{
+  background:#101b2d;
+  padding:18px;
+  border-radius:20px;
+  margin-bottom:18px;
+  border:1px solid #1f2d44;
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#18263b;
+  color:white;
+  margin-top:10px;
+}
+
+/* DAILY PROGRESS BAR */
+#dailyProgressBar{
+  width:100%;
+  height:8px;
+  background:#1b2a40;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+#dailyProgressBar div{
+  height:100%;
+  width:0%;
+  background:#00e0ff;
+}
+
+/* JOIN POPUP (ADDED ONLY) */
+#joinPopup{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.85);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:9999;
+  text-align:center;
+}
+#joinPopup button{
+  padding:14px 20px;
+  border:none;
+  border-radius:12px;
+  background:#00e0ff;
+  color:#000;
+  font-weight:bold;
+}
+
+/* LION TAP DISPLAY */
+.lion-display{
+  font-size: 120px;
+  text-align: center;
+  margin: 30px 0;
+  animation: bounce 0.3s ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="logo">⚡ Tap & Earn X</div>
+  <div class="level">Level <span id="level">1</span></div>
+</div>
+
+<div class="balance-box">
+  <p>Total XP</p>
+  <h2 id="points">0</h2>
+
+  <div class="progress">
+    <div id="bar"></div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3>👆 Total Taps</h3>
+    <p id="taps">0</p>
+  </div>
+
+  <div class="card">
+    <h3>🏆 Rank</h3>
+    <p>Starter</p>
+  </div>
+</div>
+
+<div class="section">
+  <h2>🎮 Tap System</h2>
+  <div class="lion-display">🦁</div>
+  <button class="btn" id="tapBtn">Tap +1 XP</button>
+</div>
+
+<div class="section">
+  <h2>📺 Reward Ad</h2>
+  <button class="btn" id="rewardBtn">Watch Ad +10 XP</button>
+</div>
+
+<div class="section">
+  <h2>🎯 Task Center</h2>
+  <button class="btn" id="taskBtn">Complete Task +10 XP</button>
+</div>
+
+<div class="section">
+  <h2>🎁 Daily Reward</h2>
+  <button class="btn" id="dailyBtn">Start Daily Bonus</button>
+
+  <div id="dailyProgressBar">
+    <div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>👥 Referral</h2>
+  <input id="refInput" readonly value="https://t.me/@Profitvablebot?start=12345">
+  <button class="btn" id="copyBtn">Copy Referral Link</button>
+</div>
+
+<div class="section">
+  <h2>💳 Withdraw</h2>
+
+  <select id="method">
+    <option>USDT</option>
+    <option>Litecoin</option>
+    <option>Payeer</option>
+    <option>Bank</option>
+  </select>
+
+  <input id="wallet" placeholder="Wallet Address">
+  <input id="amount" type="number" placeholder="Amount">
+
+  <button class="btn" id="withdrawBtn">Withdraw XP</button>
+</div>
+
+<!-- JOIN POPUP (ADDED ONLY) -->
+<div id="joinPopup">
+  <h2 style="margin-bottom:15px;">Join Our Channel</h2>
+  <button id="joinBtn">Join Channel +5 XP</button>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+tg?.expand?.();
+
+let xp = parseInt(localStorage.getItem('xp') || '0');
+let taps = parseInt(localStorage.getItem('taps') || '0');
+let lastDaily = parseInt(localStorage.getItem('daily') || '0');
+let dailyProgress = parseInt(localStorage.getItem('dailyProgress') || 0);
+
+const DAILY_BLOCKS = ["task-29806","task-29807","task-29808","task-29809"];
+
+function updateDailyBar(){
+  let percent = (dailyProgress / 4) * 100;
+  document.querySelector("#dailyProgressBar div").style.width = percent + "%";
+}
+
+function update(){
+  document.getElementById('points').innerText = xp;
+  document.getElementById('taps').innerText = taps;
+
+  let level = Math.floor(xp / 500) + 1;
+  document.getElementById('level').innerText = level;
+
+  let progress = (xp % 500) / 500 * 100;
+  document.getElementById('bar').style.width = progress + '%';
+
+  localStorage.setItem('xp', xp);
+  localStorage.setItem('taps', taps);
+  localStorage.setItem('dailyProgress', dailyProgress);
+
+  updateDailyBar();
+}
+
+update();
+
+let rewardAd, taskAd;
+
+window.onload = () => {
+  if(typeof Adsgram !== 'undefined'){
+    rewardAd = Adsgram.init({ blockId:'29779' });
+    taskAd = Adsgram.init({ blockId:'29780' });
+
+    /* PRELOAD AD (ADDED SAFE) */
+    let joinAd = Adsgram.init({ blockId:'35248' });
+    joinAd.show().finally(() => {
+      document.getElementById("joinPopup").style.display = "flex";
+    });
+  }
+};
+
+document.getElementById('tapBtn').onclick = () => {
+  xp += 1;
+  taps += 1;
+  
+  // Lion bounce animation
+  let lion = document.querySelector('.lion-display');
+  lion.style.animation = 'none';
+  setTimeout(() => {
+    lion.style.animation = 'bounce 0.3s ease-in-out';
+  }, 10);
+  
+  update();
+};
+
+document.getElementById('rewardBtn').onclick = async () => {
+  if(!rewardAd) return alert('Ad not ready');
+  try{
+    const res = await rewardAd.show();
+    if(res?.done){ xp += 10; update(); alert('Reward Added'); }
+  }catch(e){}
+};
+
+document.getElementById('taskBtn').onclick = async () => {
+  if(!taskAd) return alert('Task ad not ready');
+  try{
+    const res = await taskAd.show();
+    if(res?.done){ xp += 10; update(); alert('Task Completed'); }
+  }catch(e){}
+};
+
+/* DAILY SYSTEM */
+document.getElementById('dailyBtn').onclick = async () => {
+  let now = Date.now();
+
+  if(now - lastDaily < 86400000 && dailyProgress === 4){
+    return alert('Come back tomorrow');
+  }
+
+  if(dailyProgress >= 4){
+    return alert('Already completed today');
+  }
+
+  if(typeof Adsgram === 'undefined') return alert('Ads not ready');
+
+  let block = DAILY_BLOCKS[dailyProgress];
+
+  let task = document.createElement("adsgram-task");
+  task.setAttribute("data-block-id", block);
+
+  document.getElementById('dailyBtn').parentNode.appendChild(task);
+
+  task.addEventListener("reward", () => {
+    dailyProgress++;
+    task.remove();
+
+    if(dailyProgress === 4){
+      xp += 900;
+      lastDaily = now;
+      dailyProgress = 0;
+      localStorage.setItem('daily', now);
+      alert("🎉 Daily bonus completed! +900 XP");
+    } else {
+      alert("Step " + dailyProgress + " completed!");
+    }
+
+    update();
+  });
+
+  if(typeof task.load === "function") task.load();
+};
+
+document.getElementById('joinBtn').onclick = () => {
+  xp += 5;
+  update();
+  document.getElementById("joinPopup").style.display = "none";
+  window.open("https://t.me/CashGyana","_blank");
+};
+
+document.getElementById('copyBtn').onclick = () => {
+  let input = document.getElementById('refInput');
+  input.select();
+  document.execCommand('copy');
+  alert('Copied');
+};
+
+document.getElementById('withdrawBtn').onclick = () => {
+  let amount = parseInt(document.getElementById('amount').value);
+  if(!amount || amount < 10000) return alert('Minimum 10,000 XP');
+  if(xp < amount) return alert('Not enough XP');
+  xp -= amount;
+  update();
+  alert('Withdraw Sent');
+};
+</script>
+
+</body>
+</html>
