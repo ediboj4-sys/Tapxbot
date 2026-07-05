@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Tap & Earn X - Home</title>
+<title>Tap & Earn X - TapXBot</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
@@ -32,6 +32,14 @@ body{
 .container {
   max-width: 600px;
   margin: 0 auto;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
 }
 
 .header{
@@ -209,6 +217,7 @@ input,select{
   background:#00e0ff;
   color:#000;
   font-weight:bold;
+  margin: 10px;
 }
 
 .floating-text {
@@ -230,7 +239,7 @@ input,select{
 }
 
 .nav-btn {
-  padding: 10px;
+  padding: 12px;
   border: none;
   border-radius: 12px;
   background: #101b2d;
@@ -246,165 +255,812 @@ input,select{
   background: #00e0ff;
   color: #000;
 }
+
+.nav-btn.active {
+  background: linear-gradient(45deg, #00e0ff, #0077ff);
+  color: white;
+}
+
+/* MISSIONS PAGE */
+.mission-card {
+  background: linear-gradient(135deg, #1a2d45 0%, #0f1f35 100%);
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 12px;
+  border: 1px solid #2a3d55;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mission-info h3 {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.mission-info p {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.mission-reward {
+  background: linear-gradient(45deg, #00e0ff, #0077ff);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  min-width: 80px;
+  font-size: 13px;
+}
+
+.progress-section {
+  background: #0f1f35;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #1b2a40;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar div {
+  height: 100%;
+  background: #00e0ff;
+  width: 0%;
+  transition: width 0.3s;
+}
+
+/* BOUNTY PAGE */
+.bounty-card {
+  background: linear-gradient(135deg, #1a2d45 0%, #0f1f35 100%);
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 12px;
+  border: 2px solid #FFD700;
+}
+
+.bounty-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.bounty-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.bounty-rarity {
+  background: #FFD700;
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.bounty-description {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+.bounty-reward {
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: #000;
+  font-weight: bold;
+  text-align: center;
+  font-size: 14px;
+}
+
+.leaderboard {
+  background: #0f1f35;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #1f2d44;
+}
+
+.leaderboard-item:last-child {
+  border-bottom: none;
+}
+
+.rank-badge {
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 50%;
+  font-weight: bold;
+  min-width: 30px;
+  text-align: center;
+}
+
+/* WALLET PAGE */
+.transaction-card {
+  background: #0f1f35;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #1f2d44;
+}
+
+.transaction-info h4 {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.transaction-info p {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.transaction-amount {
+  text-align: right;
+}
+
+.amount-positive {
+  color: #00ff88;
+  font-weight: bold;
+}
+
+.amount-negative {
+  color: #ff4444;
+  font-weight: bold;
+}
+
+.status-badge {
+  background: #228B22;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.wallet-address-box {
+  background: #0f1f35;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 10px;
+  word-break: break-all;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.tab-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.tab-btn {
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #0f1f35;
+  color: #00e0ff;
+  border: 1px solid #1f2d44;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: linear-gradient(45deg, #00e0ff, #0077ff);
+  color: white;
+}
+
+/* PROFILE PAGE */
+.profile-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #00e0ff, #0077ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  font-size: 50px;
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.5);
+}
+
+.username {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.usertag {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.stat-box {
+  background: #0f1f35;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid #1f2d44;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #00e0ff;
+}
+
+.stat-label {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 5px;
+}
+
+/* SETTINGS PAGE */
+.setting-item {
+  background: #0f1f35;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #1f2d44;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background: #1f2d44;
+  border-radius: 13px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.toggle-switch.on {
+  background: #00e0ff;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: left 0.3s;
+}
+
+.toggle-switch.on .toggle-slider {
+  left: 27px;
+}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-  <div class="header">
-    <div class="logo">⚡ Tap & Earn X</div>
-    <div class="level">Level <span id="level">1</span></div>
-  </div>
+  <!-- HOME PAGE -->
+  <div id="homePage" class="page active">
+    <div class="header">
+      <div class="logo">⚡ Tap & Earn X</div>
+      <div class="level">Level <span id="level">1</span></div>
+    </div>
 
-  <div class="balance-box">
-    <p>Total XP</p>
-    <h2 id="points">0</h2>
+    <div class="balance-box">
+      <p>Total XP</p>
+      <h2 id="points">0</h2>
+      <div class="progress">
+        <div id="bar"></div>
+      </div>
+    </div>
 
-    <div class="progress">
-      <div id="bar"></div>
+    <div class="grid">
+      <div class="card">
+        <h3>👆 Total Taps</h3>
+        <p id="taps">0</p>
+      </div>
+      <div class="card">
+        <h3>🏆 Rank</h3>
+        <p id="rank">Starter</p>
+      </div>
+    </div>
+
+    <!-- LION TAP SECTION -->
+    <div class="section">
+      <h2>🎮 Tap The Lion</h2>
+      <div class="lion-tap-container">
+        <svg id="tapBtn" class="lion-head" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="lionGrad" cx="40%" cy="40%">
+              <stop offset="0%" style="stop-color:#D4A574;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#8B6F47;stop-opacity:1" />
+            </radialGradient>
+            <filter id="shadow">
+              <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.4"/>
+            </filter>
+          </defs>
+          
+          <circle cx="100" cy="100" r="95" fill="#C19A6B" filter="url(#shadow)"/>
+          <circle cx="100" cy="100" r="88" fill="#D2B48C"/>
+          
+          <path d="M 50 60 Q 40 50 35 65 Q 30 80 45 90" fill="#9B8860" opacity="0.6"/>
+          <path d="M 150 60 Q 160 50 165 65 Q 170 80 155 90" fill="#9B8860" opacity="0.6"/>
+          <path d="M 30 100 Q 20 95 15 110 Q 20 125 35 120" fill="#9B8860" opacity="0.6"/>
+          <path d="M 170 100 Q 180 95 185 110 Q 180 125 165 120" fill="#9B8860" opacity="0.6"/>
+          
+          <circle cx="100" cy="105" r="60" fill="url(#lionGrad)" filter="url(#shadow)"/>
+          <ellipse cx="100" cy="110" rx="50" ry="52" fill="#D4A574"/>
+          
+          <ellipse cx="100" cy="125" rx="35" ry="28" fill="#C9A96E"/>
+          <ellipse cx="100" cy="130" rx="25" ry="18" fill="#E8D5C4"/>
+          
+          <ellipse cx="100" cy="128" rx="8" ry="7" fill="#3D3D3D"/>
+          <ellipse cx="97" cy="127" rx="2" ry="2" fill="#000"/>
+          
+          <path d="M 100 128 Q 95 135 88 133" stroke="#3D3D3D" stroke-width="1.5" fill="none"/>
+          <path d="M 100 128 Q 105 135 112 133" stroke="#3D3D3D" stroke-width="1.5" fill="none"/>
+          
+          <circle cx="85" cy="95" r="6" fill="#FFF"/>
+          <circle cx="85" cy="95" r="4" fill="#FFD700"/>
+          <circle cx="83" cy="93" r="2.5" fill="#000"/>
+          <circle cx="84" cy="92" r="1" fill="#FFF" opacity="0.6"/>
+          
+          <circle cx="115" cy="95" r="6" fill="#FFF"/>
+          <circle cx="115" cy="95" r="4" fill="#FFD700"/>
+          <circle cx="117" cy="93" r="2.5" fill="#000"/>
+          <circle cx="116" cy="92" r="1" fill="#FFF" opacity="0.6"/>
+          
+          <path d="M 78 88 Q 85 85 92 87" stroke="#8B6F47" stroke-width="1.5" fill="none"/>
+          <path d="M 108 87 Q 115 85 122 88" stroke="#8B6F47" stroke-width="1.5" fill="none"/>
+          
+          <ellipse cx="65" cy="70" rx="12" ry="18" fill="#C19A6B"/>
+          <ellipse cx="65" cy="73" rx="6" ry="10" fill="#E8D5C4"/>
+          
+          <ellipse cx="135" cy="70" rx="12" ry="18" fill="#C19A6B"/>
+          <ellipse cx="135" cy="73" rx="6" ry="10" fill="#E8D5C4"/>
+          
+          <line x1="50" y1="105" x2="30" y2="100" stroke="#9B8860" stroke-width="1.5"/>
+          <line x1="50" y1="115" x2="30" y2="125" stroke="#9B8860" stroke-width="1.5"/>
+          <line x1="150" y1="105" x2="170" y2="100" stroke="#9B8860" stroke-width="1.5"/>
+          <line x1="150" y1="115" x2="170" y2="125" stroke="#9B8860" stroke-width="1.5"/>
+          
+          <circle cx="100" cy="100" r="65" fill="none" stroke="#FFD700" stroke-width="3" opacity="0.7"/>
+          <circle cx="100" cy="100" r="60" fill="none" stroke="#FFA500" stroke-width="1" opacity="0.5"/>
+        </svg>
+      </div>
+      <p style="text-align:center; margin-top:15px; font-size:14px; opacity:0.8;">Tap the lion to earn XP!</p>
+    </div>
+
+    <div class="section">
+      <h2>📺 Reward Ad</h2>
+      <button class="btn" id="rewardBtn">Watch Ad +10 XP</button>
+    </div>
+
+    <div class="section">
+      <h2>🎯 Task Center</h2>
+      <button class="btn" id="taskBtn">Complete Task +10 XP</button>
+    </div>
+
+    <div class="section">
+      <h2>🎁 Daily Reward</h2>
+      <button class="btn" id="dailyBtn">Start Daily Bonus</button>
+      <div id="dailyProgressBar">
+        <div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>👥 Referral</h2>
+      <input id="refInput" readonly value="https://t.me/@TapXBot?start=12345">
+      <button class="btn" id="copyBtn">Copy Referral Link</button>
     </div>
   </div>
 
-  <div class="grid">
-    <div class="card">
-      <h3>👆 Total Taps</h3>
-      <p id="taps">0</p>
+  <!-- MISSIONS PAGE -->
+  <div id="missionsPage" class="page">
+    <div class="header">
+      <div class="logo">🎯 Missions</div>
     </div>
 
-    <div class="card">
-      <h3>🏆 Rank</h3>
-      <p id="rank">Starter</p>
+    <div class="section">
+      <h2>🎯 Daily Missions</h2>
+      
+      <div class="mission-card">
+        <div class="mission-info">
+          <h3>Visit Twitter</h3>
+          <p>Follow us on Twitter</p>
+        </div>
+        <div class="mission-reward">+50 XP</div>
+      </div>
+
+      <div class="mission-card">
+        <div class="mission-info">
+          <h3>Share on Telegram</h3>
+          <p>Share to 5 chats</p>
+        </div>
+        <div class="mission-reward">+100 XP</div>
+      </div>
+
+      <div class="mission-card">
+        <div class="mission-info">
+          <h3>Invite 3 Friends</h3>
+          <p>Get referral rewards</p>
+        </div>
+        <div class="mission-reward">+200 XP</div>
+      </div>
+
+      <button class="btn">View All Missions</button>
     </div>
-  </div>
 
-  <!-- LION TAP SECTION -->
-  <div class="section">
-    <h2>🎮 Tap The Lion</h2>
-    <div class="lion-tap-container">
-      <svg id="tapBtn" class="lion-head" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <!-- Lion Head with Mane -->
-        <defs>
-          <radialGradient id="lionGrad" cx="40%" cy="40%">
-            <stop offset="0%" style="stop-color:#D4A574;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#8B6F47;stop-opacity:1" />
-          </radialGradient>
-          <filter id="shadow">
-            <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.4"/>
-          </filter>
-        </defs>
-        
-        <!-- Outer Mane Circle -->
-        <circle cx="100" cy="100" r="95" fill="#C19A6B" filter="url(#shadow)"/>
-        <circle cx="100" cy="100" r="88" fill="#D2B48C"/>
-        
-        <!-- Mane Details -->
-        <path d="M 50 60 Q 40 50 35 65 Q 30 80 45 90" fill="#9B8860" opacity="0.6"/>
-        <path d="M 150 60 Q 160 50 165 65 Q 170 80 155 90" fill="#9B8860" opacity="0.6"/>
-        <path d="M 30 100 Q 20 95 15 110 Q 20 125 35 120" fill="#9B8860" opacity="0.6"/>
-        <path d="M 170 100 Q 180 95 185 110 Q 180 125 165 120" fill="#9B8860" opacity="0.6"/>
-        
-        <!-- Head -->
-        <circle cx="100" cy="105" r="60" fill="url(#lionGrad)" filter="url(#shadow)"/>
-        
-        <!-- Face Color -->
-        <ellipse cx="100" cy="110" rx="50" ry="52" fill="#D4A574"/>
-        
-        <!-- Snout/Nose Area -->
-        <ellipse cx="100" cy="125" rx="35" ry="28" fill="#C9A96E"/>
-        <ellipse cx="100" cy="130" rx="25" ry="18" fill="#E8D5C4"/>
-        
-        <!-- Nose -->
-        <ellipse cx="100" cy="128" rx="8" ry="7" fill="#3D3D3D"/>
-        <ellipse cx="97" cy="127" rx="2" ry="2" fill="#000"/>
-        
-        <!-- Mouth -->
-        <path d="M 100 128 Q 95 135 88 133" stroke="#3D3D3D" stroke-width="1.5" fill="none"/>
-        <path d="M 100 128 Q 105 135 112 133" stroke="#3D3D3D" stroke-width="1.5" fill="none"/>
-        
-        <!-- Eyes -->
-        <circle cx="85" cy="95" r="6" fill="#FFF"/>
-        <circle cx="85" cy="95" r="4" fill="#FFD700"/>
-        <circle cx="83" cy="93" r="2.5" fill="#000"/>
-        <circle cx="84" cy="92" r="1" fill="#FFF" opacity="0.6"/>
-        
-        <circle cx="115" cy="95" r="6" fill="#FFF"/>
-        <circle cx="115" cy="95" r="4" fill="#FFD700"/>
-        <circle cx="117" cy="93" r="2.5" fill="#000"/>
-        <circle cx="116" cy="92" r="1" fill="#FFF" opacity="0.6"/>
-        
-        <!-- Eyebrows -->
-        <path d="M 78 88 Q 85 85 92 87" stroke="#8B6F47" stroke-width="1.5" fill="none"/>
-        <path d="M 108 87 Q 115 85 122 88" stroke="#8B6F47" stroke-width="1.5" fill="none"/>
-        
-        <!-- Ears -->
-        <ellipse cx="65" cy="70" rx="12" ry="18" fill="#C19A6B"/>
-        <ellipse cx="65" cy="73" rx="6" ry="10" fill="#E8D5C4"/>
-        
-        <ellipse cx="135" cy="70" rx="12" ry="18" fill="#C19A6B"/>
-        <ellipse cx="135" cy="73" rx="6" ry="10" fill="#E8D5C4"/>
-        
-        <!-- Whiskers -->
-        <line x1="50" y1="105" x2="30" y2="100" stroke="#9B8860" stroke-width="1.5"/>
-        <line x1="50" y1="115" x2="30" y2="125" stroke="#9B8860" stroke-width="1.5"/>
-        <line x1="150" y1="105" x2="170" y2="100" stroke="#9B8860" stroke-width="1.5"/>
-        <line x1="150" y1="115" x2="170" y2="125" stroke="#9B8860" stroke-width="1.5"/>
-        
-        <!-- Golden Ornament Ring -->
-        <circle cx="100" cy="100" r="65" fill="none" stroke="#FFD700" stroke-width="3" opacity="0.7"/>
-        <circle cx="100" cy="100" r="60" fill="none" stroke="#FFA500" stroke-width="1" opacity="0.5"/>
-      </svg>
-    </div>
-    <p style="text-align:center; margin-top:15px; font-size:14px; opacity:0.8;">Tap the lion to earn XP!</p>
-  </div>
+    <div class="section">
+      <h2>📊 Progress</h2>
+      
+      <div class="progress-section">
+        <p>Weekly Challenges</p>
+        <div class="progress-bar">
+          <div style="width: 45%;"></div>
+        </div>
+        <p style="font-size: 12px; margin-top: 8px; opacity: 0.7;">45% Complete</p>
+      </div>
 
-  <div class="section">
-    <h2>📺 Reward Ad</h2>
-    <button class="btn" id="rewardBtn">Watch Ad +10 XP</button>
-  </div>
-
-  <div class="section">
-    <h2>🎯 Task Center</h2>
-    <button class="btn" id="taskBtn">Complete Task +10 XP</button>
-  </div>
-
-  <div class="section">
-    <h2>🎁 Daily Reward</h2>
-    <button class="btn" id="dailyBtn">Start Daily Bonus</button>
-
-    <div id="dailyProgressBar">
-      <div></div>
+      <div class="progress-section">
+        <p>Total Missions Completed</p>
+        <p style="font-size: 24px; font-weight: bold; margin-top: 8px;" id="completedMissions">0</p>
+      </div>
     </div>
   </div>
 
-  <div class="section">
-    <h2>👥 Referral</h2>
-    <input id="refInput" readonly value="https://t.me/@TapXBot?start=12345">
-    <button class="btn" id="copyBtn">Copy Referral Link</button>
+  <!-- BOUNTY PAGE -->
+  <div id="bountyPage" class="page">
+    <div class="header">
+      <div class="logo">🏆 Bounty</div>
+    </div>
+
+    <div class="section">
+      <h2>⭐ Special Bounties</h2>
+      
+      <div class="bounty-card">
+        <div class="bounty-header">
+          <div class="bounty-title">Legendary Tapper</div>
+          <div class="bounty-rarity">RARE</div>
+        </div>
+        <p class="bounty-description">Reach 10,000 total taps</p>
+        <div class="bounty-reward">+5000 XP</div>
+      </div>
+
+      <div class="bounty-card">
+        <div class="bounty-header">
+          <div class="bounty-title">Wealth Accumulator</div>
+          <div class="bounty-rarity">EPIC</div>
+        </div>
+        <p class="bounty-description">Earn 50,000 XP total</p>
+        <div class="bounty-reward">+10000 XP</div>
+      </div>
+
+      <div class="bounty-card">
+        <div class="bounty-header">
+          <div class="bounty-title">Social Butterfly</div>
+          <div class="bounty-rarity">RARE</div>
+        </div>
+        <p class="bounty-description">Invite 10 friends to join</p>
+        <div class="bounty-reward">+3000 XP</div>
+      </div>
+
+      <button class="btn">Claim Bounties</button>
+    </div>
+
+    <div class="section">
+      <h2>🏅 Top Earners</h2>
+      
+      <div class="leaderboard">
+        <div class="leaderboard-item">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="rank-badge">1</div>
+            <span>@ShadowHunter</span>
+          </div>
+          <span style="font-weight: bold;">245,800 XP</span>
+        </div>
+
+        <div class="leaderboard-item">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="rank-badge">2</div>
+            <span>@TapMaster</span>
+          </div>
+          <span style="font-weight: bold;">198,500 XP</span>
+        </div>
+
+        <div class="leaderboard-item">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="rank-badge">3</div>
+            <span>@XPCollector</span>
+          </div>
+          <span style="font-weight: bold;">187,200 XP</span>
+        </div>
+
+        <div class="leaderboard-item">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="rank-badge">4</div>
+            <span>@GoldenLion</span>
+          </div>
+          <span style="font-weight: bold;">156,400 XP</span>
+        </div>
+
+        <div class="leaderboard-item">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="rank-badge">5</div>
+            <span>@EagleEye</span>
+          </div>
+          <span style="font-weight: bold;">142,800 XP</span>
+        </div>
+      </div>
+
+      <button class="btn">View Full Leaderboard</button>
+    </div>
   </div>
 
-  <div class="section">
-    <h2>💳 Withdraw</h2>
+  <!-- WALLET PAGE -->
+  <div id="walletPage" class="page">
+    <div class="header">
+      <div class="logo">💰 Wallet</div>
+    </div>
 
-    <select id="method">
-      <option>USDT</option>
-      <option>Litecoin</option>
-      <option>Payeer</option>
-      <option>Bank</option>
-    </select>
+    <div class="balance-box">
+      <p>Total Balance</p>
+      <h2 id="walletBalance">0</h2>
+      <p style="margin-top: 10px; font-size: 14px;">XP Points</p>
+    </div>
 
-    <input id="wallet" placeholder="Wallet Address">
-    <input id="amount" type="number" placeholder="Amount">
+    <div class="section">
+      <h2>💳 Withdrawal</h2>
+      
+      <div class="tab-buttons">
+        <button class="tab-btn active">Crypto</button>
+        <button class="tab-btn">Bank</button>
+      </div>
 
-    <button class="btn" id="withdrawBtn">Withdraw XP</button>
+      <select id="cryptoMethod">
+        <option>USDT (TRC20)</option>
+        <option>USDT (ERC20)</option>
+        <option>Bitcoin</option>
+        <option>Ethereum</option>
+        <option>Litecoin</option>
+      </select>
+
+      <input id="walletAddress" placeholder="Enter wallet address" type="text">
+      <input id="withdrawAmount" placeholder="Amount (Min: 10,000 XP)" type="number">
+
+      <button class="btn" id="withdrawBtn">Request Withdrawal</button>
+    </div>
+
+    <div class="section">
+      <h2>📊 Transaction History</h2>
+      
+      <div class="transaction-card">
+        <div class="transaction-info">
+          <h4>Daily Bonus Claimed</h4>
+          <p>Today at 2:30 PM</p>
+          <div class="status-badge">Completed</div>
+        </div>
+        <div class="transaction-amount amount-positive">+900 XP</div>
+      </div>
+
+      <div class="transaction-card">
+        <div class="transaction-info">
+          <h4>Ad Reward</h4>
+          <p>Today at 1:15 PM</p>
+          <div class="status-badge">Completed</div>
+        </div>
+        <div class="transaction-amount amount-positive">+10 XP</div>
+      </div>
+
+      <div class="transaction-card">
+        <div class="transaction-info">
+          <h4>Withdrawal Request</h4>
+          <p>Yesterday at 6:45 PM</p>
+          <div class="status-badge" style="background: #FF8C00;">Pending</div>
+        </div>
+        <div class="transaction-amount amount-negative">-50,000 XP</div>
+      </div>
+
+      <div class="transaction-card">
+        <div class="transaction-info">
+          <h4>Friend Referral Bonus</h4>
+          <p>2 days ago</p>
+          <div class="status-badge">Completed</div>
+        </div>
+        <div class="transaction-amount amount-positive">+500 XP</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>📋 Wallet Information</h2>
+      
+      <p style="margin-bottom: 10px; font-size: 14px;">Your Verified Addresses:</p>
+      <div class="wallet-address-box">
+        <strong>USDT Address:</strong><br>
+        TQmKDsnj8oLd7K3KcKYq5Ww8z7cGfYzLdP
+      </div>
+
+      <div class="wallet-address-box">
+        <strong>Bitcoin Address:</strong><br>
+        1A1z7agoat5fw6EDiM5i9nJ8d9cV98H5QP
+      </div>
+    </div>
   </div>
 
-  <!-- Navigation Buttons -->
+  <!-- PROFILE PAGE -->
+  <div id="profilePage" class="page">
+    <div class="header">
+      <div class="logo">👤 Profile</div>
+    </div>
+
+    <div class="section">
+      <div class="profile-header">
+        <div class="avatar">👤</div>
+        <div class="username" id="profileUsername">Player123</div>
+        <div class="usertag">@Player123</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-value" id="profileXP">0</div>
+          <div class="stat-label">Total XP</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="profileLevel">1</div>
+          <div class="stat-label">Level</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="profileRank">Starter</div>
+          <div class="stat-label">Rank</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>📈 Statistics</h2>
+      
+      <div class="stat-box" style="margin-bottom: 10px;">
+        <p style="text-align: left; margin-bottom: 5px;">Total Taps</p>
+        <div class="stat-value" id="profileTaps">0</div>
+      </div>
+
+      <div class="stat-box" style="margin-bottom: 10px;">
+        <p style="text-align: left; margin-bottom: 5px;">Daily Streaks</p>
+        <div class="stat-value">0</div>
+      </div>
+
+      <div class="stat-box">
+        <p style="text-align: left; margin-bottom: 5px;">Friends Referred</p>
+        <div class="stat-value">0</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>🎖️ Achievements</h2>
+      <p style="text-align: center; opacity: 0.7; padding: 20px;">No achievements yet. Keep grinding! 🚀</p>
+    </div>
+  </div>
+
+  <!-- SETTINGS PAGE -->
+  <div id="settingsPage" class="page">
+    <div class="header">
+      <div class="logo">⚙️ Settings</div>
+    </div>
+
+    <div class="section">
+      <h2>🔊 Sound & Notifications</h2>
+      
+      <div class="setting-item">
+        <div>
+          <p>Sound Effects</p>
+          <p style="font-size: 12px; opacity: 0.7;">Tap sounds</p>
+        </div>
+        <div class="toggle-switch on" id="soundToggle">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div>
+          <p>Push Notifications</p>
+          <p style="font-size: 12px; opacity: 0.7;">Daily reminders</p>
+        </div>
+        <div class="toggle-switch on" id="notifToggle">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div>
+          <p>Vibration</p>
+          <p style="font-size: 12px; opacity: 0.7;">Haptic feedback</p>
+        </div>
+        <div class="toggle-switch on" id="vibrationToggle">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>🎮 Game Settings</h2>
+      
+      <div class="setting-item">
+        <div>
+          <p>Auto-Click Mode</p>
+          <p style="font-size: 12px; opacity: 0.7;">Automatic tapping</p>
+        </div>
+        <div class="toggle-switch" id="autoClickToggle">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div>
+          <p>Show Floating Text</p>
+          <p style="font-size: 12px; opacity: 0.7;">+XP animations</p>
+        </div>
+        <div class="toggle-switch on" id="floatingTextToggle">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>👤 Account</h2>
+      <button class="btn">Change Username</button>
+      <button class="btn">Reset Progress</button>
+      <button class="btn" style="background: linear-gradient(45deg, #ff4444, #cc0000);">Logout</button>
+    </div>
+
+    <div class="section">
+      <h2>ℹ️ About</h2>
+      <p style="font-size: 14px; margin-bottom: 10px;">TapXBot v1.0</p>
+      <p style="font-size: 12px; opacity: 0.7;">A fun tapping game where you earn XP by tapping the lion and completing missions!</p>
+    </div>
+  </div>
+
+  <!-- NAVIGATION BUTTONS -->
   <div class="nav-buttons">
-    <button class="nav-btn" onclick="location.href='index.html'">🏠 Explore</button>
-    <button class="nav-btn" onclick="location.href='missions.html'">🎯 Missions</button>
-    <button class="nav-btn" onclick="location.href='bounty.html'">🏆 Bounty</button>
-    <button class="nav-btn" onclick="location.href='wallet.html'">💰 Wallet</button>
+    <button class="nav-btn active" onclick="showPage('homePage', this)">🏠 Home</button>
+    <button class="nav-btn" onclick="showPage('missionsPage', this)">🎯 Missions</button>
+    <button class="nav-btn" onclick="showPage('bountyPage', this)">🏆 Bounty</button>
+    <button class="nav-btn" onclick="showPage('walletPage', this)">💰 Wallet</button>
+    <button class="nav-btn" onclick="showPage('profilePage', this)">👤 Profile</button>
+    <button class="nav-btn" onclick="showPage('settingsPage', this)">⚙️ Settings</button>
   </div>
 </div>
 
@@ -412,6 +1068,7 @@ input,select{
 <div id="joinPopup">
   <h2 style="margin-bottom:15px;">Join Our Channel</h2>
   <button id="joinBtn">Join Channel +5 XP</button>
+  <button onclick="document.getElementById('joinPopup').style.display='none'" style="background: #666;">Skip</button>
 </div>
 
 <script>
@@ -440,11 +1097,18 @@ function getRank() {
 
 function update(){
   document.getElementById('points').innerText = xp;
+  document.getElementById('walletBalance').innerText = xp.toLocaleString();
+  document.getElementById('profileXP').innerText = xp.toLocaleString();
   document.getElementById('taps').innerText = taps;
-  document.getElementById('rank').innerText = getRank();
+  document.getElementById('profileTaps').innerText = taps;
+  
+  let rank = getRank();
+  document.getElementById('rank').innerText = rank;
+  document.getElementById('profileRank').innerText = rank;
 
   let level = Math.floor(xp / 500) + 1;
   document.getElementById('level').innerText = level;
+  document.getElementById('profileLevel').innerText = level;
 
   let progress = (xp % 500) / 500 * 100;
   document.getElementById('bar').style.width = progress + '%';
@@ -456,6 +1120,13 @@ function update(){
   updateDailyBar();
 }
 
+function showPage(pageId, button) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  button.classList.add('active');
+}
+
 update();
 
 let rewardAd, taskAd;
@@ -464,11 +1135,6 @@ window.onload = () => {
   if(typeof Adsgram !== 'undefined'){
     rewardAd = Adsgram.init({ blockId:'29779' });
     taskAd = Adsgram.init({ blockId:'29780' });
-
-    let joinAd = Adsgram.init({ blockId:'35248' });
-    joinAd.show().finally(() => {
-      document.getElementById("joinPopup").style.display = "flex";
-    });
   }
 };
 
@@ -476,7 +1142,6 @@ document.getElementById('tapBtn').onclick = function(e) {
   xp += 1;
   taps += 1;
   
-  // Floating text animation
   const floatingText = document.createElement('div');
   floatingText.className = 'floating-text';
   floatingText.innerText = '+1 XP';
@@ -511,7 +1176,6 @@ document.getElementById('taskBtn').onclick = async () => {
   }catch(e){}
 };
 
-/* DAILY SYSTEM */
 document.getElementById('dailyBtn').onclick = async () => {
   let now = Date.now();
 
@@ -567,13 +1231,22 @@ document.getElementById('copyBtn').onclick = () => {
 };
 
 document.getElementById('withdrawBtn').onclick = () => {
-  let amount = parseInt(document.getElementById('amount').value);
+  let amount = parseInt(document.getElementById('withdrawAmount').value);
   if(!amount || amount < 10000) return alert('Minimum 10,000 XP');
   if(xp < amount) return alert('Not enough XP');
   xp -= amount;
   update();
   alert('Withdraw Sent');
+  document.getElementById('walletAddress').value = '';
+  document.getElementById('withdrawAmount').value = '';
 };
+
+document.querySelectorAll('.toggle-switch').forEach(toggle => {
+  toggle.onclick = function(e) {
+    e.stopPropagation();
+    this.classList.toggle('on');
+  };
+});
 </script>
 
 </body>
