@@ -592,6 +592,11 @@ input::placeholder{
   margin-bottom:8px;
 }
 
+.referral-btn{
+  background:linear-gradient(135deg, #9c27b0, #e91e63);
+  margin-bottom:8px;
+}
+
 /* TASK BLOCK CONTAINER */
 .task-block-container{
   display:none;
@@ -603,6 +608,21 @@ input::placeholder{
 }
 
 .task-block-container.active{
+  display:block;
+}
+
+/* DAILY TASK BLOCK CONTAINER */
+.daily-task-block-container{
+  display:none;
+  background:rgba(0,0,0,0.5);
+  border:1px solid #00ccff;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:12px;
+  min-height:150px;
+}
+
+.daily-task-block-container.active{
   display:block;
 }
 
@@ -697,85 +717,26 @@ input::placeholder{
   cursor:not-allowed;
 }
 
-/* DAILY TASK MODAL */
-#dailyTaskModal{
-  position:fixed;
-  top:0;
-  left:0;
+.complete-task-manual-btn{
   width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.9);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:9998;
-  padding:20px;
-  overflow-y:auto;
-}
-
-.daily-task-modal-content{
-  background:linear-gradient(135deg, #1a3a24, #2d5a3d);
-  border:2px solid #00ff88;
-  border-radius:16px;
-  padding:20px;
-  max-width:90%;
-  text-align:center;
-  box-shadow:0 0 30px rgba(0,255,136,0.3);
-  width:100%;
-  margin:auto;
-}
-
-.daily-task-modal-content h2{
-  color:#00ff88;
-  margin-bottom:12px;
-  font-size:18px;
-}
-
-.daily-task-modal-content p{
-  font-size:12px;
-  margin-bottom:16px;
-  opacity:0.9;
-}
-
-.daily-task-adsgram-block{
-  margin:16px 0;
-  min-height:200px;
-}
-
-.daily-task-close-btn{
-  width:100%;
-  padding:12px;
+  padding:10px;
   border:none;
-  border-radius:10px;
-  background:linear-gradient(135deg, #00ff88, #00ccff);
-  color:#000;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:13px;
-  transition:all 0.2s;
-  margin-top:8px;
-}
-
-.daily-task-close-btn:active{
-  transform:scale(0.95);
-}
-
-.complete-task-btn{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:10px;
+  border-radius:8px;
   background:linear-gradient(135deg, #22c3a6, #00ff88);
   color:#000;
   font-weight:bold;
   cursor:pointer;
-  font-size:13px;
-  transition:all 0.2s;
-  margin-bottom:8px;
+  font-size:12px;
+  margin-top:8px;
 }
 
-.complete-task-btn:active{
+.complete-task-manual-btn:active{
   transform:scale(0.95);
+}
+
+.complete-task-manual-btn:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
 }
 </style>
 </head>
@@ -894,7 +855,7 @@ input::placeholder{
     <div style="margin-bottom:12px;">
       <button class="btn watch-ad-btn" id="watchAdBtn">📺 Watch Ad +20 coins</button>
       <p style="font-size:10px; margin-top:6px; opacity:0.6; text-align:center;">
-        ⏱️ Cooldown: 30 sec | Daily cap: 5 ads
+        ⏱️ Cooldown: 30 sec | Unlimited daily
       </p>
     </div>
 
@@ -956,7 +917,14 @@ input::placeholder{
     <!-- QUICK ACTION BUTTONS IN DAILY SECTION -->
     <div class="bonus-button-row">
       <button class="btn watch-ad-btn" id="dailyWatchAdBtn" onclick="watchAdFromDaily()">📺 Watch Ad +20</button>
-      <button class="btn task-btn" id="dailyTaskBtn" onclick="completeTaskFromDaily()">🎁 Do Task +30</button>
+      <button class="btn task-btn" id="dailyTaskBtn" onclick="activateDailyTaskBlock()">🎁 Do Task +30</button>
+    </div>
+
+    <!-- DAILY TASK BLOCK - Shows offer task when button clicked -->
+    <div class="daily-task-block-container" id="dailyTaskBlockContainer">
+      <p style="font-size:10px; opacity:0.7; margin-bottom:8px;">📊 Complete this offer to earn 30 coins</p>
+      <div id="dailyTaskAdsgramContainer"></div>
+      <button class="complete-task-manual-btn" id="completeDailyTaskManualBtn" onclick="confirmDailyTaskCompletion()">✅ I Completed the Task</button>
     </div>
 
     <button class="btn" id="claimBonusBtn" disabled>Claim 500 Bonus Coins</button>
@@ -1007,20 +975,17 @@ input::placeholder{
     <div class="disclaimer">
       ⚠️ <strong>DISCLAIMER:</strong> Withdrawal terms and conditions apply. All withdrawals are processed according to our payment policy. Please ensure your wallet address is correct before submission. We are not responsible for loss of funds due to incorrect wallet addresses.
     </div>
-  </div>
-</div>
 
-<!-- REFERRAL SECTION -->
-<div class="section withdraw">
-  <div class="section-content" style="margin-top:12px;">
-    <h2>👥 Invite Friends</h2>
-    <input id="refLink" readonly value="https://t.me/YourBotName?start=USER_ID">
-    <button class="btn" id="copyRefBtn" style="background:linear-gradient(135deg, #00ff88, #00ccff);">Copy Referral Link</button>
-    <p style="font-size:11px; margin-top:8px; opacity:0.7;">
-      Earn 100 coins for each friend!
-    </p>
-    <div class="disclaimer">
-      ⚠️ <strong>DISCLAIMER:</strong> Referral rewards are subject to verification. Fraudulent referrals or artificial account creation will result in disqualification and account suspension. Earn rewards legitimately only.
+    <!-- REFERRAL SECTION -->
+    <div style="margin-top:16px; padding-top:16px; border-top:1px solid rgba(0,255,136,0.2);">
+      <h2 style="font-size:14px; margin-bottom:12px; color:#00ff88;">👥 Invite Friends</h2>
+      <p style="font-size:11px; opacity:0.7; margin-bottom:12px;">Earn 50 coins for each friend who joins!</p>
+      <input id="refLink" readonly type="text" style="margin-bottom:8px;" value="">
+      <button class="btn referral-btn" id="copyRefBtn" onclick="copyReferralLink()">📋 Copy Referral Link</button>
+      <button class="btn referral-btn" id="shareRefBtn" onclick="shareReferralLink()" style="background:linear-gradient(135deg, #ff6b00, #ff8f00);">📤 Share Referral Link</button>
+      <div class="disclaimer" style="margin-top:10px;">
+        ⚠️ <strong>DISCLAIMER:</strong> Referral rewards are subject to verification. Fraudulent referrals or artificial account creation will result in disqualification and account suspension. Earn rewards legitimately only.
+      </div>
     </div>
   </div>
 </div>
@@ -1034,19 +999,6 @@ input::placeholder{
       <button class="cancel" onclick="closePopup()">Close</button>
       <button class="confirm" id="popupConfirm" onclick="closePopup()">OK</button>
     </div>
-  </div>
-</div>
-
-<!-- DAILY TASK MODAL -->
-<div id="dailyTaskModal">
-  <div class="daily-task-modal-content">
-    <h2 id="dailyTaskTitle">🎁 Complete Task</h2>
-    <p id="dailyTaskDesc">Complete this offer to earn 30 coins!</p>
-    
-    <div class="daily-task-adsgram-block" id="dailyTaskAdsgramContainer"></div>
-    
-    <button class="complete-task-btn" id="completeTaskManualBtn" onclick="confirmTaskCompletion()">✅ I Completed the Task</button>
-    <button class="daily-task-close-btn" onclick="closeDailyTaskModal()">Close</button>
   </div>
 </div>
 
@@ -1068,21 +1020,22 @@ const CONFIG = {
   AD_REWARD: 20,                    // 💰 Coins earned per ad watched
   ADS_REQUIRED_FOR_BONUS: 5,        // 🎯 Number of ads needed for daily bonus
   AD_COOLDOWN_SEC: 30,              // ⏱️  Seconds between ads
-  AD_DAILY_CAP: 5,                  // 🔒 Max ads per day
+  AD_DAILY_CAP: 999,                // 🔒 Max ads per day (CHANGED: Unlimited = 999)
 
   // 📋 OFFER TASK REWARDS & REQUIREMENTS
   TASK_REWARD: 30,                  // 💰 Coins earned per task completed
   TASKS_REQUIRED_FOR_BONUS: 5,      // 🎯 Number of tasks needed for daily bonus
   TASK_COOLDOWN_SEC: 30,            // ⏱️  Seconds between tasks
-  TASK_DAILY_CAP: 999,              // 🔒 Max tasks per day (unlimited = 999)
+  TASK_DAILY_CAP: 999,              // 🔒 Max tasks per day (CHANGED: Unlimited = 999)
 
   // 🎁 BONUS REWARDS
   DAILY_BONUS_AMOUNT: 500,          // 💰 Bonus coins when all requirements met
   JOIN_CHANNEL_REWARD: 5,           // 💰 Coins for joining channel
+  REFERRAL_REWARD: 50,              // 💰 Coins per referral (NEW)
 
   // 🏦 WITHDRAWAL
-  MIN_WITHDRAWAL: 15000,            // 💰 Minimum coins to withdraw (CHANGED: 15000)
-  EXCHANGE_RATE: 1,                 // 💱 1 Coin = X NGN (CHANGED: 1 naira per coin)
+  MIN_WITHDRAWAL: 15000,            // 💰 Minimum coins to withdraw
+  EXCHANGE_RATE: 1,                 // 💱 1 Coin = X NGN
 
   // 🌾 FARM REWARDS
   TAP_REWARD: 1,                    // 💰 Coins per tap
@@ -1120,7 +1073,7 @@ try {
 
 // =================== ADSGRAM CONFIG ===================
 const WATCH_AD_BLOCK_ID = '38705';
-const ADSGRAM_TASK_BLOCK_IDS = ['task-38707', 'task-38713']; // Array of task block IDs for random selection
+const ADSGRAM_TASK_BLOCK_IDS = ['task-38707', 'task-38713'];
 const JOIN_CHANNEL_AD_BLOCK_ID = '38706';
 
 // GAME STATE
@@ -1139,15 +1092,15 @@ let gameState = {
   lastAdTime: parseInt(localStorage.getItem('lastAdTime') || '0'),
   lastTaskTime: parseInt(localStorage.getItem('lastTaskTime') || '0'),
   bonusClaimedToday: localStorage.getItem('bonusClaimedToday') || '',
-  adDailyDate: localStorage.getItem('adDailyDate') || '',
   
-  // 24-hour tracking (don't reset until 24 hours)
-  requirementsLastReset: parseInt(localStorage.getItem('requirementsLastReset') || '0')
+  // 24-hour tracking
+  requirementsLastReset: parseInt(localStorage.getItem('requirementsLastReset') || '0'),
+  referralCount: parseInt(localStorage.getItem('referralCount') || '0')
 };
 
 let harvestCountdown = null;
 let adCooldown = {};
-let currentDailyTaskBlockId = null; // Track current task block being shown
+let currentDailyTaskBlockId = null;
 
 // Adsgram instances
 let rewardAd = null;
@@ -1160,13 +1113,19 @@ if (!appUserId) {
   localStorage.setItem('th_guestId', appUserId);
 }
 
+// =================== REFERRAL LINK ===================
+function generateReferralLink() {
+  const baseUrl = 'https://t.me/YourBotName?start=';
+  const refLink = baseUrl + appUserId;
+  document.getElementById('refLink').value = refLink;
+}
+
 // =================== 24 HOUR RESET CHECK ===================
 function check24HourReset() {
   const now = Date.now();
   const lastReset = gameState.requirementsLastReset || 0;
   const HOURS_24_MS = 24 * 60 * 60 * 1000;
   
-  // Only reset if 24 hours have passed
   if (now - lastReset > HOURS_24_MS) {
     gameState.adsWatchedToday = 0;
     gameState.offerTasksCompletedToday = 0;
@@ -1178,10 +1137,9 @@ function check24HourReset() {
 
 // =================== ADSGRAM SDK INIT ===================
 window.onload = async () => {
-  // Check for 24-hour reset first
   check24HourReset();
+  generateReferralLink();
 
-  // Init Adsgram
   if (typeof Adsgram !== 'undefined') {
     console.log('✅ Adsgram SDK loaded');
     try {
@@ -1200,7 +1158,7 @@ window.onload = async () => {
   updateUI();
   renderActivity();
   setInterval(() => updateUI(), 1000);
-  setInterval(() => check24HourReset(), 60000); // Check every minute
+  setInterval(() => check24HourReset(), 60000);
 };
 
 // =================== ACTIVATE TASK BLOCKS ===================
@@ -1208,26 +1166,74 @@ function activateTaskBlocks() {
   const block1 = document.getElementById('taskBlock1');
   const block2 = document.getElementById('taskBlock2');
   
-  // Show first block always
   block1.classList.add('active');
   
-  // Show second block randomly (50% chance)
   if (Math.random() > 0.5) {
     block2.classList.add('active');
   }
   
-  // Disable activation button and show confirmation
   const btn = document.getElementById('activateTasksBtn');
   btn.disabled = true;
   btn.innerText = '✅ Task Blocks Activated';
   
   toast('🎯 Offer task blocks activated!');
   
-  // Re-enable after 2 seconds
   setTimeout(() => {
     btn.disabled = false;
     btn.innerText = '📋 Activate Offer Tasks';
   }, 2000);
+}
+
+// =================== ACTIVATE DAILY TASK BLOCK ===================
+function activateDailyTaskBlock() {
+  const container = document.getElementById('dailyTaskBlockContainer');
+  
+  if (container.classList.contains('active')) {
+    container.classList.remove('active');
+    document.getElementById('dailyTaskBtn').innerText = '🎁 Do Task +30';
+    return;
+  }
+  
+  // Select random task block ID
+  currentDailyTaskBlockId = ADSGRAM_TASK_BLOCK_IDS[Math.floor(Math.random() * ADSGRAM_TASK_BLOCK_IDS.length)];
+  
+  // Create adsgram-task element
+  const taskContainer = document.getElementById('dailyTaskAdsgramContainer');
+  taskContainer.innerHTML = `<adsgram-task id="dailyAdsgramTask" data-block-id="${currentDailyTaskBlockId}"></adsgram-task>`;
+  
+  // Show container
+  container.classList.add('active');
+  document.getElementById('dailyTaskBtn').innerText = '🎁 Hide Task Block';
+  
+  toast('📋 Complete the offer task to earn 30 coins!');
+}
+
+// =================== CONFIRM DAILY TASK COMPLETION ===================
+function confirmDailyTaskCompletion() {
+  const now = Date.now();
+  const sinceLast = now - gameState.lastTaskTime;
+  
+  if (sinceLast < CONFIG.TASK_COOLDOWN_SEC * 1000) {
+    toast(`⏳ Wait ${Math.ceil((CONFIG.TASK_COOLDOWN_SEC * 1000 - sinceLast) / 1000)}s before next task`);
+    return;
+  }
+  
+  // Award coins
+  gameState.offerTasksCompletedToday++;
+  gameState.coins += CONFIG.TASK_REWARD;
+  gameState.lastTaskTime = now;
+  
+  createFloatText(`+${CONFIG.TASK_REWARD} (Task)`, '#00ff88');
+  toast(`✅ Task completed! +${CONFIG.TASK_REWARD} coins!`);
+  
+  // Hide task block
+  document.getElementById('dailyTaskBlockContainer').classList.remove('active');
+  document.getElementById('dailyTaskBtn').innerText = '🎁 Do Task +30';
+  document.getElementById('dailyTaskAdsgramContainer').innerHTML = '';
+  
+  updateDailyBonus();
+  saveState();
+  updateUI();
 }
 
 // =================== TOAST ===================
@@ -1302,91 +1308,6 @@ function watchAdFromDaily() {
   performWatchAd();
 }
 
-// =================== COMPLETE TASK FROM DAILY SECTION ===================
-function completeTaskFromDaily() {
-  if (gameState.offerTasksCompletedToday >= CONFIG.TASK_DAILY_CAP) {
-    toast(`⚠️ Daily task limit reached (${CONFIG.TASK_DAILY_CAP} max)`);
-    return;
-  }
-  
-  const now = Date.now();
-  const sinceLast = now - gameState.lastTaskTime;
-  
-  if (sinceLast < CONFIG.TASK_COOLDOWN_SEC * 1000) {
-    toast(`⏳ Wait ${Math.ceil((CONFIG.TASK_COOLDOWN_SEC * 1000 - sinceLast) / 1000)}s before next task`);
-    return;
-  }
-  
-  // Show the daily task modal with random offer task
-  showDailyTaskModal();
-}
-
-// =================== DAILY TASK MODAL ===================
-function showDailyTaskModal() {
-  // Select random task block ID
-  currentDailyTaskBlockId = ADSGRAM_TASK_BLOCK_IDS[Math.floor(Math.random() * ADSGRAM_TASK_BLOCK_IDS.length)];
-  
-  // Create adsgram-task element
-  const container = document.getElementById('dailyTaskAdsgramContainer');
-  container.innerHTML = `<adsgram-task id="dailyAdsgramTask" data-block-id="${currentDailyTaskBlockId}"></adsgram-task>`;
-  
-  // Show modal
-  document.getElementById('dailyTaskModal').style.display = 'flex';
-  
-  toast('📋 Complete the offer task to earn coins!');
-}
-
-function confirmTaskCompletion() {
-  const now = Date.now();
-  const sinceLast = now - gameState.lastTaskTime;
-  
-  if (sinceLast < CONFIG.TASK_COOLDOWN_SEC * 1000) {
-    toast(`⏳ Wait ${Math.ceil((CONFIG.TASK_COOLDOWN_SEC * 1000 - sinceLast) / 1000)}s before next task`);
-    return;
-  }
-  
-  // Award coins
-  gameState.offerTasksCompletedToday++;
-  gameState.coins += CONFIG.TASK_REWARD;
-  gameState.lastTaskTime = now;
-  
-  createFloatText(`+${CONFIG.TASK_REWARD} (Task)`, '#00ff88');
-  toast(`✅ Task completed! +${CONFIG.TASK_REWARD} coins!`);
-  
-  // Close modal and show next random task automatically
-  closeDailyTaskModal();
-  updateDailyBonus();
-  saveState();
-  updateUI();
-  
-  // Show next random task automatically after 1 second
-  if (gameState.offerTasksCompletedToday < CONFIG.TASKS_REQUIRED_FOR_BONUS) {
-    setTimeout(() => {
-      showDailyTaskModal();
-    }, 1000);
-  }
-}
-
-function closeDailyTaskModal() {
-  document.getElementById('dailyTaskModal').style.display = 'none';
-  document.getElementById('dailyTaskAdsgramContainer').innerHTML = '';
-  currentDailyTaskBlockId = null;
-}
-
-// =================== OFFER TASK COMPLETION ===================
-window.onOfferTaskCompleted = function(){
-  if (gameState.offerTasksCompletedToday < CONFIG.TASK_DAILY_CAP) {
-    gameState.offerTasksCompletedToday++;
-    gameState.coins += CONFIG.TASK_REWARD;
-    gameState.lastTaskTime = Date.now();
-    createFloatText(`+${CONFIG.TASK_REWARD} (Task)`, '#00ff88');
-    toast(`✅ Offer task completed +${CONFIG.TASK_REWARD} coins!`);
-    updateDailyBonus();
-    saveState();
-    updateUI();
-  }
-};
-
 // =================== DAILY BONUS ===================
 function updateDailyBonus(){
   const adsReq = CONFIG.ADS_REQUIRED_FOR_BONUS;
@@ -1395,7 +1316,6 @@ function updateDailyBonus(){
   document.getElementById('adsWatchedCount').innerText = `${gameState.adsWatchedToday}/${adsReq}`;
   document.getElementById('offerTasksCount').innerText = `${gameState.offerTasksCompletedToday}/${tasksReq}`;
   
-  // Update UI text with config values
   document.getElementById('bonusNoteText').innerText = `⭐ Complete to unlock daily bonus: +${CONFIG.DAILY_BONUS_AMOUNT} coins`;
   document.getElementById('claimBonusBtn').innerText = `Claim ${CONFIG.DAILY_BONUS_AMOUNT} Bonus Coins`;
   document.getElementById('dailyBonusDesc').innerText = `Complete ${adsReq} ads + ${tasksReq} offer tasks to claim ${CONFIG.DAILY_BONUS_AMOUNT} bonus coins!`;
@@ -1406,7 +1326,6 @@ function updateDailyBonus(){
     gameState.offerTasksCompletedToday >= tasksReq && 
     gameState.bonusClaimedToday !== new Date().toDateString();
   
-  // Update bonus progress bar
   const totalRequired = adsReq + tasksReq;
   const completed = gameState.adsWatchedToday + gameState.offerTasksCompletedToday;
   const progress = Math.min(100, (completed / totalRequired) * 100);
@@ -1435,6 +1354,30 @@ document.getElementById('joinBtn').onclick = () => {
   saveState();
   updateUI();
 };
+
+// =================== REFERRAL FUNCTIONS ===================
+function copyReferralLink() {
+  let link = document.getElementById('refLink');
+  link.select();
+  document.execCommand('copy');
+  showPopup('✅ Copied!', 'Referral link copied to clipboard');
+}
+
+function shareReferralLink() {
+  const link = document.getElementById('refLink').value;
+  const text = `🌾 Farm & Earn - Earn Money Playing Games!\n\nJoin me and earn 50 coins per referral!\n\n${link}`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: 'Farm & Earn',
+      text: text,
+      url: link
+    }).catch(err => console.log('Share error:', err));
+  } else {
+    // Fallback to copy
+    copyReferralLink();
+  }
+}
 
 // =================== FARM ACTIONS ===================
 function updateUI() {
@@ -1570,14 +1513,6 @@ document.getElementById('withdrawBtn').onclick = () => {
   showPopup('✅ Withdrawal Sent!', `${amount} coins → ₦${amount * CONFIG.EXCHANGE_RATE}\nMethod: ${method.toUpperCase()}`);
 };
 
-// REFERRAL
-document.getElementById('copyRefBtn').onclick = () => {
-  let link = document.getElementById('refLink');
-  link.select();
-  document.execCommand('copy');
-  showPopup('✅ Copied!', 'Referral link copied');
-};
-
 // UTILS
 function switchTab(tab) {
   document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
@@ -1628,8 +1563,8 @@ function saveState() {
   localStorage.setItem('lastAdTime', gameState.lastAdTime);
   localStorage.setItem('lastTaskTime', gameState.lastTaskTime);
   localStorage.setItem('bonusClaimedToday', gameState.bonusClaimedToday);
-  localStorage.setItem('adDailyDate', gameState.adDailyDate);
   localStorage.setItem('requirementsLastReset', gameState.requirementsLastReset);
+  localStorage.setItem('referralCount', gameState.referralCount);
 }
 
 function renderActivity() {
@@ -1639,13 +1574,6 @@ function renderActivity() {
 // Close popup on outside click
 document.getElementById('popup').onclick = (e) => {
   if (e.target.id === 'popup') closePopup();
-};
-
-// Close daily task modal on outside click
-document.getElementById('dailyTaskModal').onclick = (e) => {
-  if (e.target.id === 'dailyTaskModal') {
-    closeDailyTaskModal();
-  }
 };
 
 // Close join popup on outside click
