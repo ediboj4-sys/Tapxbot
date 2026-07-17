@@ -582,6 +582,30 @@ input::placeholder{
   margin-bottom:8px;
 }
 
+.task-btn{
+  background:linear-gradient(135deg, #6b00ff, #00a8ff);
+  margin-bottom:8px;
+}
+
+.task-tap-btn{
+  background:linear-gradient(135deg, #00ccff, #00ff88);
+  margin-bottom:8px;
+}
+
+/* TASK BLOCK CONTAINER */
+.task-block-container{
+  display:none;
+  background:rgba(0,0,0,0.5);
+  border:1px solid #00ccff;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:12px;
+}
+
+.task-block-container.active{
+  display:block;
+}
+
 /* JOIN POPUP */
 #joinPopup{
   position:fixed;
@@ -644,6 +668,33 @@ input::placeholder{
 .toast.show{
   opacity:1;
   transform:translateX(-50%) translateY(0);
+}
+
+/* BUTTON ROW FOR DAILY BONUS */
+.bonus-button-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.bonus-button-row button{
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:12px;
+  transition:all 0.2s;
+}
+
+.bonus-button-row button:active{
+  transform:scale(0.95);
+}
+
+.bonus-button-row button:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
 }
 </style>
 </head>
@@ -766,15 +817,28 @@ input::placeholder{
       </p>
     </div>
 
-    <!-- OFFER TASKS BLOCK (Adsgram) -->
+    <!-- OFFER TASKS BLOCK (Adsgram) - TAP TO ACTIVATE -->
     <div class="adsgram-section">
       <h3>🎁 Offer Tasks - Earn 30 coins each!</h3>
       <p style="font-size:10px; opacity:0.7; margin-bottom:10px;">
-        Complete unlimited offers with 30-second cooldown. Each completion = +30 coins
+        Tap below to activate task block, then complete unlimited offers with 30-second cooldown. Each completion = +30 coins
       </p>
-      <!-- ✅ TASK BLOCK - Always visible -->
-      <adsgram-task id="adsgramBlock" data-block-id="task-37623"></adsgram-task>
-      <div class="adsgram-block-id">📋 Block ID: task-37623</div>
+      <!-- TAP BUTTON TO SHOW TASK BLOCKS -->
+      <button class="btn task-tap-btn" id="activateTasksBtn" onclick="activateTaskBlocks()">📋 Activate Offer Tasks</button>
+      
+      <!-- TASK BLOCK 1 - Hidden until tapped -->
+      <div class="task-block-container" id="taskBlock1">
+        <p style="font-size:10px; opacity:0.7; margin-bottom:8px;">📊 Task Block 1 - Complete offers</p>
+        <adsgram-task id="adsgramBlock" data-block-id="task-37623"></adsgram-task>
+        <div class="adsgram-block-id">📋 Block ID: task-37623</div>
+      </div>
+
+      <!-- TASK BLOCK 2 - Hidden until tapped (randomly shown) -->
+      <div class="task-block-container" id="taskBlock2">
+        <p style="font-size:10px; opacity:0.7; margin-bottom:8px;">📊 Task Block 2 - Complete more offers</p>
+        <adsgram-task id="adsgramBlock2" data-block-id="task-45674"></adsgram-task>
+        <div class="adsgram-block-id">📋 Block ID: task-45674</div>
+      </div>
     </div>
 
     <div class="disclaimer">
@@ -806,6 +870,12 @@ input::placeholder{
 
     <div class="progress-bar" style="margin-bottom:12px;">
       <div class="progress-fill" id="dailyProgress"></div>
+    </div>
+
+    <!-- QUICK ACTION BUTTONS IN DAILY SECTION -->
+    <div class="bonus-button-row">
+      <button class="btn watch-ad-btn" id="dailyWatchAdBtn" onclick="watchAdFromDaily()">📺 Watch Ad +20</button>
+      <button class="btn task-btn" id="dailyTaskBtn" onclick="completeTaskFromDaily()">🎁 Do Task +30</button>
     </div>
 
     <button class="btn" id="claimBonusBtn" disabled>Claim 500 Bonus Coins</button>
@@ -956,7 +1026,8 @@ try {
 
 // =================== ADSGRAM CONFIG ===================
 const WATCH_AD_BLOCK_ID = '38705';
-const ADSGRAM_TASK_BLOCK_ID = 'task-38707';
+const ADSGRAM_TASK_BLOCK_ID_1 = 'task-37623';
+const ADSGRAM_TASK_BLOCK_ID_2 = 'task-45674';
 const JOIN_CHANNEL_AD_BLOCK_ID = '38706';
 
 // GAME STATE
@@ -969,13 +1040,16 @@ let gameState = {
   lastDaily: parseInt(localStorage.getItem('lastDaily') || '0'),
   selectedMethod: localStorage.getItem('selectedMethod') || 'usdt',
   
-  // Ads & Tasks tracking
+  // Ads & Tasks tracking with 24-hour reset
   adsWatchedToday: parseInt(localStorage.getItem('adsWatchedToday') || '0'),
   offerTasksCompletedToday: parseInt(localStorage.getItem('offerTasksCompletedToday') || '0'),
   lastAdTime: parseInt(localStorage.getItem('lastAdTime') || '0'),
   lastTaskTime: parseInt(localStorage.getItem('lastTaskTime') || '0'),
   bonusClaimedToday: localStorage.getItem('bonusClaimedToday') || '',
-  adDailyDate: localStorage.getItem('adDailyDate') || ''
+  adDailyDate: localStorage.getItem('adDailyDate') || '',
+  
+  // 24-hour tracking (don't reset until 24 hours)
+  requirementsLastReset: parseInt(localStorage.getItem('requirementsLastReset') || '0')
 };
 
 let harvestCountdown = null;
@@ -992,8 +1066,27 @@ if (!appUserId) {
   localStorage.setItem('th_guestId', appUserId);
 }
 
+// =================== 24 HOUR RESET CHECK ===================
+function check24HourReset() {
+  const now = Date.now();
+  const lastReset = gameState.requirementsLastReset || 0;
+  const HOURS_24_MS = 24 * 60 * 60 * 1000;
+  
+  // Only reset if 24 hours have passed
+  if (now - lastReset > HOURS_24_MS) {
+    gameState.adsWatchedToday = 0;
+    gameState.offerTasksCompletedToday = 0;
+    gameState.bonusClaimedToday = '';
+    gameState.requirementsLastReset = now;
+    console.log('✅ 24-hour reset triggered');
+  }
+}
+
 // =================== ADSGRAM SDK INIT ===================
 window.onload = async () => {
+  // Check for 24-hour reset first
+  check24HourReset();
+
   // Init Adsgram
   if (typeof Adsgram !== 'undefined') {
     console.log('✅ Adsgram SDK loaded');
@@ -1010,19 +1103,38 @@ window.onload = async () => {
     console.error('❌ Adsgram SDK not loaded');
   }
 
-  // Check if today is a new day
-  const todayStr = new Date().toDateString();
-  if (gameState.adDailyDate !== todayStr) {
-    gameState.adsWatchedToday = 0;
-    gameState.offerTasksCompletedToday = 0;
-    gameState.bonusClaimedToday = '';
-    gameState.adDailyDate = todayStr;
-  }
-
   updateUI();
   renderActivity();
   setInterval(() => updateUI(), 1000);
+  setInterval(() => check24HourReset(), 60000); // Check every minute
 };
+
+// =================== ACTIVATE TASK BLOCKS ===================
+function activateTaskBlocks() {
+  const block1 = document.getElementById('taskBlock1');
+  const block2 = document.getElementById('taskBlock2');
+  
+  // Show first block always
+  block1.classList.add('active');
+  
+  // Show second block randomly (50% chance)
+  if (Math.random() > 0.5) {
+    block2.classList.add('active');
+  }
+  
+  // Disable activation button and show confirmation
+  const btn = document.getElementById('activateTasksBtn');
+  btn.disabled = true;
+  btn.innerText = '✅ Task Blocks Activated';
+  
+  toast('🎯 Offer task blocks activated!');
+  
+  // Re-enable after 2 seconds
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerText = '📋 Activate Offer Tasks';
+  }, 2000);
+}
 
 // =================== TOAST ===================
 let toastTimer;
@@ -1035,7 +1147,9 @@ function toast(msg){
 }
 
 // =================== WATCH AD ===================
-document.getElementById('watchAdBtn').addEventListener('click', async () => {
+document.getElementById('watchAdBtn').addEventListener('click', performWatchAd);
+
+function performWatchAd() {
   if (!rewardAd) {
     toast('⏳ Ad system loading...');
     return;
@@ -1061,33 +1175,70 @@ document.getElementById('watchAdBtn').addEventListener('click', async () => {
   btn.innerText = '⏳ Loading Ad...';
   
   try {
-    const res = await rewardAd.show();
-    if (res?.done) {
-      gameState.coins += CONFIG.AD_REWARD;
-      gameState.adsWatchedToday++;
-      gameState.lastAdTime = now;
-      createFloatText(`+${CONFIG.AD_REWARD}`, '#00ff88');
-      toast(`✅ +${CONFIG.AD_REWARD} coins — thanks for watching!`);
-      updateDailyBonus();
-      saveState();
-      updateUI();
-    } else {
-      toast('⚠️ Ad skipped - no reward');
-    }
+    rewardAd.show().then(res => {
+      if (res?.done) {
+        gameState.coins += CONFIG.AD_REWARD;
+        gameState.adsWatchedToday++;
+        gameState.lastAdTime = now;
+        createFloatText(`+${CONFIG.AD_REWARD}`, '#00ff88');
+        toast(`✅ +${CONFIG.AD_REWARD} coins — thanks for watching!`);
+        updateDailyBonus();
+        saveState();
+        updateUI();
+      } else {
+        toast('⚠️ Ad skipped - no reward');
+      }
+    }).catch(error => {
+      console.error('Ad error:', error);
+      toast('⚠️ Ad closed - no reward');
+    }).finally(() => {
+      btn.disabled = false;
+      btn.innerText = `📺 Watch Ad +${CONFIG.AD_REWARD} coins`;
+    });
   } catch (error) {
     console.error('Ad error:', error);
-    toast('⚠️ Ad closed - no reward');
-  } finally {
+    toast('⚠️ Ad error - no reward');
     btn.disabled = false;
     btn.innerText = `📺 Watch Ad +${CONFIG.AD_REWARD} coins`;
   }
-});
+}
+
+// =================== WATCH AD FROM DAILY SECTION ===================
+function watchAdFromDaily() {
+  performWatchAd();
+}
+
+// =================== COMPLETE TASK FROM DAILY SECTION ===================
+function completeTaskFromDaily() {
+  if (gameState.offerTasksCompletedToday >= CONFIG.TASK_DAILY_CAP) {
+    toast(`⚠️ Daily task limit reached (${CONFIG.TASK_DAILY_CAP} max)`);
+    return;
+  }
+  
+  const now = Date.now();
+  const sinceLast = now - gameState.lastTaskTime;
+  
+  if (sinceLast < CONFIG.TASK_COOLDOWN_SEC * 1000) {
+    toast(`⏳ Wait ${Math.ceil((CONFIG.TASK_COOLDOWN_SEC * 1000 - sinceLast) / 1000)}s before next task`);
+    return;
+  }
+  
+  gameState.offerTasksCompletedToday++;
+  gameState.coins += CONFIG.TASK_REWARD;
+  gameState.lastTaskTime = now;
+  createFloatText(`+${CONFIG.TASK_REWARD} (Task)`, '#00ff88');
+  toast(`✅ Offer task completed +${CONFIG.TASK_REWARD} coins!`);
+  updateDailyBonus();
+  saveState();
+  updateUI();
+}
 
 // =================== OFFER TASK COMPLETION ===================
 window.onOfferTaskCompleted = function(){
   if (gameState.offerTasksCompletedToday < CONFIG.TASK_DAILY_CAP) {
     gameState.offerTasksCompletedToday++;
     gameState.coins += CONFIG.TASK_REWARD;
+    gameState.lastTaskTime = Date.now();
     createFloatText(`+${CONFIG.TASK_REWARD} (Task)`, '#00ff88');
     toast(`✅ Offer task completed +${CONFIG.TASK_REWARD} coins!`);
     updateDailyBonus();
@@ -1335,8 +1486,10 @@ function saveState() {
   localStorage.setItem('adsWatchedToday', gameState.adsWatchedToday);
   localStorage.setItem('offerTasksCompletedToday', gameState.offerTasksCompletedToday);
   localStorage.setItem('lastAdTime', gameState.lastAdTime);
+  localStorage.setItem('lastTaskTime', gameState.lastTaskTime);
   localStorage.setItem('bonusClaimedToday', gameState.bonusClaimedToday);
   localStorage.setItem('adDailyDate', gameState.adDailyDate);
+  localStorage.setItem('requirementsLastReset', gameState.requirementsLastReset);
 }
 
 function renderActivity() {
