@@ -611,21 +611,6 @@ input::placeholder{
   display:block;
 }
 
-/* DAILY TASK BLOCK CONTAINER */
-.daily-task-block-container{
-  display:none;
-  background:rgba(0,0,0,0.5);
-  border:1px solid #00ccff;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:12px;
-  min-height:150px;
-}
-
-.daily-task-block-container.active{
-  display:block;
-}
-
 /* JOIN POPUP */
 #joinPopup{
   position:fixed;
@@ -713,28 +698,6 @@ input::placeholder{
 }
 
 .bonus-button-row button:disabled{
-  opacity:0.5;
-  cursor:not-allowed;
-}
-
-.complete-task-manual-btn{
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  background:linear-gradient(135deg, #22c3a6, #00ff88);
-  color:#000;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:12px;
-  margin-top:8px;
-}
-
-.complete-task-manual-btn:active{
-  transform:scale(0.95);
-}
-
-.complete-task-manual-btn:disabled{
   opacity:0.5;
   cursor:not-allowed;
 }
@@ -917,14 +880,7 @@ input::placeholder{
     <!-- QUICK ACTION BUTTONS IN DAILY SECTION -->
     <div class="bonus-button-row">
       <button class="btn watch-ad-btn" id="dailyWatchAdBtn" onclick="watchAdFromDaily()">📺 Watch Ad +20</button>
-      <button class="btn task-btn" id="dailyTaskBtn" onclick="activateDailyTaskBlock()">🎁 Do Task +30</button>
-    </div>
-
-    <!-- DAILY TASK BLOCK - Shows offer task when button clicked -->
-    <div class="daily-task-block-container" id="dailyTaskBlockContainer">
-      <p style="font-size:10px; opacity:0.7; margin-bottom:8px;">📊 Complete this offer to earn 30 coins</p>
-      <div id="dailyTaskAdsgramContainer"></div>
-      <button class="complete-task-manual-btn" id="completeDailyTaskManualBtn" onclick="confirmDailyTaskCompletion()">✅ I Completed the Task</button>
+      <button class="btn task-btn" id="dailyTaskBtn" onclick="completeTaskFromDaily()">🎁 Do Task +30</button>
     </div>
 
     <button class="btn" id="claimBonusBtn" disabled>Claim 500 Bonus Coins</button>
@@ -1020,18 +976,18 @@ const CONFIG = {
   AD_REWARD: 20,                    // 💰 Coins earned per ad watched
   ADS_REQUIRED_FOR_BONUS: 5,        // 🎯 Number of ads needed for daily bonus
   AD_COOLDOWN_SEC: 30,              // ⏱️  Seconds between ads
-  AD_DAILY_CAP: 999,                // 🔒 Max ads per day (CHANGED: Unlimited = 999)
+  AD_DAILY_CAP: 999,                // 🔒 Max ads per day (Unlimited = 999)
 
   // 📋 OFFER TASK REWARDS & REQUIREMENTS
   TASK_REWARD: 30,                  // 💰 Coins earned per task completed
   TASKS_REQUIRED_FOR_BONUS: 5,      // 🎯 Number of tasks needed for daily bonus
   TASK_COOLDOWN_SEC: 30,            // ⏱️  Seconds between tasks
-  TASK_DAILY_CAP: 999,              // 🔒 Max tasks per day (CHANGED: Unlimited = 999)
+  TASK_DAILY_CAP: 999,              // 🔒 Max tasks per day (Unlimited = 999)
 
   // 🎁 BONUS REWARDS
   DAILY_BONUS_AMOUNT: 500,          // 💰 Bonus coins when all requirements met
   JOIN_CHANNEL_REWARD: 5,           // 💰 Coins for joining channel
-  REFERRAL_REWARD: 50,              // 💰 Coins per referral (NEW)
+  REFERRAL_REWARD: 50,              // 💰 Coins per referral
 
   // 🏦 WITHDRAWAL
   MIN_WITHDRAWAL: 15000,            // 💰 Minimum coins to withdraw
@@ -1095,7 +1051,10 @@ let gameState = {
   
   // 24-hour tracking
   requirementsLastReset: parseInt(localStorage.getItem('requirementsLastReset') || '0'),
-  referralCount: parseInt(localStorage.getItem('referralCount') || '0')
+  referralCount: parseInt(localStorage.getItem('referralCount') || '0'),
+  
+  // Task completion tracking
+  taskCompletionPending: false
 };
 
 let harvestCountdown = null;
@@ -1184,32 +1143,8 @@ function activateTaskBlocks() {
   }, 2000);
 }
 
-// =================== ACTIVATE DAILY TASK BLOCK ===================
-function activateDailyTaskBlock() {
-  const container = document.getElementById('dailyTaskBlockContainer');
-  
-  if (container.classList.contains('active')) {
-    container.classList.remove('active');
-    document.getElementById('dailyTaskBtn').innerText = '🎁 Do Task +30';
-    return;
-  }
-  
-  // Select random task block ID
-  currentDailyTaskBlockId = ADSGRAM_TASK_BLOCK_IDS[Math.floor(Math.random() * ADSGRAM_TASK_BLOCK_IDS.length)];
-  
-  // Create adsgram-task element
-  const taskContainer = document.getElementById('dailyTaskAdsgramContainer');
-  taskContainer.innerHTML = `<adsgram-task id="dailyAdsgramTask" data-block-id="${currentDailyTaskBlockId}"></adsgram-task>`;
-  
-  // Show container
-  container.classList.add('active');
-  document.getElementById('dailyTaskBtn').innerText = '🎁 Hide Task Block';
-  
-  toast('📋 Complete the offer task to earn 30 coins!');
-}
-
-// =================== CONFIRM DAILY TASK COMPLETION ===================
-function confirmDailyTaskCompletion() {
+// =================== COMPLETE TASK FROM DAILY SECTION ===================
+function completeTaskFromDaily() {
   const now = Date.now();
   const sinceLast = now - gameState.lastTaskTime;
   
@@ -1218,22 +1153,39 @@ function confirmDailyTaskCompletion() {
     return;
   }
   
-  // Award coins
-  gameState.offerTasksCompletedToday++;
-  gameState.coins += CONFIG.TASK_REWARD;
-  gameState.lastTaskTime = now;
+  // Select random task block ID
+  currentDailyTaskBlockId = ADSGRAM_TASK_BLOCK_IDS[Math.floor(Math.random() * ADSGRAM_TASK_BLOCK_IDS.length)];
   
-  createFloatText(`+${CONFIG.TASK_REWARD} (Task)`, '#00ff88');
-  toast(`✅ Task completed! +${CONFIG.TASK_REWARD} coins!`);
+  // Switch to tasks tab and show the task
+  switchTab('tasks');
   
-  // Hide task block
-  document.getElementById('dailyTaskBlockContainer').classList.remove('active');
-  document.getElementById('dailyTaskBtn').innerText = '🎁 Do Task +30';
-  document.getElementById('dailyTaskAdsgramContainer').innerHTML = '';
-  
-  updateDailyBonus();
-  saveState();
-  updateUI();
+  // Delay to let the tab switch animate
+  setTimeout(() => {
+    // Scroll to offer tasks section
+    const adSection = document.querySelector('.adsgram-section');
+    if (adSection) {
+      adSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    // Show task blocks
+    const block1 = document.getElementById('taskBlock1');
+    const block2 = document.getElementById('taskBlock2');
+    
+    block1.classList.remove('active');
+    block2.classList.remove('active');
+    
+    // Show only the randomly selected task
+    if (currentDailyTaskBlockId === ADSGRAM_TASK_BLOCK_IDS[0]) {
+      block1.classList.add('active');
+    } else {
+      block2.classList.add('active');
+    }
+    
+    // Mark that we're waiting for task completion
+    gameState.taskCompletionPending = true;
+    
+    toast('📋 Complete this offer task to earn 30 coins!');
+  }, 300);
 }
 
 // =================== TOAST ===================
@@ -1307,6 +1259,28 @@ function performWatchAd() {
 function watchAdFromDaily() {
   performWatchAd();
 }
+
+// =================== OFFER TASK COMPLETION (Auto-reward on task done) ===================
+window.onOfferTaskCompleted = function(){
+  if (gameState.taskCompletionPending && gameState.offerTasksCompletedToday < CONFIG.TASK_DAILY_CAP) {
+    const now = Date.now();
+    const sinceLast = now - gameState.lastTaskTime;
+    
+    if (sinceLast >= CONFIG.TASK_COOLDOWN_SEC * 1000) {
+      gameState.offerTasksCompletedToday++;
+      gameState.coins += CONFIG.TASK_REWARD;
+      gameState.lastTaskTime = now;
+      gameState.taskCompletionPending = false;
+      
+      createFloatText(`+${CONFIG.TASK_REWARD} (Task)`, '#00ff88');
+      toast(`✅ Task completed! +${CONFIG.TASK_REWARD} coins!`);
+      
+      updateDailyBonus();
+      saveState();
+      updateUI();
+    }
+  }
+};
 
 // =================== DAILY BONUS ===================
 function updateDailyBonus(){
@@ -1519,7 +1493,16 @@ function switchTab(tab) {
   document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
   
   document.querySelector('.section.' + tab).classList.add('active');
-  event.target.classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  tabs.forEach(t => {
+    if (t.onclick && t.onclick.toString().includes(`'${tab}'`)) {
+      t.classList.add('active');
+    }
+  });
+  
+  // Get the clicked tab directly
+  const tabBtn = Array.from(tabs).find(t => t.textContent.toLowerCase().includes(tab === 'farm' ? 'farm' : tab === 'tasks' ? 'tasks' : tab === 'daily' ? 'daily' : 'withdraw'));
+  if (tabBtn) tabBtn.classList.add('active');
 }
 
 function showPopup(title, message) {
