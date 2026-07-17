@@ -696,6 +696,87 @@ input::placeholder{
   opacity:0.5;
   cursor:not-allowed;
 }
+
+/* DAILY TASK MODAL */
+#dailyTaskModal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.9);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9998;
+  padding:20px;
+  overflow-y:auto;
+}
+
+.daily-task-modal-content{
+  background:linear-gradient(135deg, #1a3a24, #2d5a3d);
+  border:2px solid #00ff88;
+  border-radius:16px;
+  padding:20px;
+  max-width:90%;
+  text-align:center;
+  box-shadow:0 0 30px rgba(0,255,136,0.3);
+  width:100%;
+  margin:auto;
+}
+
+.daily-task-modal-content h2{
+  color:#00ff88;
+  margin-bottom:12px;
+  font-size:18px;
+}
+
+.daily-task-modal-content p{
+  font-size:12px;
+  margin-bottom:16px;
+  opacity:0.9;
+}
+
+.daily-task-adsgram-block{
+  margin:16px 0;
+  min-height:200px;
+}
+
+.daily-task-close-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(135deg, #00ff88, #00ccff);
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:13px;
+  transition:all 0.2s;
+  margin-top:8px;
+}
+
+.daily-task-close-btn:active{
+  transform:scale(0.95);
+}
+
+.complete-task-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(135deg, #22c3a6, #00ff88);
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:13px;
+  transition:all 0.2s;
+  margin-bottom:8px;
+}
+
+.complete-task-btn:active{
+  transform:scale(0.95);
+}
 </style>
 </head>
 
@@ -830,13 +911,13 @@ input::placeholder{
       <div class="task-block-container" id="taskBlock1">
         <p style="font-size:10px; opacity:0.7; margin-bottom:8px;">📊 Task Block 1 - Complete offers</p>
         <adsgram-task id="adsgramBlock" data-block-id="task-38707"></adsgram-task>
-        <div class="adsgram-block-id">📋 Block ID: task-38713</div>
+        <div class="adsgram-block-id">📋 Block ID: task-38707</div>
       </div>
 
       <!-- TASK BLOCK 2 - Hidden until tapped (randomly shown) -->
       <div class="task-block-container" id="taskBlock2">
         <p style="font-size:10px; opacity:0.7; margin-bottom:8px;">📊 Task Block 2 - Complete more offers</p>
-        <adsgram-task id="adsgramBlock2" data-block-id="task-38707"></adsgram-task>
+        <adsgram-task id="adsgramBlock2" data-block-id="task-38713"></adsgram-task>
         <div class="adsgram-block-id">📋 Block ID: task-38713</div>
       </div>
     </div>
@@ -908,12 +989,12 @@ input::placeholder{
     </div>
 
     <div class="input-group">
-      <label class="label">Amount (Min: 1000 coins = ₦5,000)</label>
-      <input id="amount" placeholder="Enter amount" type="number" min="1000">
+      <label class="label">Amount (Min: 15000 coins = ₦15,000)</label>
+      <input id="amount" placeholder="Enter amount" type="number" min="15000">
     </div>
 
     <div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; margin-bottom:12px; font-size:11px;">
-      <div>📊 Exchange Rate: 1 Coin = ₦5</div>
+      <div>📊 Exchange Rate: 1 Coin = ₦1</div>
       <div style="margin-top:4px;">You'll receive: ₦<span id="convertedAmount">0</span></div>
     </div>
 
@@ -956,6 +1037,19 @@ input::placeholder{
   </div>
 </div>
 
+<!-- DAILY TASK MODAL -->
+<div id="dailyTaskModal">
+  <div class="daily-task-modal-content">
+    <h2 id="dailyTaskTitle">🎁 Complete Task</h2>
+    <p id="dailyTaskDesc">Complete this offer to earn 30 coins!</p>
+    
+    <div class="daily-task-adsgram-block" id="dailyTaskAdsgramContainer"></div>
+    
+    <button class="complete-task-btn" id="completeTaskManualBtn" onclick="confirmTaskCompletion()">✅ I Completed the Task</button>
+    <button class="daily-task-close-btn" onclick="closeDailyTaskModal()">Close</button>
+  </div>
+</div>
+
 <!-- JOIN POPUP (for Adsgram join channel) -->
 <div id="joinPopup">
   <h2>Join Our Channel</h2>
@@ -987,8 +1081,8 @@ const CONFIG = {
   JOIN_CHANNEL_REWARD: 5,           // 💰 Coins for joining channel
 
   // 🏦 WITHDRAWAL
-  MIN_WITHDRAWAL: 1000,             // 💰 Minimum coins to withdraw
-  EXCHANGE_RATE: 5,                 // 💱 1 Coin = X NGN
+  MIN_WITHDRAWAL: 15000,            // 💰 Minimum coins to withdraw (CHANGED: 15000)
+  EXCHANGE_RATE: 1,                 // 💱 1 Coin = X NGN (CHANGED: 1 naira per coin)
 
   // 🌾 FARM REWARDS
   TAP_REWARD: 1,                    // 💰 Coins per tap
@@ -1026,8 +1120,7 @@ try {
 
 // =================== ADSGRAM CONFIG ===================
 const WATCH_AD_BLOCK_ID = '38705';
-const ADSGRAM_TASK_BLOCK_ID_1 = 'task-38707';
-const ADSGRAM_TASK_BLOCK_ID_2 = 'task-38713';
+const ADSGRAM_TASK_BLOCK_IDS = ['task-38707', 'task-38713']; // Array of task block IDs for random selection
 const JOIN_CHANNEL_AD_BLOCK_ID = '38706';
 
 // GAME STATE
@@ -1054,6 +1147,7 @@ let gameState = {
 
 let harvestCountdown = null;
 let adCooldown = {};
+let currentDailyTaskBlockId = null; // Track current task block being shown
 
 // Adsgram instances
 let rewardAd = null;
@@ -1223,14 +1317,60 @@ function completeTaskFromDaily() {
     return;
   }
   
+  // Show the daily task modal with random offer task
+  showDailyTaskModal();
+}
+
+// =================== DAILY TASK MODAL ===================
+function showDailyTaskModal() {
+  // Select random task block ID
+  currentDailyTaskBlockId = ADSGRAM_TASK_BLOCK_IDS[Math.floor(Math.random() * ADSGRAM_TASK_BLOCK_IDS.length)];
+  
+  // Create adsgram-task element
+  const container = document.getElementById('dailyTaskAdsgramContainer');
+  container.innerHTML = `<adsgram-task id="dailyAdsgramTask" data-block-id="${currentDailyTaskBlockId}"></adsgram-task>`;
+  
+  // Show modal
+  document.getElementById('dailyTaskModal').style.display = 'flex';
+  
+  toast('📋 Complete the offer task to earn coins!');
+}
+
+function confirmTaskCompletion() {
+  const now = Date.now();
+  const sinceLast = now - gameState.lastTaskTime;
+  
+  if (sinceLast < CONFIG.TASK_COOLDOWN_SEC * 1000) {
+    toast(`⏳ Wait ${Math.ceil((CONFIG.TASK_COOLDOWN_SEC * 1000 - sinceLast) / 1000)}s before next task`);
+    return;
+  }
+  
+  // Award coins
   gameState.offerTasksCompletedToday++;
   gameState.coins += CONFIG.TASK_REWARD;
   gameState.lastTaskTime = now;
+  
   createFloatText(`+${CONFIG.TASK_REWARD} (Task)`, '#00ff88');
-  toast(`✅ Offer task completed +${CONFIG.TASK_REWARD} coins!`);
+  toast(`✅ Task completed! +${CONFIG.TASK_REWARD} coins!`);
+  
+  // Close modal and show next random task automatically
+  closeDailyTaskModal();
   updateDailyBonus();
   saveState();
   updateUI();
+  
+  // Show next random task automatically after 1 second
+  if (gameState.offerTasksCompletedToday < CONFIG.TASKS_REQUIRED_FOR_BONUS) {
+    setTimeout(() => {
+      showDailyTaskModal();
+    }, 1000);
+  }
+}
+
+function closeDailyTaskModal() {
+  document.getElementById('dailyTaskModal').style.display = 'none';
+  document.getElementById('dailyTaskAdsgramContainer').innerHTML = '';
+  currentDailyTaskBlockId = null;
 }
 
 // =================== OFFER TASK COMPLETION ===================
@@ -1499,6 +1639,13 @@ function renderActivity() {
 // Close popup on outside click
 document.getElementById('popup').onclick = (e) => {
   if (e.target.id === 'popup') closePopup();
+};
+
+// Close daily task modal on outside click
+document.getElementById('dailyTaskModal').onclick = (e) => {
+  if (e.target.id === 'dailyTaskModal') {
+    closeDailyTaskModal();
+  }
 };
 
 // Close join popup on outside click
