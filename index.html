@@ -1074,7 +1074,7 @@ if (!appUserId) {
 
 // =================== REFERRAL LINK ===================
 function generateReferralLink() {
-  const baseUrl = 'https://t.me/YourBotName?start=';
+  const baseUrl = 'https://t.me/Promoteaffibot?start=';
   const refLink = baseUrl + appUserId;
   document.getElementById('refLink').value = refLink;
 }
@@ -1324,7 +1324,7 @@ document.getElementById('joinBtn').onclick = () => {
   createFloatText(`+${CONFIG.JOIN_CHANNEL_REWARD}`, '#00ff88');
   document.getElementById("joinPopup").style.display = "none";
   toast(`✨ +${CONFIG.JOIN_CHANNEL_REWARD} coins for joining!`);
-  window.open('https://t.me/freeupdateas', "_blank");
+  window.open('https://t.me/Adatyubot?start=ref_6136849497', "_blank");
   saveState();
   updateUI();
 };
