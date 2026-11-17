@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,9 +7,7 @@
 <title>Farm & Earn</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<!-- ADSGRAM SDK -->
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-<!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
 
 <style>
@@ -104,15 +103,7 @@ input::placeholder{color:rgba(255,255,255,.5)}
 .bonus-button-row button:disabled{opacity:.5;cursor:not-allowed}
 
 /* MINIFARM PARTNER TASK STATUS */
-.partner-task-box{
-  display:none;
-  background:rgba(0,0,0,.45);
-  border:1px solid #00ccff;
-  border-radius:12px;
-  padding:12px;
-  margin-bottom:12px;
-  line-height:1.5;
-}
+.partner-task-box{display:none;background:rgba(0,0,0,.45);border:1px solid #00ccff;border-radius:12px;padding:12px;margin-bottom:12px;line-height:1.5}
 .partner-task-box.active{display:block}
 .partner-task-box h3{color:#00ff88;font-size:13px;margin-bottom:6px}
 .partner-task-status{font-size:12px;opacity:.9}
@@ -128,7 +119,6 @@ input::placeholder{color:rgba(255,255,255,.5)}
   <div class="level-badge">Lv. <span id="level">1</span></div>
 </div>
 
-<!-- MINIFARM PARTNER TASK STATUS -->
 <div class="partner-task-box" id="partnerTaskBox">
   <h3>🎯 MiniFarm Partner Task</h3>
   <div class="partner-task-status" id="partnerTaskStatus">Checking your task...</div>
@@ -457,8 +447,9 @@ function check24HourReset(){
 
 /* =====================================================
    MINIFARM PARTNER TASK INTEGRATION
-   The partner secret is NOT placed in this HTML file.
-   The partner bot sends the start verification separately.
+   The partner secret is never placed in this HTML file.
+   MiniFarm verifies the bot start, Mini App launch,
+   activity duration and reward on its own server.
 ===================================================== */
 
 const MINIFARM_PARTNER={
@@ -475,6 +466,7 @@ let partnerCompletionBusy=false;
 let partnerRequiredSeconds=0;
 let partnerActiveSeconds=0;
 
+/* Get task code passed by Telegram or URL */
 function getPartnerTaskCode(){
   try{
     const url=new URL(window.location.href);
@@ -483,7 +475,10 @@ function getPartnerTaskCode(){
     if(queryCode)return queryCode;
 
     const startParam=tg?.initDataUnsafe?.start_param;
-    if(startParam && startParam.startsWith('mf_'))return startParam;
+
+    if(startParam && startParam.startsWith('mf_')){
+      return startParam;
+    }
 
     return null;
   }catch(error){
@@ -492,6 +487,16 @@ function getPartnerTaskCode(){
   }
 }
 
+/* Safely read the nested API response */
+function getPartnerResponseData(result){
+  if(result && result.data && typeof result.data==='object'){
+    return result.data;
+  }
+
+  return {};
+}
+
+/* Partner task status display */
 function showPartnerTask(message,activeSeconds,requiredSeconds){
   const box=document.getElementById('partnerTaskBox');
   const status=document.getElementById('partnerTaskStatus');
@@ -507,30 +512,45 @@ function showPartnerTask(message,activeSeconds,requiredSeconds){
   progress.style.width=percent+'%';
 }
 
+/* API request */
 async function partnerApiRequest(endpoint,payload){
   const response=await fetch(MINIFARM_PARTNER.API_BASE+endpoint,{
     method:'POST',
     headers:{
       'Content-Type':'application/json'
     },
-    body:JSON.stringify(payload)
+    body:JSON.stringify(payload),
+    cache:'no-store'
   });
 
-  let data;
+  let result;
 
   try{
-    data=await response.json();
+    result=await response.json();
   }catch(error){
     throw new Error('MiniFarm returned an invalid response.');
   }
 
   if(!response.ok){
-    throw new Error(data?.message||data?.error||('HTTP error '+response.status));
+    throw new Error(
+      result?.message ||
+      result?.error ||
+      ('HTTP error '+response.status)
+    );
   }
 
-  return data;
+  return result;
 }
 
+/* Stop heartbeat timer */
+function stopPartnerHeartbeat(){
+  if(partnerHeartbeatTimer){
+    clearInterval(partnerHeartbeatTimer);
+    partnerHeartbeatTimer=null;
+  }
+}
+
+/* Start partner verification */
 async function startPartnerTaskFlow(){
   partnerTaskCode=getPartnerTaskCode();
 
@@ -549,12 +569,16 @@ async function startPartnerTaskFlow(){
     return;
   }
 
-  if(!partnerTaskCode.startsWith('mf_')){
+  if(!/^mf_[A-Za-z0-9_-]{1,96}$/.test(partnerTaskCode)){
     showPartnerTask('Invalid partner task code.',0,0);
     return;
   }
 
-  showPartnerTask('Verifying your Telegram account and partner task...',0,0);
+  showPartnerTask(
+    'Verifying your Telegram account and partner task...',
+    0,
+    0
+  );
 
   try{
     const result=await partnerApiRequest('partner-launch.php',{
@@ -564,11 +588,21 @@ async function startPartnerTaskFlow(){
     });
 
     if(result.success!==true){
-      throw new Error(result.message||result.error||'MiniFarm could not verify this task.');
+      throw new Error(
+        result.message ||
+        'MiniFarm could not verify this task.'
+      );
     }
 
-    partnerRequiredSeconds=parseInt(result.required_seconds||0,10);
-    partnerActiveSeconds=parseInt(result.active_seconds||0,10);
+    /* IMPORTANT: launch PHP returns fields inside result.data */
+    const data=getPartnerResponseData(result);
+
+    partnerRequiredSeconds=parseInt(data.required_seconds||0,10);
+    partnerActiveSeconds=parseInt(data.active_seconds||0,10);
+
+    if(data.mini_app_opened!==true){
+      throw new Error('MiniFarm did not confirm the Mini App launch.');
+    }
 
     if(partnerRequiredSeconds<=0){
       throw new Error('MiniFarm returned an invalid task duration.');
@@ -577,12 +611,15 @@ async function startPartnerTaskFlow(){
     partnerTaskActive=true;
 
     showPartnerTask(
-      'Partner task verified. Keep this Mini App open while your activity is counted.',
+      'Partner task verified. Keep this Mini App open while MiniFarm counts your activity.',
       partnerActiveSeconds,
       partnerRequiredSeconds
     );
 
-    if(result.ready_to_complete===true || partnerActiveSeconds>=partnerRequiredSeconds){
+    if(
+      data.ready_to_complete===true ||
+      partnerActiveSeconds>=partnerRequiredSeconds
+    ){
       await completePartnerTask();
       return;
     }
@@ -591,7 +628,10 @@ async function startPartnerTaskFlow(){
 
   }catch(error){
     console.error('Partner launch error:',error);
+
     partnerTaskActive=false;
+    stopPartnerHeartbeat();
+
     showPartnerTask(
       'Partner task verification failed: '+error.message,
       0,
@@ -600,22 +640,28 @@ async function startPartnerTaskFlow(){
   }
 }
 
+/* Start heartbeat timer */
 function startPartnerHeartbeat(){
-  if(partnerHeartbeatTimer){
-    clearInterval(partnerHeartbeatTimer);
-  }
+  stopPartnerHeartbeat();
 
-  partnerHeartbeatTimer=setInterval(async()=>{
+  if(!partnerTaskActive)return;
+
+  partnerHeartbeatTimer=setInterval(()=>{
     if(!partnerTaskActive)return;
+
     if(document.visibilityState!=='visible')return;
+
     if(partnerHeartbeatBusy || partnerCompletionBusy)return;
 
-    await sendPartnerHeartbeat();
+    sendPartnerHeartbeat();
   },MINIFARM_PARTNER.HEARTBEAT_INTERVAL);
 }
 
+/* Send heartbeat to MiniFarm */
 async function sendPartnerHeartbeat(){
   if(!tg?.initData || !partnerTaskCode)return;
+  if(!partnerTaskActive)return;
+  if(partnerHeartbeatBusy || partnerCompletionBusy)return;
 
   partnerHeartbeatBusy=true;
 
@@ -627,69 +673,83 @@ async function sendPartnerHeartbeat(){
     });
 
     if(result.success!==true){
-      throw new Error(result.message||result.error||'Activity update was rejected.');
+      throw new Error(
+        result.message ||
+        'Activity update was rejected.'
+      );
     }
 
+    /* IMPORTANT: heartbeat PHP returns fields inside result.data */
+    const data=getPartnerResponseData(result);
+
     partnerActiveSeconds=parseInt(
-      result.active_seconds ?? partnerActiveSeconds,
+      data.active_seconds ?? partnerActiveSeconds,
       10
     );
 
     partnerRequiredSeconds=parseInt(
-      result.required_seconds ?? partnerRequiredSeconds,
+      data.required_seconds ?? partnerRequiredSeconds,
       10
     );
 
     const remaining=Math.max(
       0,
       parseInt(
-        result.remaining_seconds ??
+        data.remaining_seconds ??
         (partnerRequiredSeconds-partnerActiveSeconds),
         10
       )
     );
 
-    if(result.ready_to_complete===true || remaining<=0){
+    if(
+      data.ready_to_complete===true ||
+      remaining<=0
+    ){
       showPartnerTask(
-        'Required activity completed. Verifying your reward...',
+        'Required activity completed. Verifying your reward with MiniFarm...',
         partnerActiveSeconds,
         partnerRequiredSeconds
       );
 
+      /* Completion happens after heartbeat finishes */
+      partnerHeartbeatBusy=false;
       await completePartnerTask();
       return;
     }
 
     showPartnerTask(
-      'Activity verified: '+partnerActiveSeconds+' / '+partnerRequiredSeconds+' seconds. Keep the Mini App open.',
+      'Activity verified: '+partnerActiveSeconds+
+      ' / '+partnerRequiredSeconds+
+      ' seconds. Keep the Mini App open.',
       partnerActiveSeconds,
       partnerRequiredSeconds
     );
 
   }catch(error){
     console.error('Partner heartbeat error:',error);
+
     showPartnerTask(
-      'Connection issue. Your task has not been marked complete yet. Keep the Mini App open.',
+      'Connection issue: '+error.message+
+      '. Your task is not marked complete yet. Keep the Mini App open.',
       partnerActiveSeconds,
       partnerRequiredSeconds
     );
+
   }finally{
     partnerHeartbeatBusy=false;
   }
 }
 
+/* Complete task and receive MiniFarm confirmation */
 async function completePartnerTask(){
-  if(partnerCompletionBusy || !partnerTaskCode || !tg?.initData)return;
+  if(partnerCompletionBusy)return;
+  if(!partnerTaskCode || !tg?.initData)return;
 
   partnerCompletionBusy=true;
-
-  if(partnerHeartbeatTimer){
-    clearInterval(partnerHeartbeatTimer);
-    partnerHeartbeatTimer=null;
-  }
+  stopPartnerHeartbeat();
 
   showPartnerTask(
-    'Sending completion request to MiniFarm for verification...',
+    'Sending completion request to MiniFarm...',
     partnerActiveSeconds,
     partnerRequiredSeconds
   );
@@ -702,39 +762,79 @@ async function completePartnerTask(){
     });
 
     if(result.success!==true){
-      throw new Error(result.message||result.error||'MiniFarm did not approve the completion.');
+      throw new Error(
+        result.message ||
+        'MiniFarm did not approve the completion.'
+      );
     }
+
+    /* Completion PHP also returns wallet details inside result.data */
+    const data=getPartnerResponseData(result);
 
     partnerTaskActive=false;
 
+    const reward=Number(data.reward_mx||0);
+    const balance=Number(data.balance_mx||0);
+
+    let successMessage=result.message||
+      'Partner task completed successfully.';
+
+    if(reward>0){
+      successMessage+=' Reward credited: '+reward+' MX.';
+    }
+
+    if(data.balance_mx!==undefined){
+      successMessage+=' MiniFarm wallet balance: '+balance+' MX.';
+    }
+
     showPartnerTask(
-      result.message||'Partner task completed successfully. MiniFarm has processed the reward.',
+      successMessage,
       partnerRequiredSeconds,
       partnerRequiredSeconds
     );
 
-    toast('✅ MiniFarm partner task completed!');
+    toast('✅ MiniFarm confirmed your partner task reward!');
+
+    console.log('MiniFarm partner completion:',{
+      success:result.success,
+      reward_mx:data.reward_mx,
+      balance_mx:data.balance_mx,
+      total_earned_mx:data.total_earned_mx,
+      reward_paid:data.reward_paid
+    });
 
   }catch(error){
     console.error('Partner completion error:',error);
 
-    partnerTaskActive=false;
+    /*
+      Do not permanently disable the task after a temporary
+      completion error. The next heartbeat can retry completion
+      once MiniFarm confirms the required activity duration.
+    */
+    partnerTaskActive=true;
 
     showPartnerTask(
-      'Completion could not be confirmed: '+error.message+'. Please contact MiniFarm support if this continues.',
+      'Completion request failed: '+error.message+
+      '. Retrying verification. Keep the Mini App open.',
       partnerActiveSeconds,
       partnerRequiredSeconds
     );
+
+    startPartnerHeartbeat();
 
   }finally{
     partnerCompletionBusy=false;
   }
 }
 
-/* Stop heartbeat when page is hidden.
-   The backend also checks elapsed activity time. */
+/* When the Mini App becomes visible again, send a heartbeat */
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible' && partnerTaskActive){
+  if(
+    document.visibilityState==='visible' &&
+    partnerTaskActive &&
+    !partnerHeartbeatBusy &&
+    !partnerCompletionBusy
+  ){
     sendPartnerHeartbeat();
   }
 });
@@ -773,7 +873,7 @@ window.onload=async()=>{
   setInterval(()=>check24HourReset(),60000);
 
   /* Start MiniFarm partner verification if task_code exists */
-  startPartnerTaskFlow();
+  await startPartnerTaskFlow();
 };
 
 /* ACTIVATE TASK BLOCKS */
