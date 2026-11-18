@@ -594,7 +594,6 @@ async function startPartnerTaskFlow(){
       );
     }
 
-    /* IMPORTANT: launch PHP returns fields inside result.data */
     const data=getPartnerResponseData(result);
 
     partnerRequiredSeconds=parseInt(data.required_seconds||0,10);
@@ -648,9 +647,7 @@ function startPartnerHeartbeat(){
 
   partnerHeartbeatTimer=setInterval(()=>{
     if(!partnerTaskActive)return;
-
     if(document.visibilityState!=='visible')return;
-
     if(partnerHeartbeatBusy || partnerCompletionBusy)return;
 
     sendPartnerHeartbeat();
@@ -679,7 +676,6 @@ async function sendPartnerHeartbeat(){
       );
     }
 
-    /* IMPORTANT: heartbeat PHP returns fields inside result.data */
     const data=getPartnerResponseData(result);
 
     partnerActiveSeconds=parseInt(
@@ -711,7 +707,6 @@ async function sendPartnerHeartbeat(){
         partnerRequiredSeconds
       );
 
-      /* Completion happens after heartbeat finishes */
       partnerHeartbeatBusy=false;
       await completePartnerTask();
       return;
@@ -740,7 +735,7 @@ async function sendPartnerHeartbeat(){
   }
 }
 
-/* Complete task and receive MiniFarm confirmation */
+/* COMPLETE TASK AND CHECK MINIFARM BOT MESSAGE DELIVERY */
 async function completePartnerTask(){
   if(partnerCompletionBusy)return;
   if(!partnerTaskCode || !tg?.initData)return;
@@ -768,49 +763,44 @@ async function completePartnerTask(){
       );
     }
 
-    /* Completion PHP also returns wallet details inside result.data */
     const data=getPartnerResponseData(result);
 
     partnerTaskActive=false;
+    stopPartnerHeartbeat();
 
-    const reward=Number(data.reward_mx||0);
-    const balance=Number(data.balance_mx||0);
+    const codeSent =
+      data.reward_code_sent === true ||
+      data.code_sent === true ||
+      data.telegram_sent === true ||
+      data.message_sent === true ||
+      data.notification_sent === true;
 
-    let successMessage=result.message||
-      'Partner task completed successfully.';
+    if(codeSent){
+      showPartnerTask(
+        '✅ Task completed! MiniFarm has sent your reward code to your MiniFarm bot chat. Open the bot to collect it.',
+        partnerRequiredSeconds,
+        partnerRequiredSeconds
+      );
 
-    if(reward>0){
-      successMessage+=' Reward credited: '+reward+' MX.';
+      toast('✅ Reward code sent to your MiniFarm bot chat!');
+    }else{
+      showPartnerTask(
+        'Task completion accepted by MiniFarm. Reward-code delivery has not yet been confirmed. Please check your MiniFarm bot chat.',
+        partnerRequiredSeconds,
+        partnerRequiredSeconds
+      );
+
+      toast('Task accepted. Check your MiniFarm bot chat.');
     }
-
-    if(data.balance_mx!==undefined){
-      successMessage+=' MiniFarm wallet balance: '+balance+' MX.';
-    }
-
-    showPartnerTask(
-      successMessage,
-      partnerRequiredSeconds,
-      partnerRequiredSeconds
-    );
-
-    toast('✅ MiniFarm confirmed your partner task reward!');
 
     console.log('MiniFarm partner completion:',{
       success:result.success,
-      reward_mx:data.reward_mx,
-      balance_mx:data.balance_mx,
-      total_earned_mx:data.total_earned_mx,
-      reward_paid:data.reward_paid
+      reward_code_sent:codeSent
     });
 
   }catch(error){
     console.error('Partner completion error:',error);
 
-    /*
-      Do not permanently disable the task after a temporary
-      completion error. The next heartbeat can retry completion
-      once MiniFarm confirms the required activity duration.
-    */
     partnerTaskActive=true;
 
     showPartnerTask(
@@ -872,7 +862,6 @@ window.onload=async()=>{
   setInterval(()=>updateUI(),1000);
   setInterval(()=>check24HourReset(),60000);
 
-  /* Start MiniFarm partner verification if task_code exists */
   await startPartnerTaskFlow();
 };
 
