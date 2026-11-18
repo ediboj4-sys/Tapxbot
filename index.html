@@ -1146,3 +1146,43 @@ document.querySelectorAll(
     }
   });
 });
+  
+/* ==========================================
+   PART 4 — FINAL INITIALIZATION & CLEANUP
+   TAPX + MINIFARM PARTNER REWARD INTEGRATION
+========================================== */
+
+/* PREVENT DUPLICATE TASK REWARDS */
+window.addEventListener('beforeunload',()=>{
+  stopPartnerHeartbeat();
+});
+
+/* RESTORE PARTNER TASK WHEN PAGE RETURNS */
+window.addEventListener('pageshow',()=>{
+  if(
+    partnerTaskActive &&
+    partnerTaskCode &&
+    document.visibilityState==='visible'
+  ){
+    sendPartnerHeartbeat();
+  }
+});
+
+/* CHECK PARTNER TASK STATUS */
+document.addEventListener('DOMContentLoaded',()=>{
+  console.log('TapX + MiniFarm integration loaded');
+});
+
+/* FINAL ERROR HANDLING */
+window.addEventListener('unhandledrejection',event=>{
+  console.error(
+    'Unhandled integration error:',
+    event.reason
+  );
+});
+
+/* END OF TAPX + MINIFARM INTEGRATION */
+</script>
+</body>
+</html>
+
