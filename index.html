@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -328,7 +329,8 @@ input::placeholder{color:rgba(255,255,255,.5)}
 
 <div class="toast" id="toast"></div>
 
-<script>const CONFIG = {
+<script>
+const CONFIG = {
   AD_REWARD:20,
   ADS_REQUIRED_FOR_BONUS:5,
   AD_COOLDOWN_SEC:30,
@@ -385,6 +387,20 @@ try{
 const WATCH_AD_BLOCK_ID='38705';
 const ADSGRAM_TASK_BLOCK_IDS=['task-38707','task-38713'];
 const JOIN_CHANNEL_AD_BLOCK_ID='38706';
+
+/* YOUR TELEGRAM CHANNEL URL */
+const JOIN_CHANNEL_URL='https://t.me/konnet';
+
+/* JOIN CHANNEL BUTTON CLICK HANDLER */
+document.getElementById('joinBtn').addEventListener('click',function(){
+
+  if(tg && typeof tg.openTelegramLink==='function'){
+    tg.openTelegramLink(JOIN_CHANNEL_URL);
+  }else{
+    window.open(JOIN_CHANNEL_URL,'_blank');
+  }
+
+});
 
 /* GAME STATE */
 let gameState={
@@ -445,9 +461,6 @@ function check24HourReset(){
 
 /* =====================================================
    MINIFARM PARTNER TASK INTEGRATION
-   The partner secret is never placed in this HTML file.
-   MiniFarm verifies the bot start, Mini App launch,
-   activity duration and reward on its own server.
 ===================================================== */
 
 const MINIFARM_PARTNER={
@@ -540,14 +553,10 @@ async function partnerApiRequest(endpoint,payload){
   return result;
 }
 
-
 /* =====================================================
    AUTOMATIC TAPX + MINIFARM DUAL REWARD
-   TapX keeps its existing localStorage coin reward.
-   This request also credits the authenticated Telegram
-   user's TapX database wallet and MiniFarm MX wallet.
-   No claim codes are generated or displayed.
 ===================================================== */
+
 let miniFarmDualRewardBusy = false;
 
 async function sendMiniFarmDualReward(rewardType){
@@ -662,7 +671,6 @@ async function startPartnerTaskFlow(){
       );
     }
 
-    /* IMPORTANT: launch PHP returns fields inside result.data */
     const data=getPartnerResponseData(result);
 
     partnerRequiredSeconds=parseInt(data.required_seconds||0,10);
@@ -707,6 +715,7 @@ async function startPartnerTaskFlow(){
     );
   }
 }
+
 /* STOP PARTNER HEARTBEAT */
 function stopPartnerHeartbeat(){
   if(partnerHeartbeatTimer){
@@ -918,7 +927,6 @@ window.onload=async()=>{
   setInterval(()=>updateUI(),1000);
   setInterval(()=>check24HourReset(),60000);
 
-  /* Existing MiniFarm partner task session */
   partnerTaskCode=getPartnerTaskCode();
 
   if(partnerTaskCode){
@@ -1049,7 +1057,6 @@ function performWatchAd(){
     rewardAd.show().then(res=>{
       if(res?.done){
 
-        /* TapX localStorage reward */
         gameState.coins+=CONFIG.AD_REWARD;
         gameState.adsWatchedToday++;
         gameState.lastAdTime=Date.now();
@@ -1067,7 +1074,6 @@ function performWatchAd(){
         saveState();
         updateUI();
 
-        /* Also credit TapX database and MiniFarm: 50 MX */
         void sendMiniFarmDualReward('ad');
 
       }else{
@@ -1111,7 +1117,6 @@ window.onOfferTaskCompleted=function(){
 
     if(sinceLast>=CONFIG.TASK_COOLDOWN_SEC*1000){
 
-      /* TapX localStorage reward */
       gameState.offerTasksCompletedToday++;
       gameState.coins+=CONFIG.TASK_REWARD;
       gameState.lastTaskTime=now;
@@ -1130,7 +1135,6 @@ window.onOfferTaskCompleted=function(){
       saveState();
       updateUI();
 
-      /* Also credit TapX database and MiniFarm: 50 MX */
       void sendMiniFarmDualReward('task');
     }
   }
@@ -1146,10 +1150,9 @@ document.querySelectorAll(
     }
   });
 });
-  
+
 /* ==========================================
    PART 4 — FINAL INITIALIZATION & CLEANUP
-   TAPX + MINIFARM PARTNER REWARD INTEGRATION
 ========================================== */
 
 /* PREVENT DUPLICATE TASK REWARDS */
@@ -1185,4 +1188,3 @@ window.addEventListener('unhandledrejection',event=>{
 </script>
 </body>
 </html>
-
