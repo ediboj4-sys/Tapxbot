@@ -328,4 +328,382 @@ input::placeholder{color:rgba(255,255,255,.5)}
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script><script>const CONFIG = {
+  AD_REWARD:20,
+  ADS_REQUIRED_FOR_BONUS:5,
+  AD_COOLDOWN_SEC:30,
+  AD_DAILY_CAP:999,
+  TASK_REWARD:30,
+  TASKS_REQUIRED_FOR_BONUS:5,
+  TASK_COOLDOWN_SEC:30,
+  TASK_DAILY_CAP:999,
+  DAILY_BONUS_AMOUNT:500,
+  JOIN_CHANNEL_REWARD:5,
+  REFERRAL_REWARD:50,
+  MIN_WITHDRAWAL:15000,
+  EXCHANGE_RATE:1,
+  TAP_REWARD:1,
+  PLANT_COST:10,
+  PLANT_REWARD:5,
+  HARVEST_REWARD:50,
+  HARVEST_COOLDOWN_MS:300000
+};
+
+console.log('CONFIG LOADED:',CONFIG);
+
+/* TELEGRAM INITIALIZATION */
+const tg = window.Telegram?.WebApp;
+
+if(tg){
+  try{
+    tg.ready();
+    tg.expand();
+  }catch(error){
+    console.warn('Telegram initialization:',error);
+  }
+}
+
+/* SUPABASE CONFIG */
+const SUPABASE_URL='https://bedlwbnkrwcqldjkmjtn.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_TCI6fZmtCn0wHU8A9PrQBQ_1jNtnESC';
+
+let SUPA=null;
+
+try{
+  if(window.supabase && typeof window.supabase.createClient==='function'){
+    SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+    console.log('Supabase client initialized');
+  }else{
+    console.warn('Supabase JS not available');
+  }
+}catch(e){
+  console.error('Supabase init error',e);
+  SUPA=null;
+}
+
+/* ADSGRAM CONFIG */
+const WATCH_AD_BLOCK_ID='38705';
+const ADSGRAM_TASK_BLOCK_IDS=['task-38707','task-38713'];
+const JOIN_CHANNEL_AD_BLOCK_ID='38706';
+
+/* GAME STATE */
+let gameState={
+  coins:parseInt(localStorage.getItem('coins')||'0'),
+  totalTaps:parseInt(localStorage.getItem('totalTaps')||'0'),
+  farmLevel:parseInt(localStorage.getItem('farmLevel')||'1'),
+  lastHarvest:parseInt(localStorage.getItem('lastHarvest')||Date.now()),
+  dailyProgress:JSON.parse(localStorage.getItem('dailyProgress')||'[false,false,false,false]'),
+  lastDaily:parseInt(localStorage.getItem('lastDaily')||'0'),
+  selectedMethod:localStorage.getItem('selectedMethod')||'usdt',
+  adsWatchedToday:parseInt(localStorage.getItem('adsWatchedToday')||'0'),
+  offerTasksCompletedToday:parseInt(localStorage.getItem('offerTasksCompletedToday')||'0'),
+  lastAdTime:parseInt(localStorage.getItem('lastAdTime')||'0'),
+  lastTaskTime:parseInt(localStorage.getItem('lastTaskTime')||'0'),
+  bonusClaimedToday:localStorage.getItem('bonusClaimedToday')||'',
+  requirementsLastReset:parseInt(localStorage.getItem('requirementsLastReset')||'0'),
+  referralCount:parseInt(localStorage.getItem('referralCount')||'0'),
+  taskCompletionPending:false
+};
+
+let harvestCountdown=null;
+let adCooldown={};
+let currentDailyTaskBlockId=null;
+let rewardAd=null;
+let joinAd=null;
+
+/* USER ID */
+let appUserId=tg?.initDataUnsafe?.user?.id
+  ?String(tg.initDataUnsafe.user.id)
+  :(localStorage.getItem('th_guestId')||null);
+
+if(!appUserId){
+  appUserId='guest_'+Math.random().toString(36).slice(2,10);
+  localStorage.setItem('th_guestId',appUserId);
+}
+
+/* REFERRAL LINK */
+function generateReferralLink(){
+  const baseUrl='https://t.me/Promoteaffibot?start=';
+  document.getElementById('refLink').value=baseUrl+appUserId;
+}
+
+/* 24 HOUR RESET */
+function check24HourReset(){
+  const now=Date.now();
+  const lastReset=gameState.requirementsLastReset||0;
+  const HOURS_24_MS=24*60*60*1000;
+
+  if(now-lastReset>HOURS_24_MS){
+    gameState.adsWatchedToday=0;
+    gameState.offerTasksCompletedToday=0;
+    gameState.bonusClaimedToday='';
+    gameState.requirementsLastReset=now;
+    console.log('24-hour reset triggered');
+    saveState();
+  }
+}
+
+/* =====================================================
+   MINIFARM PARTNER TASK INTEGRATION
+   The partner secret is never placed in this HTML file.
+   MiniFarm verifies the bot start, Mini App launch,
+   activity duration and reward on its own server.
+===================================================== */
+
+const MINIFARM_PARTNER={
+  API_BASE:'https://playmxbot.xyz/api/',
+  BOT_USERNAME:'Promoteaffibot',
+  HEARTBEAT_INTERVAL:10000
+};
+
+let partnerTaskCode=null;
+let partnerTaskActive=false;
+let partnerHeartbeatTimer=null;
+let partnerHeartbeatBusy=false;
+let partnerCompletionBusy=false;
+let partnerRequiredSeconds=0;
+let partnerActiveSeconds=0;
+
+/* Get task code passed by Telegram or URL */
+function getPartnerTaskCode(){
+  try{
+    const url=new URL(window.location.href);
+    const queryCode=url.searchParams.get('task_code');
+
+    if(queryCode)return queryCode;
+
+    const startParam=tg?.initDataUnsafe?.start_param;
+
+    if(startParam && startParam.startsWith('mf_')){
+      return startParam;
+    }
+
+    return null;
+  }catch(error){
+    console.error('Could not read partner task code:',error);
+    return null;
+  }
+}
+
+/* Safely read the nested API response */
+function getPartnerResponseData(result){
+  if(result && result.data && typeof result.data==='object'){
+    return result.data;
+  }
+
+  return {};
+}
+
+/* Partner task status display */
+function showPartnerTask(message,activeSeconds,requiredSeconds){
+  const box=document.getElementById('partnerTaskBox');
+  const status=document.getElementById('partnerTaskStatus');
+  const progress=document.getElementById('partnerTaskProgress');
+
+  box.classList.add('active');
+  status.textContent=message;
+
+  const percent=requiredSeconds>0
+    ?Math.min(100,(activeSeconds/requiredSeconds)*100)
+    :0;
+
+  progress.style.width=percent+'%';
+}
+
+/* API request */
+async function partnerApiRequest(endpoint,payload){
+  const response=await fetch(MINIFARM_PARTNER.API_BASE+endpoint,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify(payload),
+    cache:'no-store'
+  });
+
+  let result;
+
+  try{
+    result=await response.json();
+  }catch(error){
+    throw new Error('MiniFarm returned an invalid response.');
+  }
+
+  if(!response.ok){
+    throw new Error(
+      result?.message ||
+      result?.error ||
+      ('HTTP error '+response.status)
+    );
+  }
+
+  return result;
+}
+
+
+/* =====================================================
+   AUTOMATIC TAPX + MINIFARM DUAL REWARD
+   TapX keeps its existing localStorage coin reward.
+   This request also credits the authenticated Telegram
+   user's TapX database wallet and MiniFarm MX wallet.
+   No claim codes are generated or displayed.
+===================================================== */
+let miniFarmDualRewardBusy = false;
+
+async function sendMiniFarmDualReward(rewardType){
+  if(!['ad','task'].includes(rewardType)) return;
+
+  const initData = tg?.initData;
+  if(!initData || !tg?.initDataUnsafe?.user?.id){
+    console.warn('Dual reward not sent: open TapX from Telegram first.');
+    toast('⚠️ Open TapX inside Telegram to credit the MiniFarm reward.');
+    return;
+  }
+
+  if(miniFarmDualRewardBusy) return;
+  miniFarmDualRewardBusy = true;
+
+  const eventId = (
+    window.crypto && typeof window.crypto.randomUUID === 'function'
+  )
+    ? window.crypto.randomUUID()
+    : ('tapx_' + Date.now() + '_' + Math.random().toString(36).slice(2,12));
+
+  try{
+    const response = await fetch(MINIFARM_PARTNER.API_BASE+'tapx-dual-reward.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        initData:initData,
+        event_id:eventId,
+        reward_type:rewardType
+      }),
+      cache:'no-store'
+    });
+
+    let result;
+    try{
+      result = await response.json();
+    }catch(error){
+      throw new Error('MiniFarm returned an invalid response.');
+    }
+
+    if(response.status===409 && result?.data?.duplicate===true){
+      toast('ℹ️ This reward was already credited to both wallets.');
+      return;
+    }
+
+    if(!response.ok || result?.success!==true){
+      throw new Error(result?.message || ('HTTP error '+response.status));
+    }
+
+    const data = result.data || {};
+    console.log('TapX + MiniFarm dual reward credited:',data);
+    toast('🎉 '+(rewardType==='ad'?'Ad':'Task')+' reward credited: '+
+      (data.minifarm_reward_mx||50)+' MX to MiniFarm!');
+
+  }catch(error){
+    console.error('TapX + MiniFarm dual reward failed:',error);
+    toast('⚠️ TapX reward was added, but MiniFarm credit failed: '+error.message);
+  }finally{
+    miniFarmDualRewardBusy = false;
+  }
+}
+
+/* Stop heartbeat timer */
+function stopPartnerHeartbeat(){
+  if(partnerHeartbeatTimer){
+    clearInterval(partnerHeartbeatTimer);
+    partnerHeartbeatTimer=null;
+  }
+}
+
+/* Start partner verification */
+async function startPartnerTaskFlow(){
+  partnerTaskCode=getPartnerTaskCode();
+
+  if(!partnerTaskCode){
+    return;
+  }
+
+  const initData=tg?.initData;
+
+  if(!tg || !initData){
+    showPartnerTask(
+      'Please open this Mini App from Telegram to verify your partner task.',
+      0,
+      0
+    );
+    return;
+  }
+
+  if(!/^mf_[A-Za-z0-9_-]{1,96}$/.test(partnerTaskCode)){
+    showPartnerTask('Invalid partner task code.',0,0);
+    return;
+  }
+
+  showPartnerTask(
+    'Verifying your Telegram account and partner task...',
+    0,
+    0
+  );
+
+  try{
+    const result=await partnerApiRequest('partner-launch.php',{
+      bot_username:MINIFARM_PARTNER.BOT_USERNAME,
+      task_code:partnerTaskCode,
+      initData:initData
+    });
+
+    if(result.success!==true){
+      throw new Error(
+        result.message ||
+        'MiniFarm could not verify this task.'
+      );
+    }
+
+    /* IMPORTANT: launch PHP returns fields inside result.data */
+    const data=getPartnerResponseData(result);
+
+    partnerRequiredSeconds=parseInt(data.required_seconds||0,10);
+    partnerActiveSeconds=parseInt(data.active_seconds||0,10);
+
+    if(data.mini_app_opened!==true){
+      throw new Error('MiniFarm did not confirm the Mini App launch.');
+    }
+
+    if(partnerRequiredSeconds<=0){
+      throw new Error('MiniFarm returned an invalid task duration.');
+    }
+
+    partnerTaskActive=true;
+
+    showPartnerTask(
+      'Partner task verified. Keep this Mini App open while MiniFarm counts your activity.',
+      partnerActiveSeconds,
+      partnerRequiredSeconds
+    );
+
+    if(
+      data.ready_to_complete===true ||
+      partnerActiveSeconds>=partnerRequiredSeconds
+    ){
+      await completePartnerTask();
+      return;
+    }
+
+    startPartnerHeartbeat();
+
+  }catch(error){
+    console.error('Partner launch error:',error);
+
+    partnerTaskActive=false;
+    stopPartnerHeartbeat();
+
+    showPartnerTask(
+      'Partner task verification failed: '+error.message,
+      0,
+      0
+    );
+  }
+}
