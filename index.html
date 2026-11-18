@@ -707,3 +707,442 @@ async function startPartnerTaskFlow(){
     );
   }
 }
+/* STOP PARTNER HEARTBEAT */
+function stopPartnerHeartbeat(){
+  if(partnerHeartbeatTimer){
+    clearInterval(partnerHeartbeatTimer);
+    partnerHeartbeatTimer=null;
+  }
+}
+
+/* START PARTNER HEARTBEAT */
+function startPartnerHeartbeat(){
+  stopPartnerHeartbeat();
+
+  if(!partnerTaskActive)return;
+
+  partnerHeartbeatTimer=setInterval(()=>{
+    if(!partnerTaskActive)return;
+    if(document.visibilityState!=='visible')return;
+    if(partnerHeartbeatBusy || partnerCompletionBusy)return;
+
+    sendPartnerHeartbeat();
+  },MINIFARM_PARTNER.HEARTBEAT_INTERVAL);
+}
+
+/* SEND HEARTBEAT */
+async function sendPartnerHeartbeat(){
+  if(!tg?.initData || !partnerTaskCode)return;
+  if(!partnerTaskActive)return;
+  if(partnerHeartbeatBusy || partnerCompletionBusy)return;
+
+  partnerHeartbeatBusy=true;
+
+  try{
+    const result=await partnerApiRequest('partner-heartbeat.php',{
+      bot_username:MINIFARM_PARTNER.BOT_USERNAME,
+      task_code:partnerTaskCode,
+      initData:tg.initData
+    });
+
+    if(result.success!==true){
+      throw new Error(result.message||'Activity update was rejected.');
+    }
+
+    const data=getPartnerResponseData(result);
+
+    partnerActiveSeconds=parseInt(
+      data.active_seconds ?? partnerActiveSeconds,10
+    );
+
+    partnerRequiredSeconds=parseInt(
+      data.required_seconds ?? partnerRequiredSeconds,10
+    );
+
+    const remaining=Math.max(
+      0,
+      parseInt(
+        data.remaining_seconds ??
+        (partnerRequiredSeconds-partnerActiveSeconds),10
+      )
+    );
+
+    if(data.ready_to_complete===true || remaining<=0){
+      showPartnerTask(
+        'Required activity completed. Verifying with MiniFarm...',
+        partnerActiveSeconds,
+        partnerRequiredSeconds
+      );
+
+      partnerHeartbeatBusy=false;
+      await completePartnerTask();
+      return;
+    }
+
+    showPartnerTask(
+      'Activity verified: '+partnerActiveSeconds+
+      ' / '+partnerRequiredSeconds+
+      ' seconds. Keep the Mini App open.',
+      partnerActiveSeconds,
+      partnerRequiredSeconds
+    );
+
+  }catch(error){
+    console.error('Partner heartbeat error:',error);
+
+    showPartnerTask(
+      'Connection issue: '+error.message+
+      '. Keep the Mini App open.',
+      partnerActiveSeconds,
+      partnerRequiredSeconds
+    );
+
+  }finally{
+    partnerHeartbeatBusy=false;
+  }
+}
+
+/* COMPLETE PARTNER TASK */
+async function completePartnerTask(){
+  if(partnerCompletionBusy)return;
+  if(!partnerTaskCode || !tg?.initData)return;
+
+  partnerCompletionBusy=true;
+  stopPartnerHeartbeat();
+
+  showPartnerTask(
+    'Sending completion request to MiniFarm...',
+    partnerActiveSeconds,
+    partnerRequiredSeconds
+  );
+
+  try{
+    const result=await partnerApiRequest('partner-complete.php',{
+      bot_username:MINIFARM_PARTNER.BOT_USERNAME,
+      task_code:partnerTaskCode,
+      initData:tg.initData
+    });
+
+    if(result.success!==true){
+      throw new Error(
+        result.message||'MiniFarm did not approve completion.'
+      );
+    }
+
+    const data=getPartnerResponseData(result);
+
+    partnerTaskActive=false;
+
+    const reward=Number(data.reward_mx||0);
+    const balance=Number(data.balance_mx||0);
+
+    let message=result.message||'Partner task completed successfully.';
+
+    if(reward>0){
+      message+=' Reward credited: '+reward+' MX.';
+    }
+
+    if(data.balance_mx!==undefined){
+      message+=' MiniFarm balance: '+balance+' MX.';
+    }
+
+    showPartnerTask(
+      message,
+      partnerRequiredSeconds,
+      partnerRequiredSeconds
+    );
+
+    toast('✅ MiniFarm confirmed your partner task!');
+
+  }catch(error){
+    console.error('Partner completion error:',error);
+
+    partnerTaskActive=true;
+
+    showPartnerTask(
+      'Completion request failed: '+error.message+
+      '. Retrying verification. Keep the Mini App open.',
+      partnerActiveSeconds,
+      partnerRequiredSeconds
+    );
+
+    startPartnerHeartbeat();
+
+  }finally{
+    partnerCompletionBusy=false;
+  }
+}
+
+/* SEND HEARTBEAT WHEN APP BECOMES VISIBLE */
+document.addEventListener('visibilitychange',()=>{
+  if(
+    document.visibilityState==='visible' &&
+    partnerTaskActive &&
+    !partnerHeartbeatBusy &&
+    !partnerCompletionBusy
+  ){
+    sendPartnerHeartbeat();
+  }
+});
+
+/* PAGE INITIALIZATION */
+window.onload=async()=>{
+  check24HourReset();
+  generateReferralLink();
+
+  if(typeof Adsgram!=='undefined'){
+    console.log('Adsgram SDK loaded');
+
+    try{
+      rewardAd=Adsgram.init({blockId:WATCH_AD_BLOCK_ID});
+      console.log('Watch Ad initialized');
+
+      joinAd=Adsgram.init({blockId:JOIN_CHANNEL_AD_BLOCK_ID});
+      console.log('Join Channel Ad initialized');
+
+      joinAd.show().finally(()=>{
+        document.getElementById('joinPopup').style.display='flex';
+      });
+
+    }catch(error){
+      console.error('Adsgram initialization error:',error);
+    }
+  }else{
+    console.error('Adsgram SDK not loaded');
+  }
+
+  updateDailyBonus();
+  updateUI();
+  renderActivity();
+
+  setInterval(()=>updateUI(),1000);
+  setInterval(()=>check24HourReset(),60000);
+
+  /* Existing MiniFarm partner task session */
+  partnerTaskCode=getPartnerTaskCode();
+
+  if(partnerTaskCode){
+    startPartnerTaskFlow();
+  }
+};
+
+/* ACTIVATE TASK BLOCKS */
+function activateTaskBlocks(){
+  const block1=document.getElementById('taskBlock1');
+  const block2=document.getElementById('taskBlock2');
+
+  block1.classList.add('active');
+  gameState.taskCompletionPending=true;
+
+  if(Math.random()>.5){
+    block2.classList.add('active');
+  }
+
+  const btn=document.getElementById('activateTasksBtn');
+  btn.disabled=true;
+  btn.innerText='✅ Task Blocks Activated';
+
+  toast('🎯 Offer task blocks activated!');
+
+  setTimeout(()=>{
+    btn.disabled=false;
+    btn.innerText='📋 Activate Offer Tasks';
+  },2000);
+}
+
+/* COMPLETE TASK FROM DAILY SECTION */
+function completeTaskFromDaily(){
+  const now=Date.now();
+  const sinceLast=now-gameState.lastTaskTime;
+
+  if(sinceLast<CONFIG.TASK_COOLDOWN_SEC*1000){
+    toast(
+      `⏳ Wait ${Math.ceil(
+        (CONFIG.TASK_COOLDOWN_SEC*1000-sinceLast)/1000
+      )}s before next task`
+    );
+    return;
+  }
+
+  currentDailyTaskBlockId=ADSGRAM_TASK_BLOCK_IDS[
+    Math.floor(Math.random()*ADSGRAM_TASK_BLOCK_IDS.length)
+  ];
+
+  switchTab('tasks');
+
+  setTimeout(()=>{
+    const adSection=document.querySelector('.adsgram-section');
+
+    if(adSection){
+      adSection.scrollIntoView({
+        behavior:'smooth',
+        block:'center'
+      });
+    }
+
+    const block1=document.getElementById('taskBlock1');
+    const block2=document.getElementById('taskBlock2');
+
+    block1.classList.remove('active');
+    block2.classList.remove('active');
+
+    if(currentDailyTaskBlockId===ADSGRAM_TASK_BLOCK_IDS[0]){
+      block1.classList.add('active');
+    }else{
+      block2.classList.add('active');
+    }
+
+    gameState.taskCompletionPending=true;
+
+    toast('📋 Complete this offer task to earn 30 coins!');
+  },300);
+}
+
+/* TOAST MESSAGE */
+let toastTimer;
+
+function toast(msg){
+  const el=document.getElementById('toast');
+
+  el.innerText=msg;
+  el.classList.add('show');
+
+  clearTimeout(toastTimer);
+
+  toastTimer=setTimeout(()=>{
+    el.classList.remove('show');
+  },2600);
+}
+
+/* WATCH AD */
+document.getElementById('watchAdBtn')
+  .addEventListener('click',performWatchAd);
+
+function performWatchAd(){
+  if(!rewardAd){
+    toast('⏳ Ad system loading...');
+    return;
+  }
+
+  const btn=document.getElementById('watchAdBtn');
+  const now=Date.now();
+  const sinceLast=now-gameState.lastAdTime;
+
+  if(gameState.adsWatchedToday>=CONFIG.AD_DAILY_CAP){
+    toast('⚠️ Daily ad limit reached');
+    return;
+  }
+
+  if(sinceLast<CONFIG.AD_COOLDOWN_SEC*1000){
+    toast(
+      `⏳ Wait ${Math.ceil(
+        (CONFIG.AD_COOLDOWN_SEC*1000-sinceLast)/1000
+      )}s before next ad`
+    );
+    return;
+  }
+
+  btn.disabled=true;
+  btn.innerText='⏳ Loading Ad...';
+
+  try{
+    rewardAd.show().then(res=>{
+      if(res?.done){
+
+        /* TapX localStorage reward */
+        gameState.coins+=CONFIG.AD_REWARD;
+        gameState.adsWatchedToday++;
+        gameState.lastAdTime=Date.now();
+
+        createFloatText(
+          `+${CONFIG.AD_REWARD}`,
+          '#00ff88'
+        );
+
+        toast(
+          `✅ +${CONFIG.AD_REWARD} coins — thanks for watching!`
+        );
+
+        updateDailyBonus();
+        saveState();
+        updateUI();
+
+        /* Also credit TapX database and MiniFarm: 50 MX */
+        void sendMiniFarmDualReward('ad');
+
+      }else{
+        toast('⚠️ Ad skipped - no reward');
+      }
+
+    }).catch(error=>{
+      console.error('Ad error:',error);
+      toast('⚠️ Ad closed - no reward');
+
+    }).finally(()=>{
+      btn.disabled=false;
+      btn.innerText=`📺 Watch Ad +${CONFIG.AD_REWARD} coins`;
+    });
+
+  }catch(error){
+    console.error('Ad error:',error);
+
+    toast('⚠️ Ad error - no reward');
+
+    btn.disabled=false;
+    btn.innerText=`📺 Watch Ad +${CONFIG.AD_REWARD} coins`;
+  }
+}
+
+/* WATCH AD FROM DAILY SECTION */
+function watchAdFromDaily(){
+  performWatchAd();
+}
+
+/* ADSGRAM OFFER TASK COMPLETION */
+window.onOfferTaskCompleted=function(){
+
+  if(
+    gameState.taskCompletionPending &&
+    gameState.offerTasksCompletedToday<CONFIG.TASK_DAILY_CAP
+  ){
+
+    const now=Date.now();
+    const sinceLast=now-gameState.lastTaskTime;
+
+    if(sinceLast>=CONFIG.TASK_COOLDOWN_SEC*1000){
+
+      /* TapX localStorage reward */
+      gameState.offerTasksCompletedToday++;
+      gameState.coins+=CONFIG.TASK_REWARD;
+      gameState.lastTaskTime=now;
+      gameState.taskCompletionPending=false;
+
+      createFloatText(
+        `+${CONFIG.TASK_REWARD} (Task)`,
+        '#00ff88'
+      );
+
+      toast(
+        `✅ Task completed! +${CONFIG.TASK_REWARD} coins!`
+      );
+
+      updateDailyBonus();
+      saveState();
+      updateUI();
+
+      /* Also credit TapX database and MiniFarm: 50 MX */
+      void sendMiniFarmDualReward('task');
+    }
+  }
+};
+
+/* ADSGRAM TASK REWARD EVENTS */
+document.querySelectorAll(
+  '#adsgramBlock, #adsgramBlock2'
+).forEach(taskElement=>{
+  taskElement.addEventListener('reward',()=>{
+    if(typeof window.onOfferTaskCompleted==='function'){
+      window.onOfferTaskCompleted();
+    }
+  });
+});
