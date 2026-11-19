@@ -1612,4 +1612,7 @@ document.getElementById('joinPopup').onclick=(e)=>{
     document.getElementById('joinPopup').style.display='none';
   }
 };
+</script>
 
+</body>
+</html>
