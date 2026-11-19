@@ -1140,3 +1140,476 @@ async function performWatchAd(){
 function watchAdFromDaily(){
   performWatchAd();
 }
+
+/* EXISTING ADSGRAM OFFER CALLBACK */
+window.onOfferTaskCompleted=async function(){
+  if(gameState.taskCompletionPending &&
+     gameState.offerTasksCompletedToday<CONFIG.TASK_DAILY_CAP){
+
+    const now=Date.now();
+    const sinceLast=now-gameState.lastTaskTime;
+
+    if(sinceLast>=CONFIG.TASK_COOLDOWN_SEC*1000){
+      if(!requireTapxWallet()) return;
+      try{
+        await sendMiniFarmDualReward('task');
+      }catch(rewardError){
+        toast('⚠️ Task reward was not credited: '+rewardError.message);
+        return;
+      }
+      gameState.lastTaskTime=now;
+      gameState.taskCompletionPending=false;
+
+      createFloatText(`+${CONFIG.TASK_REWARD} (Task)`,'#00ff88');
+      toast(`✅ Task completed! +${CONFIG.TASK_REWARD} coins!`);
+
+      updateDailyBonus();
+      saveState();
+      updateUI();
+    }
+  }
+};
+
+// AdsGram task completion events
+document.querySelectorAll('#adsgramBlock, #adsgramBlock2').forEach(taskElement=>{
+  taskElement.addEventListener('reward',()=>{
+    if(typeof window.onOfferTaskCompleted==='function'){
+      window.onOfferTaskCompleted();
+    }
+  });
+});
+
+/* DAILY BONUS — MYSQL SERVER COUNTERS */
+function updateDailyBonus(){
+  const adsReq=CONFIG.ADS_REQUIRED_FOR_BONUS;
+  const tasksReq=CONFIG.TASKS_REQUIRED_FOR_BONUS;
+  const ads=Math.max(0,Number(gameState.adsWatchedToday||0));
+  const tasks=Math.max(0,Number(gameState.offerTasksCompletedToday||0));
+
+  document.getElementById('adsWatchedCount').innerText=`${ads}/${adsReq}`;
+  document.getElementById('offerTasksCount').innerText=`${tasks}/${tasksReq}`;
+
+  document.getElementById('bonusNoteText').innerText=
+    `⭐ Complete to unlock daily bonus: +${CONFIG.DAILY_BONUS_AMOUNT} coins`;
+
+  document.getElementById('claimBonusBtn').innerText=
+    `Claim ${CONFIG.DAILY_BONUS_AMOUNT} Bonus Coins`;
+
+  document.getElementById('dailyBonusDesc').innerText=
+    `Complete ${adsReq} ads + ${tasksReq} offer tasks to claim ${CONFIG.DAILY_BONUS_AMOUNT} bonus coins!`;
+
+  document.getElementById('dailyReqText').innerText=
+    `Requirements: ${adsReq} ads watched + ${tasksReq} offer tasks completed`;
+
+  const completed=Math.min(ads,adsReq)+Math.min(tasks,tasksReq);
+  const progress=Math.min(100,(completed/(adsReq+tasksReq))*100);
+
+  document.getElementById('bonusProgressBar').style.width=progress+'%';
+
+  const canClaim=gameState.dailyStatsLoaded===true &&
+    gameState.canClaimDailyBonus===true &&
+    gameState.bonusClaimedToday!==true;
+
+  document.getElementById('claimBonusBtn').disabled=!canClaim;
+
+  if(gameState.bonusClaimedToday===true){
+    document.getElementById('bonusNoteText').innerText='✅ Today’s 500-coin bonus has already been claimed.';
+  }else if(!gameState.dailyStatsLoaded){
+    document.getElementById('bonusNoteText').innerText='⏳ Connecting to the server to load today’s progress...';
+  }else if(ads<adsReq || tasks<tasksReq){
+    document.getElementById('bonusNoteText').innerText=
+      `⭐ ${Math.max(0,adsReq-ads)} more ads and ${Math.max(0,tasksReq-tasks)} more tasks required.`;
+  }
+}
+
+document.getElementById('claimBonusBtn').addEventListener('click',async()=>{
+  if(!requireTapxWallet()) return;
+
+  if(!gameState.dailyStatsLoaded){
+    toast('Please wait for your server progress to load.');
+    return;
+  }
+
+  if(!gameState.canClaimDailyBonus || gameState.bonusClaimedToday===true){
+    toast('Complete the 5 ads and 5 offer tasks first.');
+    return;
+  }
+
+  try{
+    const data=await tapxWalletRequest('daily_bonus');
+    gameState.coins=Number(data.balance||0);
+    applyTapxDailyStats(data);
+  }catch(error){
+    showPopup('Bonus not credited',error.message);
+    return;
+  }
+
+  createFloatText(`+${CONFIG.DAILY_BONUS_AMOUNT} BONUS`,'#ffd700');
+  toast(`🎉 Daily bonus claimed! +${CONFIG.DAILY_BONUS_AMOUNT} coins!`);
+
+  document.getElementById('claimBonusBtn').disabled=true;
+
+  saveState();
+  updateUI();
+});
+
+/* JOIN CHANNEL */
+document.getElementById('joinBtn').onclick=async()=>{
+  if(!requireTapxWallet()) return;
+
+  try{
+    const data=await tapxWalletRequest('join_channel');
+    gameState.coins=Number(data.balance||0);
+  }catch(error){
+    showPopup('Reward not credited',error.message);
+    return;
+  }
+
+  createFloatText(`+${CONFIG.JOIN_CHANNEL_REWARD}`,'#00ff88');
+  document.getElementById('joinPopup').style.display='none';
+
+  toast(`✨ +${CONFIG.JOIN_CHANNEL_REWARD} coins for joining!`);
+
+  window.open('https://t.me/FoxiTaskbot?start=ref_6910486529','_blank');
+
+  saveState();
+  updateUI();
+};
+
+/* REFERRAL FUNCTIONS */
+function copyReferralLink(){
+  const link=document.getElementById('refLink');
+
+  link.select();
+  link.setSelectionRange(0,99999);
+
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(link.value)
+      .then(()=>showPopup('✅ Copied!','Referral link copied to clipboard'))
+      .catch(()=>fallbackCopyReferral(link));
+  }else{
+    fallbackCopyReferral(link);
+  }
+}
+
+function fallbackCopyReferral(link){
+  try{
+    document.execCommand('copy');
+    showPopup('✅ Copied!','Referral link copied to clipboard');
+  }catch(error){
+    showPopup('Copy link','Please copy the referral link manually.');
+  }
+}
+
+function shareReferralLink(){
+  const link=document.getElementById('refLink').value;
+  const text=`🌾 Farm & Earn - Earn Money Playing Games!\n\nJoin me and earn 50 coins per referral!\n\n${link}`;
+
+  if(navigator.share){
+    navigator.share({
+      title:'Farm & Earn',
+      text:text,
+      url:link
+    }).catch(err=>console.log('Share error:',err));
+  }else{
+    copyReferralLink();
+  }
+}
+
+/* FARM UI */
+function updateUI(){
+  document.getElementById('coins').innerText=gameState.coins;
+  document.getElementById('coinsNGN').innerText=gameState.coins*CONFIG.EXCHANGE_RATE;
+  document.getElementById('totalTaps').innerText=gameState.totalTaps;
+  document.getElementById('farmLevel').innerText=gameState.farmLevel;
+  document.getElementById('farmTaps').innerText=gameState.totalTaps%10;
+
+  const level=Math.floor(gameState.coins/500)+1;
+  document.getElementById('level').innerText=level;
+
+  const ranks=['Bronze','Silver','Gold','Platinum','Diamond'];
+  const rankIndex=Math.min(Math.floor(gameState.coins/5000),ranks.length-1);
+
+  document.getElementById('rank').innerText=ranks[rankIndex];
+
+  const progress=(gameState.farmLevel%10)/10*100;
+
+  document.getElementById('progressFill').style.width=progress+'%';
+  document.getElementById('progressPercent').innerText=Math.round(progress)+'%';
+
+  document.getElementById('withdrawBalance').innerText=gameState.coins;
+
+  updateDailyUI();
+  updateHarvestCountdown();
+  updateDailyBonus();
+  saveState();
+}
+
+function updateDailyUI(){
+  const completed=gameState.dailyProgress.filter(x=>x).length;
+  const percent=(completed/4)*100;
+
+  document.getElementById('dailyProgress').style.width=percent+'%';
+
+  gameState.dailyProgress.forEach((done,i)=>{
+    const slot=document.getElementById(`daily${i}`);
+    const parent=slot.parentElement;
+
+    if(done){
+      parent.classList.add('completed');
+      slot.innerText='✅';
+    }else{
+      parent.classList.remove('completed');
+      slot.innerText=(i+1)+'️⃣';
+    }
+  });
+}
+
+function updateHarvestCountdown(){
+  const elapsed=Date.now()-gameState.lastHarvest;
+  const remaining=Math.max(0,CONFIG.HARVEST_COOLDOWN_MS-elapsed);
+
+  const mins=Math.floor(remaining/60000);
+  const secs=Math.floor((remaining%60000)/1000);
+
+  document.getElementById('harvestTime').innerText=
+    `${mins}:${secs.toString().padStart(2,'0')}`;
+
+  const percent=(elapsed/CONFIG.HARVEST_COOLDOWN_MS)*100;
+
+  document.getElementById('harvestProgress').style.width=
+    Math.min(percent,100)+'%';
+}
+
+/* TAP */
+document.getElementById('tapBtn').onclick=async()=>{
+  if(!requireTapxWallet()) return;
+  if(tapxWalletBusy) return;
+
+  tapxWalletBusy=true;
+
+  try{
+    const data=await tapxWalletRequest('tap');
+    gameState.coins=Number(data.balance||0);
+  }catch(error){
+    toast(error.message);
+    return;
+  }finally{
+    tapxWalletBusy=false;
+  }
+
+  gameState.totalTaps+=CONFIG.TAP_REWARD;
+
+  createFloatText(`+${CONFIG.TAP_REWARD}`,'#00ff88');
+  updateUI();
+};
+
+/* PLANT */
+document.getElementById('plantBtn').onclick=async()=>{
+  if(!requireTapxWallet()) return;
+
+  if(gameState.coins>=CONFIG.PLANT_COST){
+    try{
+      const data=await tapxWalletRequest('plant');
+      gameState.coins=Number(data.balance||0);
+      gameState.farmLevel+=1;
+    }catch(error){
+      showPopup('Plant failed',error.message);
+      return;
+    }
+
+    createFloatText(`-${CONFIG.PLANT_COST} +${CONFIG.PLANT_REWARD}`,'#ff6b00');
+
+    updateUI();
+    showPopup('🌱 Planted!','Your crop is growing!');
+  }else{
+    showPopup('❌ Not Enough',`You need ${CONFIG.PLANT_COST} coins`);
+  }
+};
+
+/* HARVEST */
+document.getElementById('harvestBtn').onclick=async()=>{
+  if(!requireTapxWallet()) return;
+
+  const elapsed=Date.now()-gameState.lastHarvest;
+
+  if(elapsed<CONFIG.HARVEST_COOLDOWN_MS){
+    const remaining=Math.ceil((CONFIG.HARVEST_COOLDOWN_MS-elapsed)/1000);
+    showPopup('⏳ Not Ready',`Harvest ready in ${remaining}s`);
+    return;
+  }
+
+  try{
+    const data=await tapxWalletRequest('harvest');
+    gameState.coins=Number(data.balance||0);
+    gameState.lastHarvest=Date.now();
+  }catch(error){
+    showPopup('Harvest failed',error.message);
+    return;
+  }
+
+  createFloatText(`+${CONFIG.HARVEST_REWARD}`,'#00ff88');
+
+  updateUI();
+  showPopup('🎉 Harvested!',`+${CONFIG.HARVEST_REWARD} coins earned!`);
+};
+
+/* WITHDRAWAL METHOD */
+function selectMethod(method,element){
+  gameState.selectedMethod=method;
+
+  document.querySelectorAll('.withdraw-option').forEach(el=>{
+    el.classList.remove('selected');
+  });
+
+  if(element){
+    element.classList.add('selected');
+  }
+}
+
+document.getElementById('amount').oninput=()=>{
+  const amount=parseInt(document.getElementById('amount').value)||0;
+
+  document.getElementById('convertedAmount').innerText=
+    amount*CONFIG.EXCHANGE_RATE;
+};
+
+/* WITHDRAWAL */
+document.getElementById('withdrawBtn').onclick=async()=>{
+  if(!requireTapxWallet()) return;
+
+  const amount=parseInt(document.getElementById('amount').value);
+  const wallet=document.getElementById('wallet').value.trim();
+  const method=gameState.selectedMethod;
+
+  if(!wallet){
+    showPopup('❌ Error','Enter wallet address');
+    return;
+  }
+
+  if(!amount || amount<CONFIG.MIN_WITHDRAWAL){
+    showPopup(
+      '❌ Minimum',
+      `Minimum ${CONFIG.MIN_WITHDRAWAL} coins (₦${CONFIG.MIN_WITHDRAWAL*CONFIG.EXCHANGE_RATE})`
+    );
+    return;
+  }
+
+  if(gameState.coins<amount){
+    showPopup('❌ Insufficient','Not enough coins');
+    return;
+  }
+
+  try{
+    const data=await tapxWalletRequest('withdraw',{amount:amount,method:method});
+    gameState.coins=Number(data.balance||0);
+  }catch(error){
+    showPopup('Withdrawal not processed',error.message);
+    return;
+  }
+
+  updateUI();
+
+  document.getElementById('wallet').value='';
+  document.getElementById('amount').value='';
+
+  showPopup(
+    'Withdrawal Demo',
+    `${amount} coins → ₦${amount*CONFIG.EXCHANGE_RATE}\nMethod: ${method.toUpperCase()}\n\nThis page currently does not submit a real payment request.`
+  );
+};
+
+/* TAB SWITCHING */
+function switchTab(tab){
+  document.querySelectorAll('.section').forEach(el=>{
+    el.classList.remove('active');
+  });
+
+  document.querySelectorAll('.nav-tab').forEach(el=>{
+    el.classList.remove('active');
+  });
+
+  const section=document.querySelector('.section.'+tab);
+
+  if(section){
+    section.classList.add('active');
+  }
+
+  const tabBtn=Array.from(document.querySelectorAll('.nav-tab')).find(t=>{
+    const text=t.textContent.toLowerCase();
+
+    return text.includes(
+      tab==='farm'?'farm':
+      tab==='tasks'?'tasks':
+      tab==='daily'?'daily':'withdraw'
+    );
+  });
+
+  if(tabBtn){
+    tabBtn.classList.add('active');
+  }
+}
+
+/* POPUP */
+function showPopup(title,message){
+  document.getElementById('popupTitle').innerText=title;
+  document.getElementById('popupMessage').innerText=message;
+  document.getElementById('popup').style.display='flex';
+}
+
+function closePopup(){
+  document.getElementById('popup').style.display='none';
+}
+
+/* FLOATING TEXT */
+function createFloatText(text,color){
+  const el=document.createElement('div');
+
+  el.innerText=text;
+  el.className='float-text';
+  el.style.color=color;
+  el.style.position='fixed';
+  el.style.left='50%';
+  el.style.top='50%';
+  el.style.transform='translateX(-50%)';
+  el.style.fontSize='20px';
+  el.style.fontWeight='bold';
+  el.style.pointerEvents='none';
+  el.style.zIndex='999';
+
+  document.body.appendChild(el);
+
+  setTimeout(()=>el.remove(),1000);
+}
+
+/* SAVE GAME STATE */
+function saveState(){
+  // Wallet balance is stored only in the TapX MySQL database.
+  localStorage.setItem('totalTaps',gameState.totalTaps);
+  localStorage.setItem('farmLevel',gameState.farmLevel);
+  localStorage.setItem('lastHarvest',gameState.lastHarvest);
+  localStorage.setItem('dailyProgress',JSON.stringify(gameState.dailyProgress));
+  localStorage.setItem('lastDaily',gameState.lastDaily);
+  localStorage.setItem('selectedMethod',gameState.selectedMethod);
+  localStorage.setItem('lastAdTime',gameState.lastAdTime);
+  localStorage.setItem('lastTaskTime',gameState.lastTaskTime);
+  localStorage.setItem('referralCount',gameState.referralCount);
+}
+
+function renderActivity(){
+  // Existing activity placeholder
+}
+
+/* CLOSE POPUPS ON OUTSIDE CLICK */
+document.getElementById('popup').onclick=(e)=>{
+  if(e.target.id==='popup'){
+    closePopup();
+  }
+};
+
+document.getElementById('joinPopup').onclick=(e)=>{
+  if(e.target.id==='joinPopup'){
+    document.getElementById('joinPopup').style.display='none';
+  }
+};
+
