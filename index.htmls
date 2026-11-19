@@ -247,3 +247,201 @@ input::placeholder{color:rgba(255,255,255,.5)}
       <div class="daily-slot" id="dailySlot2"><span id="daily2">3️⃣</span></div>
       <div class="daily-slot" id="dailySlot3"><span id="daily3">4️⃣</span></div>
     </div>
+    <div class="progress-bar" style="margin-bottom:12px;"><div class="progress-fill" id="dailyProgress"></div></div>
+
+    <div class="bonus-button-row">
+      <button class="btn watch-ad-btn" id="dailyWatchAdBtn" onclick="watchAdFromDaily()">📺 Watch Ad +20</button>
+      <button class="btn task-btn" id="dailyTaskBtn" onclick="completeTaskFromDaily()">🎁 Do Task +30</button>
+    </div>
+
+    <button class="btn" id="claimBonusBtn" disabled>Claim 500 Bonus Coins</button>
+    <p style="font-size:10px;margin-top:10px;opacity:.6;" id="dailyReqText">Requirements: 5 ads watched + 5 offer tasks completed</p>
+  </div>
+</div>
+
+<div class="section withdraw">
+  <div class="section-content">
+    <h2>💳 Withdraw Earnings</h2>
+    <p style="font-size:12px;margin:12px 0;opacity:.8;">💰 <strong id="withdrawBalance">0</strong> coins available</p>
+
+    <div class="input-group">
+      <label class="label">Select Payment Method</label>
+      <div class="withdraw-options">
+        <div class="withdraw-option selected" onclick="selectMethod('usdt',this)">💵 USDT</div>
+        <div class="withdraw-option" onclick="selectMethod('litecoin',this)">Ł Litecoin</div>
+        <div class="withdraw-option" onclick="selectMethod('payeer',this)">💳 Payeer</div>
+        <div class="withdraw-option" onclick="selectMethod('bank',this)">🏦 Bank</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label class="label">Wallet Address</label>
+      <input id="wallet" placeholder="Enter wallet address" type="text">
+    </div>
+
+    <div class="input-group">
+      <label class="label">Amount (Min: 15000 coins = ₦15,000)</label>
+      <input id="amount" placeholder="Enter amount" type="number" min="15000">
+    </div>
+
+    <div style="background:rgba(0,0,0,.5);padding:10px;border-radius:8px;margin-bottom:12px;font-size:11px;">
+      <div>📊 Exchange Rate: 1 Coin = ₦1</div>
+      <div style="margin-top:4px;">You'll receive: ₦<span id="convertedAmount">0</span></div>
+    </div>
+
+    <button class="btn" id="withdrawBtn">WITHDRAW NOW</button>
+    <p style="font-size:10px;margin-top:12px;opacity:.6;text-align:center;">Withdrawal requests are recorded for review; this demo does not send payments.</p>
+
+    <div class="disclaimer">
+      ⚠️ <strong>DISCLAIMER:</strong> Withdrawal terms and conditions apply. All withdrawals are processed according to our payment policy. Please ensure your wallet address is correct before submission. We are not responsible for loss of funds due to incorrect wallet addresses.
+    </div>
+
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(0,255,136,.2);">
+      <h2 style="font-size:14px;margin-bottom:12px;color:#00ff88;">👥 Invite Friends</h2>
+      <p style="font-size:11px;opacity:.7;margin-bottom:12px;">Earn 50 coins for each friend who joins!</p>
+      <input id="refLink" readonly type="text" style="margin-bottom:8px;" value="">
+      <button class="btn referral-btn" id="copyRefBtn" onclick="copyReferralLink()">📋 Copy Referral Link</button>
+      <button class="btn referral-btn" id="shareRefBtn" onclick="shareReferralLink()" style="background:linear-gradient(135deg,#ff6b00,#ff8f00);">📤 Share Referral Link</button>
+      <div class="disclaimer" style="margin-top:10px;">
+        ⚠️ <strong>DISCLAIMER:</strong> Referral rewards are subject to verification. Fraudulent referrals or artificial account creation will result in disqualification and account suspension. Earn rewards legitimately only.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="popup">
+  <div class="popup-content">
+    <h2 id="popupTitle">Message</h2>
+    <p id="popupMessage"></p>
+    <div class="popup-buttons">
+      <button class="cancel" onclick="closePopup()">Close</button>
+      <button class="confirm" id="popupConfirm" onclick="closePopup()">OK</button>
+    </div>
+  </div>
+</div>
+
+<div id="joinPopup">
+  <h2>Join Our Channel</h2>
+  <button id="joinBtn">Join Channel +5 coins</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CONFIG = {
+  AD_REWARD:20,
+  ADS_REQUIRED_FOR_BONUS:5,
+  AD_COOLDOWN_SEC:30,
+  AD_DAILY_CAP:999,
+  TASK_REWARD:30,
+  TASKS_REQUIRED_FOR_BONUS:5,
+  TASK_COOLDOWN_SEC:30,
+  TASK_DAILY_CAP:999,
+  DAILY_BONUS_AMOUNT:500,
+  JOIN_CHANNEL_REWARD:5,
+  REFERRAL_REWARD:50,
+  MIN_WITHDRAWAL:15000,
+  EXCHANGE_RATE:1,
+  TAP_REWARD:1,
+  PLANT_COST:10,
+  PLANT_REWARD:5,
+  HARVEST_REWARD:50,
+  HARVEST_COOLDOWN_MS:300000
+};
+
+console.log('CONFIG LOADED:',CONFIG);
+
+/* TELEGRAM INITIALIZATION */
+const tg = window.Telegram?.WebApp;
+
+if(tg){
+  try{
+    tg.ready();
+    tg.expand();
+  }catch(error){
+    console.warn('Telegram initialization:',error);
+  }
+}
+
+/* SUPABASE CONFIG */
+const SUPABASE_URL='https://bedlwbnkrwcqldjkmjtn.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_TCI6fZmtCn0wHU8A9PrQBQ_1jNtnESC';
+
+let SUPA=null;
+
+try{
+  if(window.supabase && typeof window.supabase.createClient==='function'){
+    SUPA=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+    console.log('Supabase client initialized');
+  }else{
+    console.warn('Supabase JS not available');
+  }
+}catch(e){
+  console.error('Supabase init error',e);
+  SUPA=null;
+}
+
+/* ADSGRAM CONFIG */
+const WATCH_AD_BLOCK_ID='38705';
+const ADSGRAM_TASK_BLOCK_IDS=['task-38707','task-38713'];
+const JOIN_CHANNEL_AD_BLOCK_ID='38706';
+
+/* GAME STATE */
+let gameState={
+  coins:0,
+  totalTaps:parseInt(localStorage.getItem('totalTaps')||'0'),
+  farmLevel:parseInt(localStorage.getItem('farmLevel')||'1'),
+  lastHarvest:parseInt(localStorage.getItem('lastHarvest')||Date.now()),
+  dailyProgress:JSON.parse(localStorage.getItem('dailyProgress')||'[false,false,false,false]'),
+  lastDaily:parseInt(localStorage.getItem('lastDaily')||'0'),
+  selectedMethod:localStorage.getItem('selectedMethod')||'usdt',
+  adsWatchedToday:0,
+  offerTasksCompletedToday:0,
+  dailyStatsLoaded:false,
+  canClaimDailyBonus:false,
+  lastAdTime:parseInt(localStorage.getItem('lastAdTime')||'0'),
+  lastTaskTime:parseInt(localStorage.getItem('lastTaskTime')||'0'),
+  bonusClaimedToday:false,
+  referralCount:parseInt(localStorage.getItem('referralCount')||'0'),
+  taskCompletionPending:false
+};
+
+let harvestCountdown=null;
+let adCooldown={};
+let currentDailyTaskBlockId=null;
+let rewardAd=null;
+let joinAd=null;
+
+/* USER ID */
+let appUserId=tg?.initDataUnsafe?.user?.id
+  ?String(tg.initDataUnsafe.user.id)
+  :(localStorage.getItem('th_guestId')||null);
+
+if(!appUserId){
+  appUserId='guest_'+Math.random().toString(36).slice(2,10);
+  localStorage.setItem('th_guestId',appUserId);
+}
+
+/* REFERRAL LINK */
+function generateReferralLink(){
+  const baseUrl='https://t.me/Promoteaffibot?start=';
+  document.getElementById('refLink').value=baseUrl+appUserId;
+}
+
+/* DAILY COUNTERS ARE SERVER-OWNED (MYSQL), NOT LOCALSTORAGE */
+function applyTapxDailyStats(data={}){
+  gameState.adsWatchedToday=Number(data.ads_watched_today||0);
+  gameState.offerTasksCompletedToday=Number(data.offer_tasks_completed_today||0);
+  gameState.bonusClaimedToday=data.bonus_claimed_today===true;
+  gameState.canClaimDailyBonus=data.can_claim_daily_bonus===true;
+  gameState.dailyStatsLoaded=true;
+  updateDailyBonus();
+}
+
+async function refreshTapxDailyStats(){
+  const data=await tapxWalletRequest('balance');
+  gameState.coins=Number(data.balance||0);
+  applyTapxDailyStats(data);
+  updateUI();
+  return data;
+}
