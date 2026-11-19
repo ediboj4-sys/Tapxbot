@@ -1,768 +1,304 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Farm & Earn</title>
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+
 <style>
-:root{--green:#168b45;--dark:#086b32;--light:#e9f8ed;--bg:#f4f8f4;--text:#183323;--muted:#718078}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text);padding-bottom:85px}
-button,input{font:inherit}button{border:0;cursor:pointer}
-button:disabled{opacity:.55;cursor:not-allowed}
-#app{max-width:520px;margin:auto;min-height:100vh}
-.header{background:linear-gradient(135deg,var(--dark),var(--green));color:white;padding:20px 16px 24px;border-radius:0 0 22px 22px}
-.header-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.logo{font-size:21px;font-weight:800}.logo span{color:#ffe28a}
-.profile{background:#ffffff29;border-radius:20px;padding:8px 12px;font-size:12px}
-.balance-card{margin-top:22px;background:#ffffff20;border:1px solid #ffffff30;border-radius:17px;padding:17px}
-.balance-label{font-size:13px}.balance-value{font-size:32px;font-weight:800;margin-top:7px}
-.balance-sub{font-size:12px;margin-top:5px;opacity:.85}
-.main{padding:16px}.section-title{font-size:18px;font-weight:800;margin:8px 0 13px}
-.card{background:white;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 3px 12px #0000000b}
-.card-title{font-size:16px;font-weight:800;margin-bottom:8px}
-.card-description{font-size:13px;color:var(--muted);line-height:1.5}
-.primary-btn{display:block;width:100%;padding:13px;margin-top:13px;background:var(--green);color:white;border-radius:11px;font-weight:700}
-.secondary-btn{display:block;width:100%;padding:12px;margin-top:10px;background:var(--light);color:var(--dark);border-radius:11px;font-weight:700}
-.farm-banner{background:linear-gradient(135deg,#d8f3d9,#a8dfa9);border-radius:17px;padding:18px;text-align:center;margin-bottom:14px}
-.farm-emoji{font-size:48px;margin-bottom:8px}.farm-banner h2{font-size:19px;color:var(--dark)}
-.farm-banner p{font-size:12px;margin-top:6px;color:#356a43}
-.farm-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
-.stat-box{background:white;border-radius:13px;padding:13px;text-align:center}
-.stat-number{font-size:20px;font-weight:800;color:var(--green)}
-.stat-label{color:var(--muted);font-size:11px;margin-top:5px}
-.plots{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
-.plot{min-height:115px;background:#edf7e9;border:2px dashed #a7c99f;border-radius:13px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;text-align:center;padding:10px}
-.plot-emoji{font-size:30px}.plot-name{font-size:12px;font-weight:700}
-.plot-action{background:var(--green);color:white;padding:7px 12px;border-radius:8px;font-size:11px;font-weight:700}
-.task-row{display:flex;align-items:center;gap:12px}
-.task-icon{width:43px;height:43px;border-radius:12px;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:23px;flex-shrink:0}
-.task-info{flex:1;min-width:0}.task-name{font-weight:800;font-size:14px}
-.task-reward{font-size:12px;color:var(--green);margin-top:5px;font-weight:700}
-.task-btn{background:var(--green);color:white;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:700}
-.progress-track{height:10px;background:#e7eee8;border-radius:20px;overflow:hidden;margin:12px 0}
-.progress-fill{height:100%;width:0;background:var(--green);transition:width .3s}
-.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
-.input-group{margin-top:13px}.input-group label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
-.input-group input{width:100%;padding:13px;border:1px solid #dce5dd;border-radius:10px;outline:none;background:white;color:var(--text)}
-.method-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:9px}
-.method-btn{padding:12px 8px;background:#f0f5f0;border:1px solid #dce8dd;border-radius:10px;font-size:12px;font-weight:700;color:var(--text)}
-.method-btn.active{background:var(--light);border:2px solid var(--green);color:var(--dark)}
-.bottom-nav{position:fixed;z-index:50;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:white;border-top:1px solid #e6ece7;display:grid;grid-template-columns:repeat(4,1fr);padding:9px 5px calc(9px + env(safe-area-inset-bottom))}
-.nav-item{background:transparent;color:#87938a;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:700}
-.nav-icon{font-size:21px}.nav-item.active{color:var(--green)}
-.popup-overlay{display:none;position:fixed;z-index:100;inset:0;background:#0009;align-items:center;justify-content:center;padding:18px}
-.popup-overlay.show{display:flex}.popup{background:white;width:100%;max-width:390px;border-radius:18px;padding:21px;text-align:center}
-.popup h3{font-size:18px;margin-bottom:9px}.popup p{color:var(--muted);font-size:13px;line-height:1.5}
-.popup-close{width:100%;padding:12px;margin-top:13px;background:#edf3ee;border-radius:10px;font-weight:700}
-#toast{position:fixed;z-index:200;bottom:95px;left:50%;transform:translateX(-50%);background:#20372a;color:white;padding:12px 17px;border-radius:10px;font-size:13px;display:none;max-width:90%;text-align:center}
-.page{display:none}.page.active{display:block}
-.small-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:9px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(180deg,#2d5a3d 0%,#1a3a24 100%);color:white;font-family:Arial,sans-serif;padding:10px;overflow-x:hidden;padding-bottom:100px}
+.header{display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(0,0,0,.3);border-radius:12px;margin-bottom:12px}
+.logo{font-size:20px;font-weight:bold;color:#00ff88}
+.level-badge{background:#ff6b00;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:bold}
+.farm-container{position:relative;width:100%;height:280px;background:linear-gradient(180deg,#4a7c59 0%,#2d5a3d 100%);border-radius:16px;overflow:hidden;margin-bottom:12px;border:2px solid #00ff88;box-shadow:0 4px 15px rgba(0,255,136,.2)}
+.farm-background{position:absolute;top:0;left:0;width:100%;height:100%;background-image:repeating-linear-gradient(90deg,#3a6a4a 0px,#3a6a4a 40px,transparent 40px,transparent 80px),repeating-linear-gradient(0deg,#3a6a4a 0px,#3a6a4a 40px,transparent 40px,transparent 80px);opacity:.5}
+.farm-content{position:relative;z-index:2;width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.tap-zone{width:100px;height:100px;background:radial-gradient(circle,#ffeb3b,#ffc107);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:50px;cursor:pointer;box-shadow:0 8px 20px rgba(255,235,59,.4);transition:all .1s;user-select:none}
+.tap-zone:active{transform:scale(.85);box-shadow:0 3px 10px rgba(255,235,59,.2)}
+.tap-count{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.6);padding:8px 14px;border-radius:20px;font-size:12px}
+.farm-level{position:absolute;bottom:10px;left:10px;background:linear-gradient(135deg,#0066ff,#00ccff);padding:8px 14px;border-radius:12px;font-size:12px;font-weight:bold}
+.crops{position:absolute;bottom:20px;left:20px;display:flex;gap:8px;font-size:24px}
+.crop{animation:sway 3s ease-in-out infinite}
+.crop:nth-child(2){animation-delay:.5s}
+.crop:nth-child(3){animation-delay:1s}
+@keyframes sway{0%,100%{transform:rotate(0deg)}50%{transform:rotate(3deg)}}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-card{background:rgba(0,0,0,.4);border:1px solid #00ff88;padding:14px;border-radius:12px;text-align:center}
+.stat-card h3{font-size:11px;opacity:.7;margin-bottom:6px}
+.stat-card .value{font-size:24px;font-weight:bold;color:#00ff88}
+.stat-card .sub{font-size:10px;opacity:.6;margin-top:4px}
+.progress-section{background:rgba(0,0,0,.4);border:1px solid #00ff88;padding:12px;border-radius:12px;margin-bottom:12px}
+.progress-section h3{font-size:12px;margin-bottom:8px;display:flex;justify-content:space-between}
+.progress-bar{width:100%;height:8px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#00ff88,#00ccff);width:0%;transition:width .3s}
+.nav-tabs{display:flex;gap:8px;margin-bottom:12px;background:rgba(0,0,0,.3);padding:8px;border-radius:12px;overflow-x:auto}
+.nav-tab{flex:1;min-width:80px;padding:10px;border:none;border-radius:8px;background:transparent;color:white;cursor:pointer;font-size:12px;font-weight:bold;transition:all .3s;white-space:nowrap}
+.nav-tab.active{background:linear-gradient(135deg,#00ff88,#00ccff);color:#000}
+.section{display:none}
+.section.active{display:block}
+.section-content{background:rgba(0,0,0,.4);border:1px solid #00ff88;padding:14px;border-radius:12px}
+.section-content h2{font-size:14px;margin-bottom:12px;color:#00ff88;display:flex;align-items:center;gap:8px}
+.btn{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#00ff88,#00ccff);color:#000;font-weight:bold;cursor:pointer;font-size:13px;transition:all .2s;margin-top:10px}
+.btn:active{transform:scale(.95)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+input,select{width:100%;padding:10px;border:none;border-radius:8px;background:rgba(0,0,0,.5);color:white;margin-top:8px;border:1px solid #00ff88;font-size:12px}
+input::placeholder{color:rgba(255,255,255,.5)}
+.input-group{margin-bottom:8px}
+.label{font-size:11px;opacity:.7;display:block;margin-bottom:4px}
+.earnings-card{background:linear-gradient(135deg,#ff6b00,#ff8f00);padding:16px;border-radius:12px;margin-bottom:12px;text-align:center}
+.earnings-card .label{opacity:.9;color:white}
+.earnings-card .value{font-size:32px;font-weight:bold;color:white;margin:8px 0}
+.earnings-card .sub{font-size:11px;opacity:.8}
+.withdraw-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.withdraw-option{background:rgba(0,0,0,.5);border:2px solid #00ff88;padding:12px;border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;font-size:12px}
+.withdraw-option.selected{background:linear-gradient(135deg,#00ff88,#00ccff);color:#000;font-weight:bold}
+.withdraw-option:active{transform:scale(.95)}
+#popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);display:none;justify-content:center;align-items:center;z-index:9999;padding:20px}
+.popup-content{background:linear-gradient(135deg,#1a3a24,#2d5a3d);border:2px solid #00ff88;border-radius:16px;padding:20px;max-width:90%;text-align:center;box-shadow:0 0 30px rgba(0,255,136,.3)}
+.popup-content h2{margin-bottom:12px;color:#00ff88}
+.popup-content p{font-size:13px;margin-bottom:16px;opacity:.9}
+.popup-buttons{display:flex;gap:8px}
+.popup-buttons button{flex:1;padding:10px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:12px}
+.popup-buttons .confirm{background:linear-gradient(135deg,#00ff88,#00ccff);color:#000}
+.popup-buttons .cancel{background:rgba(255,255,255,.1);color:white}
+.daily-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.daily-slot{aspect-ratio:1;background:rgba(0,0,0,.5);border:2px solid #00ff88;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+.daily-slot.completed{background:linear-gradient(135deg,#00ff88,#00ccff);color:#000}
+.disclaimer{background:rgba(255,165,0,.2);border:1px solid #ffa500;padding:8px 10px;border-radius:8px;font-size:10px;opacity:.85;margin-top:10px;line-height:1.4}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px)}}
+.float-text{animation:floatUp 1s ease-out forwards}
+.bonus-challenge{background:linear-gradient(135deg,rgba(242,169,59,.15),rgba(34,195,166,.15));border:1px solid rgba(255,165,0,.5);border-radius:12px;padding:14px;margin-bottom:12px}
+.bonus-challenge h3{color:#f2a93b;margin-bottom:12px;font-size:13px;font-weight:bold}
+.bonus-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.bonus-stat{background:rgba(0,0,0,.4);border:1px solid #00ff88;padding:8px;border-radius:8px;text-align:center;font-size:11px}
+.bonus-stat .label{opacity:.7;margin-bottom:4px}
+.bonus-stat .value{font-size:16px;font-weight:bold;color:#00ff88}
+.bonus-progress-bar{width:100%;height:6px;background:rgba(0,0,0,.3);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.bonus-progress-bar>div{height:100%;width:0%;background:linear-gradient(90deg,#f2a93b,#22c3a6);transition:width .3s}
+.bonus-note{font-size:10px;color:#f2a93b;opacity:.8;margin-bottom:8px}
+.adsgram-section{background:rgba(0,0,0,.4);border:1px solid #00ff88;padding:12px;border-radius:12px;margin-bottom:12px}
+.adsgram-section h3{font-size:12px;color:#00ff88;margin-bottom:8px}
+.adsgram-block-id{font-size:9px;color:rgba(255,255,255,.5);margin-top:8px}
+.watch-ad-btn{background:linear-gradient(135deg,#ff6b00,#ff8f00);margin-bottom:8px}
+.task-btn{background:linear-gradient(135deg,#6b00ff,#00a8ff);margin-bottom:8px}
+.task-tap-btn{background:linear-gradient(135deg,#00ccff,#00ff88);margin-bottom:8px}
+.referral-btn{background:linear-gradient(135deg,#9c27b0,#e91e63);margin-bottom:8px}
+.task-block-container{display:none;background:rgba(0,0,0,.5);border:1px solid #00ccff;padding:12px;border-radius:10px;margin-bottom:12px}
+.task-block-container.active{display:block}
+#joinPopup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:10000;flex-direction:column;gap:20px;padding:20px}
+#joinPopup h2{color:#00ff88;font-size:24px}
+#joinPopup button{padding:14px 20px;border:none;border-radius:12px;background:linear-gradient(135deg,#00ff88,#00ccff);color:#000;font-weight:bold;cursor:pointer;font-size:16px}
+#joinPopup button:active{transform:scale(.96)}
+.toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%) translateY(20px);background:#1a2230;border:1px solid #00ff88;color:white;padding:12px 18px;border-radius:12px;font-size:12px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s ease;z-index:999;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:88%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.bonus-button-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.bonus-button-row button{padding:10px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:12px;transition:all .2s}
+.bonus-button-row button:active{transform:scale(.95)}
+.bonus-button-row button:disabled{opacity:.5;cursor:not-allowed}
 </style>
 </head>
+
 <body>
-<div id="app">
 
-<header class="header">
- <div class="header-top">
-  <div class="logo">🌱 Farm <span>& Earn</span></div>
-  <div class="profile" id="profileName">👤 Farmer</div>
- </div>
- <div class="balance-card">
-  <div class="balance-label">Your Coin Balance</div>
-  <div class="balance-value" id="coinBalance">0</div>
-  <div class="balance-sub">Keep farming and completing tasks!</div>
- </div>
-</header>
-
-<main class="main">
-<section class="page active" id="farmPage">
- <div class="farm-banner">
-  <div class="farm-emoji">🚜🌾</div>
-  <h2>Welcome to Your Farm</h2>
-  <p>Plant crops, wait for them to grow, then harvest.</p>
- </div>
- <div class="farm-stats">
-  <div class="stat-box"><div class="stat-number" id="harvestCount">0</div><div class="stat-label">Total Harvests</div></div>
-  <div class="stat-box"><div class="stat-number" id="farmLevel">1</div><div class="stat-label">Farm Level</div></div>
- </div>
- <div class="card">
-  <div class="card-title">🌱 My Farm Plots</div>
-  <div class="card-description">Plant a crop in an empty plot. Harvest when it is ready.</div>
-  <div class="plots" id="farmPlots">
-   <div class="plot" id="plot0"></div><div class="plot" id="plot1"></div>
-   <div class="plot" id="plot2"></div><div class="plot" id="plot3"></div>
-  </div>
- </div>
- <div class="card"><div class="card-title">🌾 Farming Guide</div><div class="card-description">Planting uses the existing wallet API. Harvest rewards are credited by the server.</div></div>
-</section>
-
-<section class="page" id="tasksPage">
- <div class="section-title">🎯 Earn More Coins</div>
- <div class="card">
-  <div class="task-row"><div class="task-icon">📺</div><div class="task-info"><div class="task-name">Watch Advertisement</div><div class="task-reward">Reward: +20 TapX coins and +50 MiniFarm MX</div></div><button class="task-btn" id="watchAdBtn">Watch</button></div>
-  <div class="small-note">Complete the advertisement to request your reward.</div>
- </div>
- <div class="card">
-  <div class="task-row"><div class="task-icon">🎁</div><div class="task-info"><div class="task-name">Offer Tasks</div><div class="task-reward">Reward: +30 TapX coins and +50 MiniFarm MX</div></div><button class="task-btn" id="offerTaskBtn">Open</button></div>
-  <div class="small-note">Use the AdsGram offer task blocks below.</div>
- </div>
-
- <div class="card" id="joinChannelCard">
-  <div class="task-row"><div class="task-icon">📢</div><div class="task-info"><div class="task-name">Join Our Channel</div><div class="task-reward">Reward: +5 coins once</div></div><button class="task-btn" id="joinChannelBtn">Join</button></div>
- </div>
-
- <div class="card">
-  <div class="task-row"><div class="task-icon">👥</div><div class="task-info"><div class="task-name">Invite Friends</div><div class="task-reward">Referral link</div></div><button class="task-btn" id="inviteBtn">Invite</button></div>
- </div>
- <div class="section-title">🧩 More Offer Tasks</div>
- <div class="card"><div class="card-title">Complete tasks and earn</div><div id="offerTaskBlock1"></div><div id="offerTaskBlock2"></div></div>
-</section>
-
-<section class="page" id="dailyPage">
- <div class="section-title">🎁 Daily Rewards</div>
- <div class="card">
-  <div class="card-title">Daily Bonus</div>
-  <div class="card-description">Watch 5 advertisements and complete 5 offer tasks to unlock your daily bonus.</div>
-  <div class="progress-label"><span>Advertisements</span><span id="dailyAdsProgress">0 / 5</span></div>
-  <div class="progress-track"><div class="progress-fill" id="dailyAdsBar"></div></div>
-  <div class="progress-label"><span>Completed Tasks</span><span id="dailyTasksProgress">0 / 5</span></div>
-  <div class="progress-track"><div class="progress-fill" id="dailyTasksBar"></div></div>
-  <div class="task-reward">Daily reward: +500 coins</div>
-  <button class="primary-btn" id="claimDailyBtn">Claim Daily Bonus</button>
- </div>
-</section>
-
-<section class="page" id="withdrawPage">
- <div class="section-title">💰 Withdraw Coins</div>
- <div class="card">
-  <div class="card-title">Withdrawal Information</div>
-  <div class="card-description">Minimum withdrawal: 15,000 coins<br>Exchange rate: 1 coin = ₦1</div>
-  <div class="input-group"><label for="withdrawAmount">Amount (Coins)</label><input type="number" id="withdrawAmount" min="15000" placeholder="Enter amount"></div>
-  <div class="input-group"><label>Choose Payment Method</label>
-   <div class="method-buttons">
-    <button class="method-btn" data-method="OPay">OPay</button>
-    <button class="method-btn" data-method="Moniepoint">Moniepoint</button>
-    <button class="method-btn" data-method="Bank">Bank Transfer</button>
-    <button class="method-btn" data-method="Binance">Binance</button>
-   </div>
-  </div>
-  <div class="input-group"><label for="withdrawAccount">Account Number / Wallet Address</label><input type="text" id="withdrawAccount" placeholder="Enter account or wallet details"></div>
-  <div class="input-group"><label for="withdrawName">Account Name</label><input type="text" id="withdrawName" placeholder="Enter account name"></div>
-  <button class="primary-btn" id="withdrawBtn">Submit Withdrawal</button>
-  <p class="small-note">This wallet endpoint records a demo withdrawal debit. It does not automatically transfer money to your payment account.</p>
- </div>
-</section>
-</main>
-
-<nav class="bottom-nav">
- <button class="nav-item active" data-page="farmPage"><span class="nav-icon">🌱</span><span>Farm</span></button>
- <button class="nav-item" data-page="tasksPage"><span class="nav-icon">🎯</span><span>Tasks</span></button>
- <button class="nav-item" data-page="dailyPage"><span class="nav-icon">🎁</span><span>Daily</span></button>
- <button class="nav-item" data-page="withdrawPage"><span class="nav-icon">💰</span><span>Withdraw</span></button>
-</nav>
-
-<div class="popup-overlay" id="generalPopup">
- <div class="popup"><h3 id="popupTitle">Notice</h3><p id="popupMessage"></p><button class="popup-close" id="closeGeneralPopup">Close</button></div>
+<div class="header">
+  <div class="logo">🌾 Farm & Earn</div>
+  <div class="level-badge">Lv. <span id="level">1</span></div>
 </div>
-<div id="toast"></div>
 
-<script>
-(function(){
-"use strict";
-
-const tg=window.Telegram?.WebApp||null;
-
-const CONFIG={
- apiBase:"https://playmxbot.xyz/api",
- channelUrl:"https://t.me/FoxiTaskbot?start=ref_6910486529",
- referralBot:"https://t.me/Promoteaffibot?start=",
- ads:{watch:"38705",offerOne:"task-38707",offerTwo:"task-38713"},
- rewards:{watch:20,offer:30,join:5,daily:500,tap:1},
- withdrawal:{minimum:15000}
-};
-
-if(tg){
- tg.ready();
- tg.expand();
- try{
-  tg.setHeaderColor("#086b32");
-  tg.setBackgroundColor("#f4f8f4");
- }catch(e){}
-}
-
-const telegramUser=tg?.initDataUnsafe?.user||null;
-const telegramId=telegramUser?.id?String(telegramUser.id):null;
-const userName=telegramUser?([telegramUser.first_name,telegramUser.last_name].filter(Boolean).join(" ")):"Farmer";
-
-let saved={};
-try{
- saved=JSON.parse(localStorage.getItem("gameState")||"{}")||{};
-}catch(e){}
-
-const gameState={
- coins:Number(saved.coins)||0,
- harvests:Number(saved.harvests)||0,
- farmLevel:Number(saved.farmLevel)||1,
- plots:Array.isArray(saved.plots)?saved.plots:[]
-};
-
-while(gameState.plots.length<4)gameState.plots.push(null);
-gameState.plots=gameState.plots.slice(0,4);
-
-let toastTimer;
-
-function showToast(message){
- const el=document.getElementById("toast");
- el.textContent=message;
- el.style.display="block";
- clearTimeout(toastTimer);
- toastTimer=setTimeout(()=>el.style.display="none",3000);
-}
-
-function showPopup(title,message){
- document.getElementById("popupTitle").textContent=title;
- document.getElementById("popupMessage").textContent=message;
- document.getElementById("generalPopup").classList.add("show");
-}
-
-function closePopup(){
- document.getElementById("generalPopup").classList.remove("show");
-}
-
-function isTelegramApp(){
- return !!(tg&&tg.initData&&telegramUser&&telegramId);
-}
-
-function requireTelegram(){
- if(isTelegramApp())return true;
- showPopup("Open in Telegram","Please open Farm & Earn from its Telegram bot.");
- return false;
-}
-
-function saveLocal(){
- try{
-  const old=JSON.parse(localStorage.getItem("gameState")||"{}")||{};
-  old.coins=gameState.coins;
-  old.harvests=gameState.harvests;
-  old.farmLevel=gameState.farmLevel;
-  old.plots=gameState.plots;
-  localStorage.setItem("gameState",JSON.stringify(old));
- }catch(e){
-  console.warn("Local save failed",e);
- }
-}
-
-function switchTab(page){
- document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===page));
- document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
- window.scrollTo({top:0,behavior:"smooth"});
-}
-
-document.querySelectorAll(".nav-item").forEach(b=>{
- b.addEventListener("click",()=>switchTab(b.dataset.page));
-});
-
-document.getElementById("closeGeneralPopup").addEventListener("click",closePopup);
-
-document.querySelectorAll(".method-btn").forEach(b=>{
- b.addEventListener("click",()=>{
-  document.querySelectorAll(".method-btn").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");
-  gameState.selectedMethod=b.dataset.method;
- });
-});
-
-document.getElementById("profileName").textContent="👤 "+userName;
-
-function getReferralLink(){
- return telegramId?CONFIG.referralBot+encodeURIComponent(telegramId):"";
-}
-
-async function inviteFriends(){
- if(!requireTelegram())return;
- const link=getReferralLink();
- const share="https://t.me/share/url?url="+encodeURIComponent(link)+"&text="+encodeURIComponent("Join Farm & Earn and start earning rewards!");
- tg.openTelegramLink(share);
-}
-
-document.getElementById("inviteBtn").addEventListener("click",inviteFriends);
-
-window.FarmEarn={
- CONFIG,tg,telegramUser,telegramId,userName,gameState,
- isTelegramApp,requireTelegram,showToast,showPopup,closePopup,
- switchTab,saveLocal,getReferralLink
-};
-
-})();
-</script>
-
-<script>
-(function(){
-"use strict";
-
-const FE=window.FarmEarn;
-if(!FE)return;
-
-const CONFIG=FE.CONFIG;
-let busy=false;
-
-function eventId(prefix){
- return prefix+"_"+Date.now()+"_"+Math.random().toString(36).slice(2,18);
-}
-
-function updateBalance(balance){
- const n=Number(balance);
- if(!Number.isFinite(n))throw new Error("Invalid balance returned by server.");
- FE.gameState.coins=n;
- document.getElementById("coinBalance").textContent=n.toLocaleString();
- FE.saveLocal();
-}
-
-function updateDailyProgress(d){
- const ads=Number(d.ads_watched_today)||0;
- const tasks=Number(d.offer_tasks_completed_today)||0;
- const reqAds=Number(d.required_ads)||5;
- const reqTasks=Number(d.required_tasks)||5;
-
- document.getElementById("dailyAdsProgress").textContent=ads+" / "+reqAds;
- document.getElementById("dailyTasksProgress").textContent=tasks+" / "+reqTasks;
- document.getElementById("dailyAdsBar").style.width=Math.min(100,ads/Math.max(1,reqAds)*100)+"%";
- document.getElementById("dailyTasksBar").style.width=Math.min(100,tasks/Math.max(1,reqTasks)*100)+"%";
-
- const claim=document.getElementById("claimDailyBtn");
- if(d.bonus_claimed_today)claim.textContent="Already Claimed Today";
- else if(d.can_claim_daily_bonus)claim.textContent="Claim Daily Bonus";
- else claim.textContent="Complete Daily Requirements";
-}
-
-async function walletRequest(payload){
- if(!FE.isTelegramApp())throw new Error("Please open Farm & Earn inside Telegram.");
-
- const response=await fetch(CONFIG.apiBase+"/tapx-wallet.php",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({...payload,initData:FE.tg.initData})
- });
-
- let result;
- try{
-  result=await response.json();
- }catch(e){
-  throw new Error("Wallet server returned an invalid response.");
- }
-
- if(!response.ok||!result||result.success!==true){
-  throw new Error(result?.message||"Wallet request failed.");
- }
-
- return result;
-}
-
-async function refreshWallet(){
- if(!FE.requireTelegram())return null;
- const result=await walletRequest({action:"balance"});
- const d=result.data||{};
- if(d.balance!==undefined)updateBalance(d.balance);
- updateDailyProgress(d);
- return d;
-}
-
-async function sendDualReward(type){
- if(!FE.isTelegramApp())throw new Error("Please open Farm & Earn inside Telegram.");
-
- const response=await fetch(CONFIG.apiBase+"/tapx-dual-reward.php",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-   initData:FE.tg.initData,
-   event_id:eventId(type),
-   reward_type:type
-  })
- });
-
- let result;
- try{
-  result=await response.json();
- }catch(e){
-  throw new Error("Reward server returned an invalid response.");
- }
-
- if(!response.ok||!result||result.success!==true){
-  throw new Error(result?.message||"Reward could not be processed.");
- }
-
- if(!result.data)throw new Error("Reward server did not return reward details.");
-
- if(result.data.tapx_balance!==undefined){
-  updateBalance(result.data.tapx_balance);
- }
-
- await refreshWallet();
- return result.data;
-}
-
-async function showAd(blockId){
- if(!window.Adsgram||typeof window.Adsgram.init!=="function"){
-  throw new Error("AdsGram is unavailable. Please try again later.");
- }
- const controller=window.Adsgram.init({blockId:String(blockId)});
- const result=await controller.show();
- return !!(result&&result.done===true);
-}
-
-async function rewardFromAd(type,blockId,button){
- if(busy)return;
- if(!FE.requireTelegram())return;
-
- busy=true;
- if(button)button.disabled=true;
-
- try{
-  FE.showToast("Loading advertisement...");
-  const completed=await showAd(blockId);
-
-  if(!completed){
-   FE.showToast("Advertisement was not completed.");
-   return;
-  }
-
-  FE.showToast("Processing reward...");
-  const data=await sendDualReward(type);
-
-  FE.showToast(
-   "Reward processed: +"+Number(data.tapx_reward||0)+
-   " TapX coins and +"+Number(data.minifarm_reward_mx||0)+" MiniFarm MX."
-  );
- }catch(e){
-  console.error(e);
-  FE.showToast(e.message||"Could not process reward.");
- }finally{
-  busy=false;
-  if(button)button.disabled=false;
- }
-}
-
-const watchButton=document.getElementById("watchAdBtn");
-watchButton.addEventListener("click",()=>rewardFromAd("ad",CONFIG.ads.watch,watchButton));
-
-function makeOfferButton(container,id,label){
- const b=document.createElement("button");
- b.type="button";
- b.className="primary-btn";
- b.textContent=label;
- b.addEventListener("click",()=>rewardFromAd("task",id,b));
- container.appendChild(b);
-}
-
-makeOfferButton(document.getElementById("offerTaskBlock1"),CONFIG.ads.offerOne,"Start Offer Task 1");
-makeOfferButton(document.getElementById("offerTaskBlock2"),CONFIG.ads.offerTwo,"Start Offer Task 2");
-
-document.getElementById("offerTaskBtn").addEventListener("click",()=>{
- document.getElementById("offerTaskBlock1").scrollIntoView({behavior:"smooth",block:"center"});
-});
-
-FE.walletRequest=walletRequest;
-FE.refreshWallet=refreshWallet;
-FE.sendDualReward=sendDualReward;
-FE.updateBalance=updateBalance;
-FE.updateDailyProgress=updateDailyProgress;
-
-})();
-</script>
-
-<script>
-(function(){
-"use strict";
-
-const FE=window.FarmEarn;
-if(!FE||!FE.walletRequest)return;
-
-const state=FE.gameState;
-const wallet=FE.walletRequest;
-const toast=FE.showToast;
-let actionBusy=false;
-
-function updateBalance(n){
- FE.updateBalance(n);
-}
-
-async function doWalletAction(payload){
- const result=await wallet(payload);
- const d=result.data||{};
- if(d.balance!==undefined)updateBalance(d.balance);
- if(FE.updateDailyProgress)FE.updateDailyProgress(d);
- return d;
-}
-
-// FARM PLOTS
-
-const GROW_TIME=5*60*1000;
-const PLOT_REWARD=50;
-
-function renderPlots(){
- state.plots.forEach((plot,index)=>{
-  const el=document.getElementById("plot"+index);
-  if(!el)return;
-
-  el.innerHTML="";
-
-  const emoji=document.createElement("div");
-  emoji.className="plot-emoji";
-
-  const name=document.createElement("div");
-  name.className="plot-name";
-
-  const button=document.createElement("button");
-  button.className="plot-action";
-  button.type="button";
-
-  if(!plot){
-   emoji.textContent="🟫";
-   name.textContent="Empty Plot";
-   button.textContent="Plant";
-   button.addEventListener("click",()=>plantPlot(index));
-  }else{
-   const elapsed=Date.now()-Number(plot.plantedAt||0);
-   const ready=elapsed>=GROW_TIME;
-
-   emoji.textContent=ready?"🌾":"🌱";
-   name.textContent=ready?"Ready to harvest":"Growing crop";
-   button.textContent=ready?"Harvest":"Growing...";
-   button.disabled=!ready;
-   button.addEventListener("click",()=>harvestPlot(index));
-  }
-
-  el.append(emoji,name,button);
- });
-}
-
-async function plantPlot(index){
- if(actionBusy)return;
- if(!FE.requireTelegram())return;
- if(state.plots[index])return toast("This plot is already planted.");
-
- actionBusy=true;
-
- try{
-  toast("Planting crop...");
-
-  const d=await doWalletAction({
-   action:"plant",
-   event_id:"plant_"+Date.now()+"_"+index+"_"+Math.random().toString(36).slice(2,10)
-  });
-
-  state.plots[index]={plantedAt:Date.now()};
-  FE.saveLocal();
-  renderPlots();
-
-  toast("Crop planted. Server balance: "+Number(d.balance).toLocaleString());
- }catch(e){
-  toast(e.message||"Could not plant crop.");
- }finally{
-  actionBusy=false;
- }
-}
-
-async function harvestPlot(index){
- if(actionBusy)return;
- if(!FE.requireTelegram())return;
-
- const plot=state.plots[index];
- if(!plot)return;
-
- if(Date.now()-Number(plot.plantedAt||0)<GROW_TIME){
-  toast("Your crop is still growing.");
-  return;
- }
-
- actionBusy=true;
-
- try{
-  toast("Harvesting crop...");
-
-  const d=await doWalletAction({
-   action:"harvest",
-   event_id:"harvest_"+Date.now()+"_"+index+"_"+Math.random().toString(36).slice(2,10)
-  });
-
-  state.plots[index]=null;
-  state.harvests++;
-  state.farmLevel=Math.max(1,Math.floor(state.harvests/10)+1);
-
-  FE.saveLocal();
-
-  document.getElementById("harvestCount").textContent=state.harvests;
-  document.getElementById("farmLevel").textContent=state.farmLevel;
-
-  renderPlots();
-
-  toast("Harvest successful! +"+Number(d.amount||PLOT_REWARD)+" coins.");
- }catch(e){
-  toast(e.message||"Harvest failed.");
- }finally{
-  actionBusy=false;
- }
-}
-
-// DAILY BONUS
-
-document.getElementById("claimDailyBtn").addEventListener("click",async function(){
- if(actionBusy)return;
- if(!FE.requireTelegram())return;
-
- actionBusy=true;
- this.disabled=true;
-
- try{
-  const d=await doWalletAction({
-   action:"daily_bonus",
-   event_id:"daily_"+Date.now()+"_"+Math.random().toString(36).slice(2,12)
-  });
-
-  toast("Daily bonus claimed! +"+Number(d.amount||500)+" coins.");
-  await FE.refreshWallet();
- }catch(e){
-  toast(e.message||"Daily bonus could not be claimed.");
- }finally{
-  actionBusy=false;
-  this.disabled=false;
-  await FE.refreshWallet().catch(()=>{});
- }
-});
-
-// JOIN CHANNEL — NO MEMBERSHIP VERIFICATION
-
-const joinButton=document.getElementById("joinChannelBtn");
-const joinCard=document.getElementById("joinChannelCard");
-const joinStorageKey="farm_join_button_removed";
-
-function removeJoinTask(){
- if(joinCard)joinCard.remove();
- localStorage.setItem(joinStorageKey,"yes");
-}
-
-// Hide it immediately if the user has already clicked it before
-if(localStorage.getItem(joinStorageKey)==="yes"){
- removeJoinTask();
-}
-
-joinButton.addEventListener("click",function(){
- if(actionBusy)return;
- if(!FE.requireTelegram())return;
-
- // Immediately remove the Join Channel card
- removeJoinTask();
-
- // Immediately show the main Farm page
- FE.switchTab("farmPage");
-
- // Request the one-time +5 reward automatically.
- // No membership verification and no claim button.
- const rewardPromise=wallet({action:"join_channel"});
-
- // Open the Telegram channel
- try{
-  FE.tg.openTelegramLink(FE.CONFIG.channelUrl);
- }catch(e){
-  window.open(FE.CONFIG.channelUrl,"_blank");
- }
-
- // Update the balance when the API responds
- rewardPromise.then(result=>{
-  const d=result.data||{};
-  if(d.balance!==undefined)FE.updateBalance(d.balance);
-  toast("Channel reward processed: +"+Number(d.amount||5)+" coins.");
- }).catch(error=>{
-  console.error("Join reward error:",error);
-  toast(error.message||"Channel opened, but reward could not be processed.");
- });
-});
-
-// WITHDRAWAL
-
-document.getElementById("withdrawBtn").addEventListener("click",async function(){
- if(actionBusy)return;
- if(!FE.requireTelegram())return;
-
- const amount=Number(document.getElementById("withdrawAmount").value);
- const account=document.getElementById("withdrawAccount").value.trim();
- const accountName=document.getElementById("withdrawName").value.trim();
- const selectedMethod=state.selectedMethod||"";
-
- if(!Number.isInteger(amount)||amount<FE.CONFIG.withdrawal.minimum){
-  toast("Minimum withdrawal is 15,000 coins.");
-  return;
- }
-
- if(!selectedMethod){
-  toast("Please choose a payment method.");
-  return;
- }
-
- if(!account||!accountName){
-  toast("Please enter your account details.");
-  return;
- }
-
- const confirmed=confirm(
-  "Submit a demo withdrawal debit of "+amount.toLocaleString()+
-  " coins using "+selectedMethod+"?"
- );
-
- if(!confirmed)return;
-
- actionBusy=true;
- this.disabled=true;
-
- try{
-  const d=await doWalletAction({
-   action:"withdraw",
-   amount:amount,
-   method:selectedMethod,
-   event_id:"withdraw_"+Date.now()+"_"+Math.random().toString(36).slice(2,12)
-  });
-
-  toast("Withdrawal action processed. Please check your wallet history.");
-
-  document.getElementById("withdrawAmount").value="";
-  document.getElementById("withdrawAccount").value="";
-  document.getElementById("withdrawName").value="";
- }catch(e){
-  toast(e.message||"Withdrawal request failed.");
- }finally{
-  actionBusy=false;
-  this.disabled=false;
- }
-});
-
-// INITIALIZATION
-
-async function initialize(){
- renderPlots();
-
- document.getElementById("harvestCount").textContent=state.harvests;
- document.getElementById("farmLevel").textContent=state.farmLevel;
-
- if(!FE.isTelegramApp()){
-  FE.showPopup("Open in Telegram","Please open Farm & Earn from its Telegram bot.");
-  return;
- }
-
- try{
-  await FE.refreshWallet();
- }catch(e){
-  console.error("Initial wallet load failed:",e);
-  toast(e.message||"Could not load your server balance.");
- }
-}
-
-initialize();
-
-})();
-</script>
-
-</body>
-</html>
+<div class="farm-container">
+  <div class="farm-background"></div>
+  <div class="farm-content">
+    <div class="tap-count">Taps: <span id="farmTaps">0</span></div>
+    <div class="tap-zone" id="tapZone">🌾</div>
+    <div class="crops">
+      <div class="crop">🌻</div>
+      <div class="crop">🌱</div>
+      <div class="crop">🌿</div>
+    </div>
+    <div class="farm-level">
+      <div style="font-size:10px;opacity:.8;">Farm Level</div>
+      <div style="font-size:18px;"><span id="farmLevel">1</span>/60</div>
+    </div>
+  </div>
+</div>
+
+<div class="earnings-card">
+  <div class="label">💎 Total Coins Earned</div>
+  <div class="value" id="coins">0</div>
+  <div class="sub">~₦<span id="coinsNGN">0</span></div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <h3>👆 Total Taps</h3>
+    <div class="value" id="totalTaps">0</div>
+    <div class="sub">Lifetime</div>
+  </div>
+  <div class="stat-card">
+    <h3>🏆 Rank</h3>
+    <div class="value" id="rank">Bronze</div>
+    <div class="sub">Starter</div>
+  </div>
+</div>
+
+<div class="progress-section">
+  <h3><span>Farm Progress</span><span id="progressPercent">0%</span></h3>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('farm')">🎮 Farm</button>
+  <button class="nav-tab" onclick="switchTab('tasks')">✅ Tasks</button>
+  <button class="nav-tab" onclick="switchTab('daily')">🎁 Daily</button>
+  <button class="nav-tab" onclick="switchTab('withdraw')">💳 Withdraw</button>
+</div>
+
+<div class="section farm active">
+  <div class="section-content">
+    <h2>🌾 Farm System</h2>
+    <button class="btn" id="tapBtn">TAP FOR COINS +1</button>
+    <button class="btn" id="plantBtn">Plant Crop +5 (Costs 10 coins)</button>
+    <button class="btn" id="harvestBtn">Harvest Farm +50</button>
+    <div class="progress-section" style="margin-top:12px;background:rgba(0,0,0,.3);border:1px solid #00ccff;">
+      <h3><span>Next Harvest</span><span id="harvestTime">--:--</span></h3>
+      <div class="progress-bar"><div class="progress-fill" id="harvestProgress"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section tasks">
+  <div class="section-content">
+    <h2>✅ Earn & Complete Tasks</h2>
+
+    <div class="bonus-challenge">
+      <h3>🎯 Daily Bonus Challenge</h3>
+      <div class="bonus-stats">
+        <div class="bonus-stat"><div class="label">Watched Ads</div><div class="value" id="adsWatchedCount">0/5</div></div>
+        <div class="bonus-stat"><div class="label">Offer Tasks</div><div class="value" id="offerTasksCount">0/5</div></div>
+      </div>
+      <div class="bonus-progress-bar"><div id="bonusProgressBar"></div></div>
+      <div class="bonus-note" id="bonusNoteText">⭐ Complete to unlock daily bonus: +500 coins</div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <button class="btn watch-ad-btn" id="watchAdBtn">📺 Watch Ad +20 coins</button>
+      <p style="font-size:10px;margin-top:6px;opacity:.6;text-align:center;">⏱️ Cooldown: 30 sec | Unlimited daily</p>
+    </div>
+
+    <div class="adsgram-section">
+      <h3>🎁 Offer Tasks - Earn 30 coins each!</h3>
+      <p style="font-size:10px;opacity:.7;margin-bottom:10px;">Tap below to activate task block, then complete unlimited offers with 30-second cooldown. Each completion = +30 coins</p>
+      <button class="btn task-tap-btn" id="activateTasksBtn" onclick="activateTaskBlocks()">📋 Activate Offer Tasks</button>
+
+      <div class="task-block-container" id="taskBlock1">
+        <p style="font-size:10px;opacity:.7;margin-bottom:8px;">📊 Task Block 1 - Complete offers</p>
+        <adsgram-task id="adsgramBlock" data-block-id="task-38707"></adsgram-task>
+        <div class="adsgram-block-id">📋 Block ID: task-38707</div>
+      </div>
+
+      <div class="task-block-container" id="taskBlock2">
+        <p style="font-size:10px;opacity:.7;margin-bottom:8px;">📊 Task Block 2 - Complete more offers</p>
+        <adsgram-task id="adsgramBlock2" data-block-id="task-38713"></adsgram-task>
+        <div class="adsgram-block-id">📋 Block ID: task-38713</div>
+      </div>
+    </div>
+
+    <div class="disclaimer">⚠️ <strong>DISCLAIMER:</strong> Watching ads and completing tasks is completely optional. You can earn coins through farming without any ads. Ad rewards are bonus opportunities only.</div>
+  </div>
+</div>
+
+<div class="section daily">
+  <div class="section-content">
+    <h2>🎁 Daily Bonus</h2>
+    <p style="font-size:11px;opacity:.7;margin-bottom:12px;" id="dailyBonusDesc">Complete 5 ads + 5 offer tasks to claim 500 bonus coins!</p>
+
+    <div class="daily-slots">
+      <div class="daily-slot" id="dailySlot0"><span id="daily0">1️⃣</span></div>
+      <div class="daily-slot" id="dailySlot1"><span id="daily1">2️⃣</span></div>
+      <div class="daily-slot" id="dailySlot2"><span id="daily2">3️⃣</span></div>
+      <div class="daily-slot" id="dailySlot3"><span id="daily3">4️⃣</span></div>
+    </div>
+
+    <div class="progress-bar" style="margin-bottom:12px;"><div class="progress-fill" id="dailyProgress"></div></div>
+
+    <div class="bonus-button-row">
+      <button class="btn watch-ad-btn" id="dailyWatchAdBtn" onclick="watchAdFromDaily()">📺 Watch Ad +20</button>
+      <button class="btn task-btn" id="dailyTaskBtn" onclick="completeTaskFromDaily()">🎁 Do Task +30</button>
+    </div>
+
+    <button class="btn" id="claimBonusBtn" disabled>Claim 500 Bonus Coins</button>
+    <p style="font-size:10px;margin-top:10px;opacity:.6;" id="dailyReqText">Requirements: 5 ads watched + 5 offer tasks completed</p>
+  </div>
+</div>
+
+<div class="section withdraw">
+  <div class="section-content">
+    <h2>💳 Withdraw Earnings</h2>
+    <p style="font-size:12px;margin:12px 0;opacity:.8;">💰 <strong id="withdrawBalance">0</strong> coins available</p>
+
+    <div class="input-group">
+      <label class="label">Select Payment Method</label>
+      <div class="withdraw-options">
+        <div class="withdraw-option" onclick="selectMethod('usdt')">💵 USDT</div>
+        <div class="withdraw-option" onclick="selectMethod('litecoin')">Ł Litecoin</div>
+        <div class="withdraw-option" onclick="selectMethod('payeer')">💳 Payeer</div>
+        <div class="withdraw-option" onclick="selectMethod('bank')">🏦 Bank</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label class="label">Wallet Address</label>
+      <input id="wallet" placeholder="Enter wallet address" type="text">
+    </div>
+
+    <div class="input-group">
+      <label class="label">Amount (Min: 15000 coins = ₦15,000)</label>
+      <input id="amount" placeholder="Enter amount" type="number" min="15000">
+    </div>
+
+    <div style="background:rgba(0,0,0,.5);padding:10px;border-radius:8px;margin-bottom:12px;font-size:11px;">
+      <div>📊 Exchange Rate: 1 Coin = ₦1</div>
+      <div style="margin-top:4px;">You'll receive: ₦<span id="convertedAmount">0</span></div>
+    </div>
+
+    <button class="btn" id="withdrawBtn">WITHDRAW NOW</button>
+    <p style="font-size:10px;margin-top:12px;opacity:.6;text-align:center;">✅ Instant withdrawal | No fees</p>
+
+    <div class="disclaimer">⚠️ <strong>DISCLAIMER:</strong> Withdrawal terms and conditions apply. All withdrawals are processed according to our payment policy. Please ensure your wallet address is correct before submission. We are not responsible for loss of funds due to incorrect wallet addresses.</div>
+
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(0,255,136,.2);">
+      <h2 style="font-size:14px;margin-bottom:12px;color:#00ff88;">👥 Invite Friends</h2>
+      <p style="font-size:11px;opacity:.7;margin-bottom:12px;">Earn 50 coins for each friend who joins!</p>
+      <input id="refLink" readonly type="text" style="margin-bottom:8px;" value="">
+      <button class="btn referral-btn" id="copyRefBtn" onclick="copyReferralLink()">📋 Copy Referral Link</button>
+      <button class="btn referral-btn" id="shareRefBtn" onclick="shareReferralLink()" style="background:linear-gradient(135deg,#ff6b00,#ff8f00);">📤 Share Referral Link</button>
+      <div class="disclaimer" style="margin-top:10px;">⚠️ <strong>DISCLAIMER:</strong> Referral rewards are subject to verification. Fraudulent referrals or artificial account creation will result in disqualification and account suspension. Earn rewards legitimately only.</div>
+    </div>
+  </div>
+</div>
+
+<div id="popup">
+  <div class="popup-content">
+    <h2 id="popupTitle">Message</h2>
+    <p id="popupMessage"></p>
+    <div class="popup-buttons">
+      <button class="cancel" onclick="closePopup()">Close</button>
+      <button class="confirm" id="popupConfirm" onclick="closePopup()">OK</button>
+    </div>
+  </div>
+</div>
+
+<div id="joinPopup">
+  <h2>Join Our Channel</h2>
+  <button id="joinBtn">Join Channel +5 coins</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- PART 2 STARTS HERE: PASTE THE SECOND PART BELOW THIS LINE -->
