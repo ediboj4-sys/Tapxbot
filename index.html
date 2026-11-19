@@ -1150,5 +1150,294 @@ button {
 
 })();
 </script>
-</body>
-</html>
+<script>
+// ============================================
+// FARM & EARN - PART 3 OF 4
+// WATCH ADS + OFFER TASK REWARDS
+// Uses existing TapX + MiniFarm dual reward API
+// ============================================
+
+(function () {
+    "use strict";
+
+    const dualRewardUrl =
+        CONFIG.apiBase + "/tapx-dual-reward.php";
+
+    let rewardBusy = false;
+
+    function part3Toast(message) {
+        if (typeof showToast === "function") {
+            showToast(message);
+        } else {
+            alert(message);
+        }
+    }
+
+    function createRewardEventId(prefix) {
+        return prefix + "_" +
+            Date.now() + "_" +
+            Math.random().toString(36).substring(2, 14);
+    }
+
+    function updateTapxBalance(balance) {
+        const amount = Number(balance);
+
+        if (!Number.isFinite(amount)) return;
+
+        if (typeof gameState !== "undefined") {
+            gameState.coins = amount;
+        }
+
+        const display = document.getElementById("coinBalance");
+
+        if (display) {
+            display.textContent = amount.toLocaleString();
+        }
+    }
+
+    async function sendDualReward(rewardType) {
+        if (!telegramUser || !tg || !tg.initData) {
+            part3Toast("Please open Farm & Earn inside Telegram.");
+            return false;
+        }
+
+        const eventId = createRewardEventId(rewardType);
+
+        const response = await fetch(dualRewardUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                initData: tg.initData,
+                event_id: eventId,
+                reward_type: rewardType
+            })
+        });
+
+        let result;
+
+        try {
+            result = await response.json();
+        } catch (error) {
+            throw new Error("The reward server returned an invalid response.");
+        }
+
+        if (!response.ok || !result.success) {
+            if (
+                result.data &&
+                result.data.duplicate
+            ) {
+                throw new Error("This reward has already been processed.");
+            }
+
+            throw new Error(
+                result.message || "Reward could not be processed."
+            );
+        }
+
+        if (!result.data) {
+            throw new Error("The server did not return reward information.");
+        }
+
+        updateTapxBalance(result.data.tapx_balance);
+
+        // MiniFarm MX is credited by the PHP endpoint.
+        // Do not credit it again in this page.
+
+        if (typeof refreshTapxDailyStats === "function") {
+            await refreshTapxDailyStats();
+        }
+
+        return result.data;
+    }
+
+    async function showRewardAd(blockId) {
+        if (!window.Adsgram || typeof window.Adsgram.init !== "function") {
+            part3Toast("The advertisement service is unavailable. Try again later.");
+            return;
+        }
+
+        const controller = window.Adsgram.init({
+            blockId: String(blockId)
+        });
+
+        const result = await controller.show();
+
+        if (!result || result.done !== true) {
+            part3Toast("The advertisement was not completed.");
+            return false;
+        }
+
+        return true;
+    }
+
+    // ============================================
+    // WATCH AD - 20 TAPX COINS + 50 MINIFARM MX
+    // ============================================
+
+    async function performWatchAd() {
+        if (rewardBusy) return;
+
+        rewardBusy = true;
+
+        const button = document.getElementById("watchAdBtn");
+
+        if (button) button.disabled = true;
+
+        try {
+            part3Toast("Loading advertisement...");
+
+            const completed = await showRewardAd(CONFIG.ads.watch);
+
+            if (!completed) return;
+
+            part3Toast("Verifying your reward...");
+
+            const reward = await sendDualReward("ad");
+
+            part3Toast(
+                "Success! +" +
+                Number(reward.tapx_reward).toLocaleString() +
+                " TapX coins and +" +
+                Number(reward.minifarm_reward_mx).toLocaleString() +
+                " MiniFarm MX."
+            );
+
+        } catch (error) {
+            console.error("Watch ad reward error:", error);
+            part3Toast(error.message || "Unable to process your reward.");
+        } finally {
+            rewardBusy = false;
+
+            if (button) button.disabled = false;
+        }
+    }
+
+    // ============================================
+    // OFFER TASK - 30 TAPX COINS + 50 MINIFARM MX
+    // ============================================
+
+    async function completeOfferTask(blockId, button) {
+        if (rewardBusy) return;
+
+        rewardBusy = true;
+
+        if (button) button.disabled = true;
+
+        try {
+            part3Toast("Opening offer task...");
+
+            const completed = await showRewardAd(blockId);
+
+            if (!completed) return;
+
+            part3Toast("Verifying your task reward...");
+
+            const reward = await sendDualReward("task");
+
+            part3Toast(
+                "Task completed! +" +
+                Number(reward.tapx_reward).toLocaleString() +
+                " TapX coins and +" +
+                Number(reward.minifarm_reward_mx).toLocaleString() +
+                " MiniFarm MX."
+            );
+
+        } catch (error) {
+            console.error("Offer task reward error:", error);
+            part3Toast(error.message || "Unable to process task reward.");
+        } finally {
+            rewardBusy = false;
+
+            if (button) button.disabled = false;
+        }
+    }
+
+    // ============================================
+    // CONNECT WATCH AD BUTTON
+    // ============================================
+
+    const watchButton = document.getElementById("watchAdBtn");
+
+    if (watchButton) {
+        watchButton.addEventListener("click", performWatchAd);
+    }
+
+    // ============================================
+    // CONNECT OFFER TASK BUTTONS
+    // ============================================
+
+    const offerButton = document.getElementById("offerTaskBtn");
+
+    const taskOne = document.getElementById("offerTaskBlock1");
+    const taskTwo = document.getElementById("offerTaskBlock2");
+
+    function createOfferButton(container, blockId, label) {
+        if (!container) return;
+
+        const button = document.createElement("button");
+
+        button.type = "button";
+        button.textContent = label;
+        button.style.width = "100%";
+        button.style.padding = "12px";
+        button.style.marginTop = "8px";
+        button.style.borderRadius = "10px";
+        button.style.border = "none";
+        button.style.cursor = "pointer";
+
+        button.addEventListener("click", function () {
+            completeOfferTask(blockId, button);
+        });
+
+        container.appendChild(button);
+    }
+
+    if (taskOne) {
+        createOfferButton(
+            taskOne,
+            CONFIG.ads.offerOne,
+            "Start Offer Task 1"
+        );
+    }
+
+    if (taskTwo) {
+        createOfferButton(
+            taskTwo,
+            CONFIG.ads.offerTwo,
+            "Start Offer Task 2"
+        );
+    }
+
+    if (offerButton) {
+        offerButton.addEventListener("click", function () {
+            if (taskOne) {
+                taskOne.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }
+        });
+    }
+
+    // Make the functions available to the next part.
+    window.FarmEarn = window.FarmEarn || {};
+
+    window.FarmEarn.performWatchAd = performWatchAd;
+    window.FarmEarn.completeOfferTask = completeOfferTask;
+    window.FarmEarn.sendDualReward = sendDualReward;
+
+    // Keep the older callback name available.
+    window.onOfferTaskCompleted = function (blockId) {
+        const selectedBlock =
+            blockId === 2 || blockId === CONFIG.ads.offerTwo
+                ? CONFIG.ads.offerTwo
+                : CONFIG.ads.offerOne;
+
+        return completeOfferTask(selectedBlock, null);
+    };
+
+})();
+</script>
+
