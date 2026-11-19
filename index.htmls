@@ -445,3 +445,416 @@ async function refreshTapxDailyStats(){
   updateUI();
   return data;
 }
+/* =====================================================
+   MINIFARM PARTNER TASK INTEGRATION
+   The partner secret is never placed in this HTML file.
+   MiniFarm verifies the bot start, Mini App launch,
+   activity duration and reward on its own server.
+===================================================== */
+
+const MINIFARM_PARTNER={
+  API_BASE:'https://playmxbot.xyz/api/',
+  BOT_USERNAME:'Promoteaffibot',
+  HEARTBEAT_INTERVAL:10000
+};
+
+/* TAPX DATABASE WALLET API */
+const TAPX_WALLET_API=MINIFARM_PARTNER.API_BASE+'tapx-wallet.php';
+let tapxWalletReady=false;
+let tapxWalletBusy=false;
+
+function makeTapxEventId(){
+  return (window.crypto && typeof window.crypto.randomUUID==='function')
+    ?window.crypto.randomUUID()
+    :('tapx_'+Date.now()+'_'+Math.random().toString(36).slice(2,12));
+}
+
+async function tapxWalletRequest(action,extra={}){
+  if(!tg?.initData){
+    throw new Error('Please open TapX inside Telegram first.');
+  }
+
+  const response=await fetch(TAPX_WALLET_API,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      initData:tg.initData,
+      action:action,
+      event_id:makeTapxEventId(),
+      ...extra
+    }),
+    cache:'no-store'
+  });
+
+  let result;
+  try{ result=await response.json(); }
+  catch(error){ throw new Error('TapX server returned an invalid response.'); }
+
+  if(!response.ok || result?.success!==true){
+    throw new Error(result?.message || ('Wallet request failed (HTTP '+response.status+').'));
+  }
+
+  return result.data||{};
+}
+
+async function loadTapxWallet(){
+  if(!tg?.initData){
+    tapxWalletReady=false;
+    showPopup('Open in Telegram','Please open this Mini App from Telegram to load your account wallet.');
+    return false;
+  }
+  try{
+    const data=await tapxWalletRequest('balance');
+    gameState.coins=Number(data.balance||0);
+    applyTapxDailyStats(data);
+    tapxWalletReady=true;
+    updateUI();
+    return true;
+  }catch(error){
+    tapxWalletReady=false;
+    console.error('TapX wallet load failed:',error);
+    showPopup('Wallet connection failed',error.message);
+    return false;
+  }
+}
+
+function requireTapxWallet(){
+  if(!tapxWalletReady){
+    toast('⏳ Wallet is not connected. Reopen TapX from Telegram.');
+    return false;
+  }
+  return true;
+}
+
+let partnerTaskCode=null;
+let partnerTaskActive=false;
+let partnerHeartbeatTimer=null;
+let partnerHeartbeatBusy=false;
+let partnerCompletionBusy=false;
+let partnerRequiredSeconds=0;
+let partnerActiveSeconds=0;
+
+/* Get task code passed by Telegram or URL */
+function getPartnerTaskCode(){
+  try{
+    const url=new URL(window.location.href);
+    const queryCode=url.searchParams.get('task_code');
+
+    if(queryCode)return queryCode;
+
+    const startParam=tg?.initDataUnsafe?.start_param;
+
+    if(startParam && startParam.startsWith('mf_')){
+      return startParam;
+    }
+
+    return null;
+  }catch(error){
+    console.error('Could not read partner task code:',error);
+    return null;
+  }
+}
+
+/* Safely read the nested API response */
+function getPartnerResponseData(result){
+  if(result && result.data && typeof result.data==='object'){
+    return result.data;
+  }
+
+  return {};
+}
+
+/* Partner task status display */
+function showPartnerTask(message,activeSeconds,requiredSeconds){
+  const box=document.getElementById('partnerTaskBox');
+  const status=document.getElementById('partnerTaskStatus');
+  const progress=document.getElementById('partnerTaskProgress');
+
+  box.classList.add('active');
+  status.textContent=message;
+
+  const percent=requiredSeconds>0
+    ?Math.min(100,(activeSeconds/requiredSeconds)*100)
+    :0;
+
+  progress.style.width=percent+'%';
+}
+
+/* API request */
+async function partnerApiRequest(endpoint,payload){
+  const response=await fetch(MINIFARM_PARTNER.API_BASE+endpoint,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify(payload),
+    cache:'no-store'
+  });
+
+  let result;
+
+  try{
+    result=await response.json();
+  }catch(error){
+    throw new Error('MiniFarm returned an invalid response.');
+  }
+
+  if(!response.ok){
+    throw new Error(
+      result?.message ||
+      result?.error ||
+      ('HTTP error '+response.status)
+    );
+  }
+
+  return result;
+}
+
+
+/* =====================================================
+   AUTOMATIC TAPX + MINIFARM DUAL REWARD
+   The server credits the authenticated Telegram user's
+   TapX MySQL wallet and MiniFarm MX wallet. Daily counters
+   are then reloaded from the TapX server.
+   No claim codes are generated or displayed.
+===================================================== */
+let miniFarmDualRewardBusy = false;
+
+async function sendMiniFarmDualReward(rewardType){
+  if(!['ad','task'].includes(rewardType)) throw new Error('Invalid reward type.');
+
+  const initData=tg?.initData;
+  if(!initData || !tg?.initDataUnsafe?.user?.id){
+    throw new Error('Open TapX inside Telegram to receive this reward.');
+  }
+  if(miniFarmDualRewardBusy) throw new Error('A reward request is already processing.');
+  miniFarmDualRewardBusy=true;
+
+  try{
+    const response=await fetch(MINIFARM_PARTNER.API_BASE+'tapx-dual-reward.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({initData:initData,event_id:makeTapxEventId(),reward_type:rewardType}),
+      cache:'no-store'
+    });
+    let result;
+    try{ result=await response.json(); }
+    catch(error){ throw new Error('MiniFarm returned an invalid response.'); }
+
+    if(response.status===409 && result?.data?.duplicate===true){
+      await refreshTapxDailyStats();
+      throw new Error('This reward was already credited.');
+    }
+    if(!response.ok || result?.success!==true){
+      throw new Error(result?.message||('HTTP error '+response.status));
+    }
+
+    const data=result.data||{};
+    gameState.coins=Number(data.tapx_balance||0);
+    await refreshTapxDailyStats();
+    console.log('TapX + MiniFarm dual reward credited:',data);
+    toast('🎉 '+(rewardType==='ad'?'Ad':'Task')+' reward credited: '+(data.minifarm_reward_mx||50)+' MX to MiniFarm!');
+    return data;
+  }catch(error){
+    console.error('TapX + MiniFarm dual reward failed:',error);
+    throw error;
+  }finally{
+    miniFarmDualRewardBusy=false;
+  }
+}
+
+/* Stop heartbeat timer */
+function stopPartnerHeartbeat(){
+  if(partnerHeartbeatTimer){
+    clearInterval(partnerHeartbeatTimer);
+    partnerHeartbeatTimer=null;
+  }
+}
+
+/* Start partner verification */
+async function startPartnerTaskFlow(){
+  partnerTaskCode=getPartnerTaskCode();
+
+  if(!partnerTaskCode){
+    return;
+  }
+
+  const initData=tg?.initData;
+
+  if(!tg || !initData){
+    showPartnerTask(
+      'Please open this Mini App from Telegram to verify your partner task.',
+      0,
+      0
+    );
+    return;
+  }
+
+  if(!/^mf_[A-Za-z0-9_-]{1,96}$/.test(partnerTaskCode)){
+    showPartnerTask('Invalid partner task code.',0,0);
+    return;
+  }
+
+  showPartnerTask(
+    'Verifying your Telegram account and partner task...',
+    0,
+    0
+  );
+
+  try{
+    const result=await partnerApiRequest('partner-launch.php',{
+      bot_username:MINIFARM_PARTNER.BOT_USERNAME,
+      task_code:partnerTaskCode,
+      initData:initData
+    });
+
+    if(result.success!==true){
+      throw new Error(
+        result.message ||
+        'MiniFarm could not verify this task.'
+      );
+    }
+
+    /* IMPORTANT: launch PHP returns fields inside result.data */
+    const data=getPartnerResponseData(result);
+
+    partnerRequiredSeconds=parseInt(data.required_seconds||0,10);
+    partnerActiveSeconds=parseInt(data.active_seconds||0,10);
+
+    if(data.mini_app_opened!==true){
+      throw new Error('MiniFarm did not confirm the Mini App launch.');
+    }
+
+    if(partnerRequiredSeconds<=0){
+      throw new Error('MiniFarm returned an invalid task duration.');
+    }
+
+    partnerTaskActive=true;
+
+    showPartnerTask(
+      'Partner task verified. Keep this Mini App open while MiniFarm counts your activity.',
+      partnerActiveSeconds,
+      partnerRequiredSeconds
+    );
+
+    if(
+      data.ready_to_complete===true ||
+      partnerActiveSeconds>=partnerRequiredSeconds
+    ){
+      await completePartnerTask();
+      return;
+    }
+
+    startPartnerHeartbeat();
+
+  }catch(error){
+    console.error('Partner launch error:',error);
+
+    partnerTaskActive=false;
+    stopPartnerHeartbeat();
+
+    showPartnerTask(
+      'Partner task verification failed: '+error.message,
+      0,
+      0
+    );
+  }
+}
+
+/* Start heartbeat timer */
+function startPartnerHeartbeat(){
+  stopPartnerHeartbeat();
+
+  if(!partnerTaskActive)return;
+
+  partnerHeartbeatTimer=setInterval(()=>{
+    if(!partnerTaskActive)return;
+
+    if(document.visibilityState!=='visible')return;
+
+    if(partnerHeartbeatBusy || partnerCompletionBusy)return;
+
+    sendPartnerHeartbeat();
+  },MINIFARM_PARTNER.HEARTBEAT_INTERVAL);
+}
+
+/* Send heartbeat to MiniFarm */
+async function sendPartnerHeartbeat(){
+  if(!tg?.initData || !partnerTaskCode)return;
+  if(!partnerTaskActive)return;
+  if(partnerHeartbeatBusy || partnerCompletionBusy)return;
+
+  partnerHeartbeatBusy=true;
+
+  try{
+    const result=await partnerApiRequest('partner-heartbeat.php',{
+      bot_username:MINIFARM_PARTNER.BOT_USERNAME,
+      task_code:partnerTaskCode,
+      initData:tg.initData
+    });
+
+    if(result.success!==true){
+      throw new Error(
+        result.message ||
+        'Activity update was rejected.'
+      );
+    }
+
+    /* IMPORTANT: heartbeat PHP returns fields inside result.data */
+    const data=getPartnerResponseData(result);
+
+    partnerActiveSeconds=parseInt(
+      data.active_seconds ?? partnerActiveSeconds,
+      10
+    );
+
+    partnerRequiredSeconds=parseInt(
+      data.required_seconds ?? partnerRequiredSeconds,
+      10
+    );
+
+    const remaining=Math.max(
+      0,
+      parseInt(
+        data.remaining_seconds ??
+        (partnerRequiredSeconds-partnerActiveSeconds),
+        10
+      )
+    );
+
+    if(
+      data.ready_to_complete===true ||
+      remaining<=0
+    ){
+      showPartnerTask(
+        'Required activity completed. Verifying your reward with MiniFarm...',
+        partnerActiveSeconds,
+        partnerRequiredSeconds
+      );
+
+      /* Completion happens after heartbeat finishes */
+      partnerHeartbeatBusy=false;
+      await completePartnerTask();
+      return;
+    }
+
+    showPartnerTask(
+      'Activity verified: '+partnerActiveSeconds+
+      ' / '+partnerRequiredSeconds+
+      ' seconds. Keep the Mini App open.',
+      partnerActiveSeconds,
+      partnerRequiredSeconds
+    );
+
+  }catch(error){
+    console.error('Partner heartbeat error:',error);
+
+    showPartnerTask(
+      'Activity verification error: '+error.message,
+      partnerActiveSeconds,
+      partnerRequiredSeconds
+    );
+  }finally{
+    partnerHeartbeatBusy=false;
+  }
+}
