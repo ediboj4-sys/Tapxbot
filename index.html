@@ -766,6 +766,392 @@ button {
   <!-- TOAST -->
   <div id="toast"></div>
 
-<!-- PART 2 WILL BE INSERTED HERE -->
+<!-- 
+<script>
+// ============================================
+// FARM & EARN - PART 2 OF 4
+// Telegram setup, configuration and UI helpers
+// ============================================
+
+(function () {
+  "use strict";
+
+  const tg = window.Telegram?.WebApp;
+
+  // ------------------------------------------
+  // CONFIGURATION
+  // ------------------------------------------
+
+  const CONFIG = {
+    apiBase: "https://playmxbot.xyz/api",
+
+    channelUrl: "https://t.me/FoxiTaskbot?start=ref_6910486529",
+
+    referralBot: "https://t.me/Promoteaffibot?start=",
+
+    ads: {
+      watch: "38705",
+      offerOne: "task-38707",
+      offerTwo: "task-38713",
+      join: "38706"
+    },
+
+    rewards: {
+      watch: 20,
+      offer: 30,
+      join: 5,
+      referral: 50,
+      daily: 500,
+      tap: 1
+    },
+
+    dailyRequirements: {
+      ads: 5,
+      tasks: 5
+    },
+
+    withdrawal: {
+      minimum: 15000,
+      coinRate: 1
+    }
+  };
+
+  // ------------------------------------------
+  // TELEGRAM INITIALIZATION
+  // ------------------------------------------
+
+  if (tg) {
+    tg.ready();
+    tg.expand();
+
+    try {
+      tg.setHeaderColor("#086b32");
+      tg.setBackgroundColor("#f4f8f4");
+    } catch (error) {
+      console.log("Telegram appearance setup skipped.");
+    }
+  }
+
+  const telegramUser = tg?.initDataUnsafe?.user || null;
+
+  const telegramId = telegramUser?.id
+    ? String(telegramUser.id)
+    : null;
+
+  const userName = telegramUser
+    ? (
+        telegramUser.first_name +
+        (telegramUser.last_name ? " " + telegramUser.last_name : "")
+      )
+    : "Farmer";
+
+  const startParam = tg?.initDataUnsafe?.start_param || "";
+
+  // ------------------------------------------
+  // TELEGRAM APP CHECK
+  // ------------------------------------------
+
+  function isTelegramApp() {
+    return !!(
+      tg &&
+      tg.initData &&
+      telegramUser &&
+      telegramId
+    );
+  }
+
+  function requireTelegram() {
+    if (isTelegramApp()) return true;
+
+    showPopup(
+      "Open in Telegram",
+      "Please open Farm & Earn from its Telegram bot to continue."
+    );
+
+    return false;
+  }
+
+  // ------------------------------------------
+  // EXISTING LOCAL DATA
+  // Do not clear or reset existing storage.
+  // ------------------------------------------
+
+  function loadExistingGameState() {
+    let saved = {};
+
+    try {
+      const oldData = localStorage.getItem("gameState");
+
+      if (oldData) {
+        saved = JSON.parse(oldData) || {};
+      }
+    } catch (error) {
+      console.warn("Could not read previous game state:", error);
+    }
+
+    return {
+      coins: Number(saved.coins) || 0,
+      harvests: Number(saved.harvests) || 0,
+      farmLevel: Number(saved.farmLevel) || 1,
+      plots: Array.isArray(saved.plots) ? saved.plots : [],
+      selectedMethod: "",
+      telegramId: telegramId
+    };
+  }
+
+  const gameState = loadExistingGameState();
+
+  // ------------------------------------------
+  // SAVE LOCAL GAME DATA
+  // This is for game display/state only.
+  // Server-confirmed rewards will be handled
+  // in the later parts.
+  // ------------------------------------------
+
+  function saveLocalGameState() {
+    try {
+      const oldData = localStorage.getItem("gameState");
+      let previous = {};
+
+      if (oldData) {
+        previous = JSON.parse(oldData) || {};
+      }
+
+      previous.harvests = gameState.harvests;
+      previous.farmLevel = gameState.farmLevel;
+      previous.plots = gameState.plots;
+
+      // Do not overwrite the balance here.
+      // The reward API will control reward balances.
+
+      localStorage.setItem("gameState", JSON.stringify(previous));
+    } catch (error) {
+      console.warn("Could not save game state:", error);
+    }
+  }
+
+  // ------------------------------------------
+  // NOTIFICATION
+  // ------------------------------------------
+
+  let toastTimer = null;
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.style.display = "block";
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(function () {
+      toast.style.display = "none";
+    }, 2800);
+  }
+
+  // ------------------------------------------
+  // GENERAL POPUP
+  // ------------------------------------------
+
+  function showPopup(title, message) {
+    const overlay = document.getElementById("generalPopup");
+    const titleElement = document.getElementById("popupTitle");
+    const messageElement = document.getElementById("popupMessage");
+
+    if (!overlay) return;
+
+    titleElement.textContent = title;
+    messageElement.textContent = message;
+
+    overlay.classList.add("show");
+  }
+
+  function closePopup() {
+    document.getElementById("generalPopup")
+      ?.classList.remove("show");
+  }
+
+  // ------------------------------------------
+  // JOIN POPUP
+  // ------------------------------------------
+
+  function openJoinPopup() {
+    document.getElementById("joinPopup")
+      ?.classList.add("show");
+  }
+
+  function closeJoinPopup() {
+    document.getElementById("joinPopup")
+      ?.classList.remove("show");
+  }
+
+  // ------------------------------------------
+  // PAGE NAVIGATION
+  // ------------------------------------------
+
+  function switchTab(pageName) {
+    const pages = document.querySelectorAll(".page");
+    const navItems = document.querySelectorAll(".nav-item");
+
+    pages.forEach(function (page) {
+      page.classList.toggle("active", page.id === pageName);
+    });
+
+    navItems.forEach(function (item) {
+      item.classList.toggle(
+        "active",
+        item.dataset.page === pageName
+      );
+    });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  document.querySelectorAll(".nav-item").forEach(function (item) {
+    item.addEventListener("click", function () {
+      switchTab(item.dataset.page);
+    });
+  });
+
+  // ------------------------------------------
+  // WITHDRAWAL METHOD SELECTION
+  // ------------------------------------------
+
+  document.querySelectorAll(".method-btn").forEach(function (button) {
+    button.addEventListener("click", function () {
+      document.querySelectorAll(".method-btn").forEach(function (other) {
+        other.classList.remove("active");
+      });
+
+      button.classList.add("active");
+      gameState.selectedMethod = button.dataset.method || "";
+    });
+  });
+
+  // ------------------------------------------
+  // POPUP BUTTONS
+  // ------------------------------------------
+
+  document.getElementById("closeGeneralPopup")
+    ?.addEventListener("click", closePopup);
+
+  document.getElementById("closeJoinPopup")
+    ?.addEventListener("click", closeJoinPopup);
+
+  document.getElementById("openChannelBtn")
+    ?.addEventListener("click", function () {
+      if (tg) {
+        tg.openTelegramLink(CONFIG.channelUrl);
+      } else {
+        window.open(CONFIG.channelUrl, "_blank");
+      }
+    });
+
+  // ------------------------------------------
+  // PROFILE DISPLAY
+  // ------------------------------------------
+
+  const profileElement = document.getElementById("profileName");
+
+  if (profileElement) {
+    profileElement.textContent = "👤 " + userName;
+  }
+
+  // ------------------------------------------
+  // SHARE REFERRAL LINK
+  // ------------------------------------------
+
+  function getReferralLink() {
+    if (!telegramId) return "";
+
+    return CONFIG.referralBot + encodeURIComponent(telegramId);
+  }
+
+  async function inviteFriends() {
+    if (!requireTelegram()) return;
+
+    const link = getReferralLink();
+
+    if (!link) {
+      showToast("Unable to create referral link.");
+      return;
+    }
+
+    const shareText =
+      "Join Farm & Earn and start earning rewards!";
+
+    if (tg?.switchInlineQuery) {
+      tg.switchInlineQuery(link, ["users", "groups", "channels"]);
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(link);
+      showToast("Referral link copied!");
+    } catch (error) {
+      showPopup("Your Referral Link", link);
+    }
+  }
+
+  document.getElementById("inviteBtn")
+    ?.addEventListener("click", inviteFriends);
+
+  // ------------------------------------------
+  // INITIAL DISPLAY
+  // ------------------------------------------
+
+  function updateBasicDisplay() {
+    const harvestElement = document.getElementById("harvestCount");
+    const levelElement = document.getElementById("farmLevel");
+
+    if (harvestElement) {
+      harvestElement.textContent = gameState.harvests;
+    }
+
+    if (levelElement) {
+      levelElement.textContent = gameState.farmLevel;
+    }
+  }
+
+  updateBasicDisplay();
+
+  // ------------------------------------------
+  // EXPOSE SHARED FUNCTIONS FOR PART 3 & 4
+  // ------------------------------------------
+
+  window.FarmEarn = {
+    CONFIG: CONFIG,
+    tg: tg,
+    telegramUser: telegramUser,
+    telegramId: telegramId,
+    userName: userName,
+    startParam: startParam,
+    gameState: gameState,
+
+    isTelegramApp: isTelegramApp,
+    requireTelegram: requireTelegram,
+
+    showToast: showToast,
+    showPopup: showPopup,
+    closePopup: closePopup,
+
+    openJoinPopup: openJoinPopup,
+    closeJoinPopup: closeJoinPopup,
+
+    switchTab: switchTab,
+    saveLocalGameState: saveLocalGameState,
+    getReferralLink: getReferralLink
+  };
+
+  console.log("Farm & Earn Part 2 loaded.");
+
+})();
+</script>
+ -->
 </body>
 </html>
