@@ -500,3 +500,557 @@ async function processSaveQueue(){
     if(pendingSave) setTimeout(processSaveQueue,500);
   }
 }
+  // =================== DAILY RESET ===================
+function check24HourReset(){
+  const now = Date.now();
+  const lastReset = Number(gameState.requirementsLastReset) || 0;
+  const dayMs = 24 * 60 * 60 * 1000;
+
+  if(!lastReset || now - lastReset >= dayMs){
+    gameState.adsWatchedToday = 0;
+    gameState.offerTasksCompletedToday = 0;
+    gameState.bonusClaimedToday = '';
+    gameState.requirementsLastReset = now;
+    saveState();
+  }
+}
+
+// =================== TAB NAVIGATION ===================
+function switchTab(tab,button){
+  document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+
+  const section = document.querySelector('.section.'+tab);
+  if(section) section.classList.add('active');
+
+  if(button){
+    button.classList.add('active');
+  }else{
+    const index = {farm:0,tasks:1,daily:2,withdraw:3}[tab];
+    document.querySelectorAll('.nav-tab')[index]?.classList.add('active');
+  }
+}
+
+// =================== UI UPDATE ===================
+function updateUI(){
+  document.getElementById('coins').textContent = gameState.coins;
+  document.getElementById('coinsNGN').textContent = gameState.coins * CONFIG.EXCHANGE_RATE;
+  document.getElementById('totalTaps').textContent = gameState.totalTaps;
+  document.getElementById('farmLevel').textContent = gameState.farmLevel;
+  document.getElementById('farmTaps').textContent = gameState.totalTaps % 10;
+
+  const level = Math.floor(gameState.coins / 500) + 1;
+  document.getElementById('level').textContent = level;
+
+  const ranks = ['Bronze','Silver','Gold','Platinum','Diamond'];
+  const rankIndex = Math.min(Math.floor(gameState.coins / 5000),ranks.length-1);
+  document.getElementById('rank').textContent = ranks[rankIndex];
+
+  const progress = (gameState.farmLevel % 10) / 10 * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+  document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+
+  document.getElementById('withdrawBalance').textContent = gameState.coins;
+
+  updateDailyUI();
+  updateDailyBonus();
+  updateHarvestCountdown();
+}
+
+function updateDailyUI(){
+  const completed = gameState.dailyProgress.filter(Boolean).length;
+  document.getElementById('dailyProgress').style.width = (completed / 4 * 100) + '%';
+
+  gameState.dailyProgress.forEach((done,i)=>{
+    const slot = document.getElementById('daily'+i);
+    const parent = slot.parentElement;
+    if(done){
+      parent.classList.add('completed');
+      slot.textContent = '✅';
+    }else{
+      parent.classList.remove('completed');
+      slot.textContent = ['1️⃣','2️⃣','3️⃣','4️⃣'][i];
+    }
+  });
+}
+
+function updateHarvestCountdown(){
+  const elapsed = Date.now() - gameState.lastHarvest;
+  const remaining = Math.max(0,CONFIG.HARVEST_COOLDOWN_MS - elapsed);
+  const mins = Math.floor(remaining / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+
+  document.getElementById('harvestTime').textContent =
+    mins + ':' + String(secs).padStart(2,'0');
+
+  const percent = Math.min(100,elapsed / CONFIG.HARVEST_COOLDOWN_MS * 100);
+  document.getElementById('harvestProgress').style.width = percent + '%';
+}
+
+// =================== DAILY BONUS ===================
+function updateDailyBonus(){
+  const adsReq = CONFIG.ADS_REQUIRED_FOR_BONUS;
+  const tasksReq = CONFIG.TASKS_REQUIRED_FOR_BONUS;
+
+  document.getElementById('adsWatchedCount').textContent =
+    gameState.adsWatchedToday + '/' + adsReq;
+
+  document.getElementById('offerTasksCount').textContent =
+    gameState.offerTasksCompletedToday + '/' + tasksReq;
+
+  document.getElementById('bonusNoteText').textContent =
+    '⭐ Complete to unlock daily bonus: +' + CONFIG.DAILY_BONUS_AMOUNT + ' coins';
+
+  document.getElementById('claimBonusBtn').textContent =
+    'Claim ' + CONFIG.DAILY_BONUS_AMOUNT + ' Bonus Coins';
+
+  document.getElementById('dailyBonusDesc').textContent =
+    'Complete ' + adsReq + ' ads + ' + tasksReq +
+    ' offer tasks to claim ' + CONFIG.DAILY_BONUS_AMOUNT + ' bonus coins!';
+
+  document.getElementById('dailyReqText').textContent =
+    'Requirements: ' + adsReq + ' ads watched + ' + tasksReq + ' offer tasks completed';
+
+  const alreadyClaimed = gameState.bonusClaimedToday === new Date().toDateString();
+
+  const canClaim =
+    gameState.adsWatchedToday >= adsReq &&
+    gameState.offerTasksCompletedToday >= tasksReq &&
+    !alreadyClaimed;
+
+  const totalRequired = adsReq + tasksReq;
+  const completed = Math.min(
+    totalRequired,
+    gameState.adsWatchedToday + gameState.offerTasksCompletedToday
+  );
+
+  document.getElementById('bonusProgressBar').style.width =
+    (completed / totalRequired * 100) + '%';
+
+  document.getElementById('claimBonusBtn').disabled = !canClaim;
+}
+
+document.getElementById('claimBonusBtn').addEventListener('click',()=>{
+  if(!gameReady) return;
+
+  const alreadyClaimed = gameState.bonusClaimedToday === new Date().toDateString();
+
+  if(alreadyClaimed){
+    toast('You have already claimed today’s bonus.');
+    return;
+  }
+
+  if(
+    gameState.adsWatchedToday < CONFIG.ADS_REQUIRED_FOR_BONUS ||
+    gameState.offerTasksCompletedToday < CONFIG.TASKS_REQUIRED_FOR_BONUS
+  ){
+    toast('Complete the daily requirements first.');
+    return;
+  }
+
+  gameState.coins += CONFIG.DAILY_BONUS_AMOUNT;
+  gameState.bonusClaimedToday = new Date().toDateString();
+
+  createFloatText('+'+CONFIG.DAILY_BONUS_AMOUNT+' BONUS','#ffd700');
+  toast('🎉 Daily bonus claimed!');
+
+  updateUI();
+  saveState();
+});
+
+// =================== ADSGRAM INITIALIZATION ===================
+function initializeAds(){
+  if(typeof Adsgram === 'undefined'){
+    console.warn('Adsgram SDK not available.');
+    return;
+  }
+
+  try{
+    rewardAd = Adsgram.init({blockId:WATCH_AD_BLOCK_ID});
+    joinAd = Adsgram.init({blockId:JOIN_CHANNEL_AD_BLOCK_ID});
+    console.log('Adsgram initialized.');
+  }catch(error){
+    console.error('Adsgram initialization error:',error);
+  }
+}
+
+// =================== WATCH REWARDED AD ===================
+document.getElementById('watchAdBtn').addEventListener('click',performWatchAd);
+
+function performWatchAd(){
+  if(!gameReady) return toast('Connecting to your account...');
+  if(!rewardAd) return toast('Ad system is not available. Try again later.');
+
+  if(gameState.adsWatchedToday >= CONFIG.AD_DAILY_CAP){
+    return toast('Daily ad limit reached.');
+  }
+
+  const now = Date.now();
+  const elapsed = now - gameState.lastAdTime;
+  const cooldown = CONFIG.AD_COOLDOWN_SEC * 1000;
+
+  if(elapsed < cooldown){
+    const seconds = Math.ceil((cooldown - elapsed) / 1000);
+    return toast('Please wait '+seconds+' seconds before watching another ad.');
+  }
+
+  const btn = document.getElementById('watchAdBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Loading Ad...';
+
+  let adPromise;
+
+  try{
+    adPromise = rewardAd.show();
+  }catch(error){
+    console.error('Adsgram error:',error);
+    btn.disabled = false;
+    btn.textContent = '📺 Watch Ad +'+CONFIG.AD_REWARD+' coins';
+    return toast('Ad could not be started.');
+  }
+
+  Promise.resolve(adPromise).then(result=>{
+    if(result && result.done){
+      gameState.coins += CONFIG.AD_REWARD;
+      gameState.adsWatchedToday += 1;
+      gameState.lastAdTime = Date.now();
+
+      createFloatText('+'+CONFIG.AD_REWARD,'#00ff88');
+      toast('✅ You earned '+CONFIG.AD_REWARD+' coins!');
+
+      updateUI();
+      saveState();
+    }else{
+      toast('Ad was not completed. No reward.');
+    }
+  }).catch(error=>{
+    console.error('Ad error:',error);
+    toast('Ad closed or unavailable. No reward.');
+  }).finally(()=>{
+    btn.disabled = false;
+    btn.textContent = '📺 Watch Ad +'+CONFIG.AD_REWARD+' coins';
+  });
+}
+
+function watchAdFromDaily(){
+  performWatchAd();
+}
+
+// =================== OFFER TASK BLOCKS ===================
+function activateTaskBlocks(){
+  if(!gameReady) return toast('Connecting to your account...');
+
+  const block1 = document.getElementById('taskBlock1');
+  const block2 = document.getElementById('taskBlock2');
+
+  block1.classList.add('active');
+
+  if(Math.random() > 0.5){
+    block2.classList.add('active');
+  }
+
+  const btn = document.getElementById('activateTasksBtn');
+  btn.disabled = true;
+  btn.textContent = '✅ Task Blocks Activated';
+
+  toast('Offer task blocks activated.');
+
+  setTimeout(()=>{
+    btn.disabled = false;
+    btn.textContent = '📋 Activate Offer Tasks';
+  },2000);
+}
+
+function completeTaskFromDaily(){
+  if(!gameReady) return toast('Connecting to your account...');
+
+  if(gameState.offerTasksCompletedToday >= CONFIG.TASK_DAILY_CAP){
+    return toast('Daily task limit reached.');
+  }
+
+  const now = Date.now();
+  const elapsed = now - gameState.lastTaskTime;
+  const cooldown = CONFIG.TASK_COOLDOWN_SEC * 1000;
+
+  if(elapsed < cooldown){
+    return toast('Please wait '+Math.ceil((cooldown-elapsed)/1000)+' seconds.');
+  }
+
+  currentDailyTaskBlockId =
+    ADSGRAM_TASK_BLOCK_IDS[Math.floor(Math.random()*ADSGRAM_TASK_BLOCK_IDS.length)];
+
+  taskCompletionPending = true;
+  switchTab('tasks');
+
+  setTimeout(()=>{
+    const block1 = document.getElementById('taskBlock1');
+    const block2 = document.getElementById('taskBlock2');
+
+    block1.classList.remove('active');
+    block2.classList.remove('active');
+
+    if(currentDailyTaskBlockId === ADSGRAM_TASK_BLOCK_IDS[0]){
+      block1.classList.add('active');
+    }else{
+      block2.classList.add('active');
+    }
+
+    const section = document.querySelector('.adsgram-section');
+    section?.scrollIntoView({behavior:'smooth',block:'center'});
+
+    toast('Complete the offer task, then return to the app.');
+  },300);
+}
+
+// Adsgram integrations may call this callback when their task reports completion.
+window.onOfferTaskCompleted = function(){
+  if(!gameReady || !taskCompletionPending) return;
+
+  if(gameState.offerTasksCompletedToday >= CONFIG.TASK_DAILY_CAP){
+    taskCompletionPending = false;
+    return toast('Daily task limit reached.');
+  }
+
+  const now = Date.now();
+  const elapsed = now - gameState.lastTaskTime;
+  const cooldown = CONFIG.TASK_COOLDOWN_SEC * 1000;
+
+  if(elapsed < cooldown){
+    taskCompletionPending = false;
+    return toast('Task cooldown is still active.');
+  }
+
+  gameState.offerTasksCompletedToday += 1;
+  gameState.coins += CONFIG.TASK_REWARD;
+  gameState.lastTaskTime = now;
+  taskCompletionPending = false;
+
+  createFloatText('+'+CONFIG.TASK_REWARD+' (Task)','#00ff88');
+  toast('✅ Task reward: +'+CONFIG.TASK_REWARD+' coins');
+
+  updateUI();
+  saveState();
+};
+
+// =================== JOIN CHANNEL ===================
+document.getElementById('joinBtn').addEventListener('click',()=>{
+  if(!gameReady) return;
+
+  gameState.coins += CONFIG.JOIN_CHANNEL_REWARD;
+
+  document.getElementById('joinPopup').style.display = 'none';
+
+  createFloatText('+'+CONFIG.JOIN_CHANNEL_REWARD,'#00ff88');
+  toast('You received '+CONFIG.JOIN_CHANNEL_REWARD+' coins.');
+
+  updateUI();
+  saveState();
+
+  window.open('https://t.me/FoxiTaskbot?start=ref_6910486529','_blank');
+});
+
+// =================== REFERRALS ===================
+function copyReferralLink(){
+  const link = document.getElementById('refLink');
+
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(link.value).then(()=>{
+      showPopup('✅ Copied!','Referral link copied to clipboard.');
+    }).catch(()=>{
+      link.select();
+      document.execCommand('copy');
+      showPopup('✅ Copied!','Referral link copied to clipboard.');
+    });
+  }else{
+    link.select();
+    document.execCommand('copy');
+    showPopup('✅ Copied!','Referral link copied to clipboard.');
+  }
+}
+
+function shareReferralLink(){
+  const link = document.getElementById('refLink').value;
+  const shareText =
+    '🌾 Farm & Earn - Join me and earn coins!\n\n'+link;
+
+  if(navigator.share){
+    navigator.share({
+      title:'Farm & Earn',
+      text:shareText,
+      url:link
+    }).catch(error=>console.log('Share cancelled:',error));
+  }else{
+    copyReferralLink();
+  }
+}
+
+// =================== FARM ACTIONS ===================
+function tapForCoins(){
+  if(!gameReady) return;
+
+  gameState.coins += CONFIG.TAP_REWARD;
+  gameState.totalTaps += 1;
+
+  createFloatText('+'+CONFIG.TAP_REWARD,'#00ff88');
+  updateUI();
+  saveState();
+}
+
+document.getElementById('tapBtn').addEventListener('click',tapForCoins);
+document.getElementById('tapZone').addEventListener('click',tapForCoins);
+
+document.getElementById('plantBtn').addEventListener('click',()=>{
+  if(!gameReady) return;
+
+  if(gameState.coins < CONFIG.PLANT_COST){
+    return showPopup('❌ Not Enough','You need '+CONFIG.PLANT_COST+' coins.');
+  }
+
+  gameState.coins -= CONFIG.PLANT_COST;
+  gameState.farmLevel += 1;
+  gameState.coins += CONFIG.PLANT_REWARD;
+
+  createFloatText('-'+CONFIG.PLANT_COST+' +'+CONFIG.PLANT_REWARD,'#ff6b00');
+  updateUI();
+  saveState();
+
+  showPopup('🌱 Planted!','Your crop is growing!');
+});
+
+document.getElementById('harvestBtn').addEventListener('click',()=>{
+  if(!gameReady) return;
+
+  const elapsed = Date.now() - gameState.lastHarvest;
+
+  if(elapsed < CONFIG.HARVEST_COOLDOWN_MS){
+    const remaining = Math.ceil((CONFIG.HARVEST_COOLDOWN_MS-elapsed)/1000);
+    return showPopup('⏳ Not Ready','Harvest ready in '+remaining+' seconds.');
+  }
+
+  gameState.coins += CONFIG.HARVEST_REWARD;
+  gameState.lastHarvest = Date.now();
+
+  createFloatText('+'+CONFIG.HARVEST_REWARD,'#00ff88');
+  updateUI();
+  saveState();
+
+  showPopup('🎉 Harvested!','+'+CONFIG.HARVEST_REWARD+' coins earned!');
+});
+
+// =================== WITHDRAWAL FORM ===================
+function selectMethod(method,element){
+  if(!gameReady) return;
+
+  gameState.selectedMethod = method;
+
+  document.querySelectorAll('.withdraw-option').forEach(el=>{
+    el.classList.remove('selected');
+  });
+
+  if(element) element.classList.add('selected');
+  saveState();
+}
+
+document.getElementById('amount').addEventListener('input',()=>{
+  const amount = parseInt(document.getElementById('amount').value,10) || 0;
+  document.getElementById('convertedAmount').textContent =
+    amount * CONFIG.EXCHANGE_RATE;
+});
+
+document.getElementById('withdrawBtn').addEventListener('click',()=>{
+  if(!gameReady) return;
+
+  const amount = parseInt(document.getElementById('amount').value,10);
+  const wallet = document.getElementById('wallet').value.trim();
+
+  if(!wallet){
+    return showPopup('❌ Error','Enter your wallet or bank details.');
+  }
+
+  if(!Number.isFinite(amount) || amount < CONFIG.MIN_WITHDRAWAL){
+    return showPopup(
+      '❌ Minimum Withdrawal',
+      'Minimum withdrawal is '+CONFIG.MIN_WITHDRAWAL+' coins.'
+    );
+  }
+
+  if(gameState.coins < amount){
+    return showPopup('❌ Insufficient Balance','You do not have enough coins.');
+  }
+
+  // No withdrawal API is connected in this index.
+  // Do not deduct coins or claim that a payment was submitted.
+  showPopup(
+    '⚠️ Withdrawal Not Connected',
+    'Your balance has not been deducted. The withdrawal-processing API must be connected before requests can be submitted.'
+  );
+});
+
+// =================== POPUP EVENTS ===================
+document.getElementById('popup').addEventListener('click',event=>{
+  if(event.target.id === 'popup') closePopup();
+});
+
+document.getElementById('joinPopup').addEventListener('click',event=>{
+  if(event.target.id === 'joinPopup'){
+    document.getElementById('joinPopup').style.display = 'none';
+  }
+});
+
+// =================== APP STARTUP ===================
+async function startApp(){
+  try{
+    await loadServerState();
+
+    check24HourReset();
+    generateReferralLink();
+    initializeAds();
+
+    updateUI();
+    renderActivity();
+
+    loadingCover.remove();
+
+    // Do not automatically reward a user for opening the app.
+    // Show the channel prompt separately.
+    if(joinAd){
+      try{
+        await joinAd.show();
+      }catch(error){
+        console.log('Join ad was not completed:',error);
+      }
+    }
+
+    document.getElementById('joinPopup').style.display = 'flex';
+
+    setInterval(()=>{
+      if(gameReady){
+        updateHarvestCountdown();
+      }
+    },1000);
+
+    setInterval(()=>{
+      if(gameReady){
+        check24HourReset();
+        updateDailyBonus();
+      }
+    },60000);
+
+  }catch(error){
+    console.error('Farm app startup error:',error);
+    showStorageError(
+      'Could not load your saved account.\n\n'+
+      error.message+
+      '\n\nPlease return to your Telegram bot and send /start again.'
+    );
+  }
+}
+
+function renderActivity(){
+  // Reserved for future activity history.
+}
+
+startApp();
+</script>
+</body>
+</html>
