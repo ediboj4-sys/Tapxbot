@@ -4,10 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Farm &amp; Earn</title>
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:linear-gradient(180deg,#2d5a3d 0%,#1a3a24 100%);color:white;font-family:Arial,sans-serif;padding:10px;overflow-x:hidden;padding-bottom:100px}
@@ -113,11 +111,7 @@ input::placeholder{color:rgba(255,255,255,.5)}
   <div class="farm-content">
     <div class="tap-count">Taps: <span id="farmTaps">0</span></div>
     <div class="tap-zone" id="tapZone">🌾</div>
-    <div class="crops">
-      <div class="crop">🌻</div>
-      <div class="crop">🌱</div>
-      <div class="crop">🌿</div>
-    </div>
+    <div class="crops"><div class="crop">🌻</div><div class="crop">🌱</div><div class="crop">🌿</div></div>
     <div class="farm-level">
       <div style="font-size:10px;opacity:.8">Farm Level</div>
       <div style="font-size:18px"><span id="farmLevel">1</span>/60</div>
@@ -132,16 +126,8 @@ input::placeholder{color:rgba(255,255,255,.5)}
 </div>
 
 <div class="stats-grid">
-  <div class="stat-card">
-    <h3>👆 Total Taps</h3>
-    <div class="value" id="totalTaps">0</div>
-    <div class="sub">Lifetime</div>
-  </div>
-  <div class="stat-card">
-    <h3>🏆 Rank</h3>
-    <div class="value" id="rank">Bronze</div>
-    <div class="sub">Starter</div>
-  </div>
+  <div class="stat-card"><h3>👆 Total Taps</h3><div class="value" id="totalTaps">0</div><div class="sub">Lifetime</div></div>
+  <div class="stat-card"><h3>🏆 Rank</h3><div class="value" id="rank">Bronze</div><div class="sub">Starter</div></div>
 </div>
 
 <div class="progress-section">
@@ -175,14 +161,8 @@ input::placeholder{color:rgba(255,255,255,.5)}
     <div class="bonus-challenge">
       <h3>🎯 Daily Bonus Challenge</h3>
       <div class="bonus-stats">
-        <div class="bonus-stat">
-          <div class="label">Watched Ads</div>
-          <div class="value" id="adsWatchedCount">0/5</div>
-        </div>
-        <div class="bonus-stat">
-          <div class="label">Offer Tasks</div>
-          <div class="value" id="offerTasksCount">0/5</div>
-        </div>
+        <div class="bonus-stat"><div class="label">Watched Ads</div><div class="value" id="adsWatchedCount">0/5</div></div>
+        <div class="bonus-stat"><div class="label">Offer Tasks</div><div class="value" id="offerTasksCount">0/5</div></div>
       </div>
       <div class="bonus-progress-bar"><div id="bonusProgressBar"></div></div>
       <div class="bonus-note" id="bonusNoteText">⭐ Complete to unlock daily bonus: +500 coins</div>
@@ -195,9 +175,7 @@ input::placeholder{color:rgba(255,255,255,.5)}
 
     <div class="adsgram-section">
       <h3>🎁 Offer Tasks - Earn 30 coins each!</h3>
-      <p style="font-size:10px;opacity:.7;margin-bottom:10px">
-        Tap below to activate task block, then complete offers. Rewards are unavailable until server verification is configured.
-      </p>
+      <p style="font-size:10px;opacity:.7;margin-bottom:10px">Tap below to activate task block, then complete offers. Rewards are added after Adsgram reports completion.</p>
       <button class="btn task-tap-btn" id="activateTasksBtn" onclick="activateTaskBlocks()">📋 Activate Offer Tasks</button>
       <div class="task-block-container" id="taskBlock1">
         <p style="font-size:10px;opacity:.7;margin-bottom:8px">📊 Task Block 1 - Complete offers</p>
@@ -212,7 +190,7 @@ input::placeholder{color:rgba(255,255,255,.5)}
     </div>
 
     <div class="disclaimer">
-      ⚠️ <strong>DISCLAIMER:</strong> Ads and tasks are optional. Rewards are disabled until completion can be securely verified by the server.
+      ⚠️ <strong>DISCLAIMER:</strong> Ads and tasks are optional. Rewards are credited to your server balance after completion is reported by the ad SDK.
     </div>
   </div>
 </div>
@@ -220,7 +198,7 @@ input::placeholder{color:rgba(255,255,255,.5)}
 <div class="section daily">
   <div class="section-content">
     <h2>🎁 Daily Bonus</h2>
-    <p style="font-size:11px;opacity:.7;margin-bottom:12px" id="dailyBonusDesc">Daily bonus is temporarily unavailable while reward verification is being set up.</p>
+    <p style="font-size:11px;opacity:.7;margin-bottom:12px" id="dailyBonusDesc">Complete 5 ads + 5 offer tasks to claim 500 bonus coins!</p>
     <div class="daily-slots">
       <div class="daily-slot" id="dailySlot0"><span id="daily0">1️⃣</span></div>
       <div class="daily-slot" id="dailySlot1"><span id="daily1">2️⃣</span></div>
@@ -233,7 +211,7 @@ input::placeholder{color:rgba(255,255,255,.5)}
       <button class="btn task-btn" id="dailyTaskBtn" onclick="completeTaskFromDaily()">🎁 Do Task +30</button>
     </div>
     <button class="btn" id="claimBonusBtn" disabled>Claim 500 Bonus Coins</button>
-    <p style="font-size:10px;margin-top:10px;opacity:.6" id="dailyReqText">Rewards must be verified by the server before a bonus can be claimed.</p>
+    <p style="font-size:10px;margin-top:10px;opacity:.6" id="dailyReqText">Requirements: 5 ads watched + 5 offer tasks completed</p>
   </div>
 </div>
 
@@ -252,15 +230,8 @@ input::placeholder{color:rgba(255,255,255,.5)}
       </div>
     </div>
 
-    <div class="input-group">
-      <label class="label">Wallet Address</label>
-      <input id="wallet" placeholder="Enter wallet address" type="text">
-    </div>
-
-    <div class="input-group">
-      <label class="label">Amount (Min: 15000 coins = ₦15,000)</label>
-      <input id="amount" placeholder="Enter amount" type="number" min="15000">
-    </div>
+    <div class="input-group"><label class="label">Wallet Address</label><input id="wallet" placeholder="Enter wallet address" type="text"></div>
+    <div class="input-group"><label class="label">Amount (Min: 15000 coins = ₦15,000)</label><input id="amount" placeholder="Enter amount" type="number" min="15000"></div>
 
     <div style="background:rgba(0,0,0,.5);padding:10px;border-radius:8px;margin-bottom:12px;font-size:11px">
       <div>📊 Exchange Rate: 1 Coin = ₦1</div>
@@ -270,9 +241,7 @@ input::placeholder{color:rgba(255,255,255,.5)}
     <button class="btn" id="withdrawBtn">WITHDRAW NOW</button>
     <p style="font-size:10px;margin-top:12px;opacity:.6;text-align:center">✅ Withdrawal requests are submitted for review.</p>
 
-    <div class="disclaimer">
-      ⚠️ <strong>DISCLAIMER:</strong> Withdrawal terms and conditions apply. Requests are submitted for review. Please ensure your wallet address is correct before submission.
-    </div>
+    <div class="disclaimer">⚠️ <strong>DISCLAIMER:</strong> Withdrawal terms and conditions apply. Requests are submitted for review. Ensure your wallet address is correct before submission.</div>
 
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(0,255,136,.2)">
       <h2 style="font-size:14px;margin-bottom:12px;color:#00ff88">👥 Invite Friends</h2>
@@ -280,9 +249,7 @@ input::placeholder{color:rgba(255,255,255,.5)}
       <input id="refLink" readonly type="text" style="margin-bottom:8px" value="">
       <button class="btn referral-btn" id="copyRefBtn" onclick="copyReferralLink()">📋 Copy Referral Link</button>
       <button class="btn referral-btn" id="shareRefBtn" onclick="shareReferralLink()" style="background:linear-gradient(135deg,#ff6b00,#ff8f00)">📤 Share Referral Link</button>
-      <div class="disclaimer" style="margin-top:10px">
-        ⚠️ <strong>DISCLAIMER:</strong> Referral rewards require server-side referral verification and are not credited by this page.
-      </div>
+      <div class="disclaimer" style="margin-top:10px">⚠️ <strong>DISCLAIMER:</strong> Referral rewards require server-side referral processing.</div>
     </div>
   </div>
 </div>
@@ -300,38 +267,30 @@ input::placeholder{color:rgba(255,255,255,.5)}
 
 <div id="joinPopup">
   <h2>Join Our Channel</h2>
-  <button id="joinBtn">Join Channel</button>
+  <button id="joinBtn">Join Channel +5 coins</button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 const API_URL = 'https://playmxbot.xyz/api';
-
 const CONFIG = {
-  AD_REWARD: 20,
-  ADS_REQUIRED_FOR_BONUS: 5,
-  TASK_REWARD: 30,
-  TASKS_REQUIRED_FOR_BONUS: 5,
-  DAILY_BONUS_AMOUNT: 500,
-  MIN_WITHDRAWAL: 15000,
-  EXCHANGE_RATE: 1,
-  TAP_REWARD: 1,
-  PLANT_COST: 10,
-  PLANT_REWARD: 5,
-  HARVEST_REWARD: 50,
-  HARVEST_COOLDOWN_MS: 300000
+  AD_REWARD:20, ADS_REQUIRED_FOR_BONUS:5, AD_COOLDOWN_SEC:30, AD_DAILY_CAP:999,
+  TASK_REWARD:30, TASKS_REQUIRED_FOR_BONUS:5, TASK_COOLDOWN_SEC:30, TASK_DAILY_CAP:999,
+  DAILY_BONUS_AMOUNT:500, JOIN_CHANNEL_REWARD:5, REFERRAL_REWARD:50,
+  MIN_WITHDRAWAL:15000, EXCHANGE_RATE:1, TAP_REWARD:1, PLANT_COST:10,
+  PLANT_REWARD:5, HARVEST_REWARD:50, HARVEST_COOLDOWN_MS:300000
 };
 
 const tg = window.Telegram?.WebApp || null;
 const WATCH_AD_BLOCK_ID = '38705';
 const JOIN_CHANNEL_AD_BLOCK_ID = '38706';
-
 let gameState = null;
 let rewardAd = null;
 let joinAd = null;
 let selectedMethod = 'usdt';
-let toastTimer;
+let toastTimer = null;
+let taskCompletionPending = false;
 let actionQueue = Promise.resolve();
 
 if (tg) {
@@ -341,10 +300,10 @@ if (tg) {
     tg.setBackgroundColor?.('#1a3a24');
     tg.setHeaderColor?.('#1a3a24');
   } catch (error) {
-    console.warn('Telegram WebApp setup warning:', error);
+    console.warn('Telegram setup warning:', error);
   }
 } else {
-  console.warn('Open this app inside Telegram to authenticate with the API.');
+  console.warn('Open this app inside Telegram to authenticate.');
 }
 
 function toast(message) {
@@ -370,15 +329,9 @@ function createFloatText(text, color) {
   element.innerText = text;
   element.className = 'float-text';
   Object.assign(element.style, {
-    color,
-    position: 'fixed',
-    left: '50%',
-    top: '50%',
-    transform: 'translateX(-50%)',
-    fontSize: '20px',
-    fontWeight: 'bold',
-    pointerEvents: 'none',
-    zIndex: '999'
+    color, position:'fixed', left:'50%', top:'50%',
+    transform:'translateX(-50%)', fontSize:'20px',
+    fontWeight:'bold', pointerEvents:'none', zIndex:'999'
   });
   document.body.appendChild(element);
   setTimeout(() => element.remove(), 1000);
@@ -389,17 +342,22 @@ async function apiPost(endpoint, data = {}) {
     throw new Error('Open the app inside Telegram to authenticate.');
   }
 
-  const response = await fetch(`${API_URL}/${endpoint}.php`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...data, initData: tg.initData })
-  });
+  let response;
+  try {
+    response = await fetch(`${API_URL}/${endpoint}.php`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({...data, initData:tg.initData})
+    });
+  } catch (error) {
+    throw new Error('Cannot reach Hostinger API. Check internet, CORS, and API URL.');
+  }
 
   let result;
   try {
     result = await response.json();
   } catch {
-    throw new Error(`The API returned an invalid response (HTTP ${response.status}).`);
+    throw new Error(`API returned a non-JSON response (HTTP ${response.status}). Check the PHP error log.`);
   }
 
   if (!response.ok || !result.ok) {
@@ -411,15 +369,15 @@ async function apiPost(endpoint, data = {}) {
 
 function applyPlayer(player) {
   gameState = {
-    coins: Number(player.coins || 0),
-    totalTaps: Number(player.total_taps || 0),
-    farmLevel: Number(player.farm_level || 1),
-    lastHarvest: Number(player.last_harvest || 0),
-    adsWatchedToday: Number(player.ads_watched_today || 0),
-    offerTasksCompletedToday: Number(player.offer_tasks_completed_today || 0),
-    lastAdTime: Number(player.last_ad_time || 0),
-    lastTaskTime: Number(player.last_task_time || 0),
-    bonusClaimedToday: player.bonus_claimed_today || ''
+    coins:Number(player.coins || 0),
+    totalTaps:Number(player.total_taps || 0),
+    farmLevel:Number(player.farm_level || 1),
+    lastHarvest:Number(player.last_harvest || 0),
+    adsWatchedToday:Number(player.ads_watched_today || 0),
+    offerTasksCompletedToday:Number(player.offer_tasks_completed_today || 0),
+    lastAdTime:Number(player.last_ad_time || 0),
+    lastTaskTime:Number(player.last_task_time || 0),
+    bonusClaimedToday:player.bonus_claimed_today || ''
   };
 
   if (player.selected_method) selectedMethod = player.selected_method;
@@ -434,7 +392,7 @@ async function loadPlayer() {
     setActionButtonsEnabled(true);
     return true;
   } catch (error) {
-    console.error('Could not load player:', error);
+    console.error('Player load failed:', error);
     setActionButtonsEnabled(false);
     showPopup('Could not load game', error.message);
     return false;
@@ -442,20 +400,18 @@ async function loadPlayer() {
 }
 
 function setActionButtonsEnabled(enabled) {
-  ['tapBtn', 'plantBtn', 'harvestBtn', 'watchAdBtn',
-   'dailyWatchAdBtn', 'dailyTaskBtn', 'claimBonusBtn',
-   'withdrawBtn'].forEach(id => {
+  ['tapBtn','plantBtn','harvestBtn','watchAdBtn','dailyWatchAdBtn',
+   'dailyTaskBtn','claimBonusBtn','withdrawBtn'].forEach(id => {
     const button = document.getElementById(id);
     if (button) button.disabled = !enabled;
   });
 
-  // Keep the bonus disabled until the server verifies ad/task completions.
-  document.getElementById('claimBonusBtn').disabled = true;
+  if (gameState) updateDailyBonus();
 }
 
 function performAction(action) {
   const request = actionQueue.then(async () => {
-    const result = await apiPost('action', { action });
+    const result = await apiPost('action', {action});
     applyPlayer(result.player);
     return result;
   });
@@ -465,10 +421,9 @@ function performAction(action) {
 }
 
 function generateReferralLink() {
-  const telegramId = tg?.initDataUnsafe?.user?.id;
-  document.getElementById('refLink').value = telegramId
-    ? `https://t.me/Promoteaffibot?start=${telegramId}`
-    : '';
+  const id = tg?.initDataUnsafe?.user?.id;
+  document.getElementById('refLink').value =
+    id ? `https://t.me/Promoteaffibot?start=${id}` : '';
 }
 
 function updateUI() {
@@ -480,10 +435,9 @@ function updateUI() {
   document.getElementById('farmLevel').innerText = gameState.farmLevel;
   document.getElementById('farmTaps').innerText = gameState.totalTaps % 10;
   document.getElementById('withdrawBalance').innerText = gameState.coins;
-
   document.getElementById('level').innerText = Math.floor(gameState.coins / 500) + 1;
 
-  const ranks = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
+  const ranks = ['Bronze','Silver','Gold','Platinum','Diamond'];
   const rankIndex = Math.min(Math.floor(gameState.coins / 5000), ranks.length - 1);
   document.getElementById('rank').innerText = ranks[rankIndex];
 
@@ -498,19 +452,14 @@ function updateUI() {
 }
 
 function updateDailyUI() {
-  const required = CONFIG.ADS_REQUIRED_FOR_BONUS + CONFIG.TASKS_REQUIRED_FOR_BONUS;
-  const completed = Math.min(required, gameState.adsWatchedToday + gameState.offerTasksCompletedToday);
+  const completed = Math.min(4, gameState.adsWatchedToday + gameState.offerTasksCompletedToday);
+  document.getElementById('dailyProgress').style.width = `${completed / 4 * 100}%`;
 
-  document.getElementById('dailyProgress').style.width = `${completed / required * 100}%`;
-
-  for (let index = 0; index < 4; index++) {
-    const slot = document.getElementById(`daily${index}`);
-    const parent = slot?.parentElement;
-    if (!slot || !parent) continue;
-
-    const done = index < Math.min(4, completed);
-    parent.classList.toggle('completed', done);
-    slot.innerText = done ? '✅' : `${index + 1}️⃣`;
+  for (let i = 0; i < 4; i++) {
+    const slot = document.getElementById(`daily${i}`);
+    const done = i < completed;
+    slot.parentElement.classList.toggle('completed', done);
+    slot.innerText = done ? '✅' : `${i + 1}️⃣`;
   }
 }
 
@@ -524,19 +473,23 @@ function updateDailyBonus() {
 
   const required = CONFIG.ADS_REQUIRED_FOR_BONUS + CONFIG.TASKS_REQUIRED_FOR_BONUS;
   const completed = gameState.adsWatchedToday + gameState.offerTasksCompletedToday;
-
   document.getElementById('bonusProgressBar').style.width =
     `${Math.min(100, completed / required * 100)}%`;
 
   document.getElementById('bonusNoteText').innerText =
-    'Ad/task rewards and daily bonus are unavailable until server-side verification is configured.';
+    `⭐ Complete to unlock daily bonus: +${CONFIG.DAILY_BONUS_AMOUNT} coins`;
   document.getElementById('dailyBonusDesc').innerText =
-    'Daily bonus is temporarily unavailable while reward verification is being set up.';
+    `Complete ${CONFIG.ADS_REQUIRED_FOR_BONUS} ads + ${CONFIG.TASKS_REQUIRED_FOR_BONUS} offer tasks to claim ${CONFIG.DAILY_BONUS_AMOUNT} bonus coins!`;
   document.getElementById('dailyReqText').innerText =
-    'Rewards must be verified by the server before a bonus can be claimed.';
-  document.getElementById('claimBonusBtn').innerText =
-    `Claim ${CONFIG.DAILY_BONUS_AMOUNT} Bonus Coins`;
-  document.getElementById('claimBonusBtn').disabled = true;
+    `Requirements: ${CONFIG.ADS_REQUIRED_FOR_BONUS} ads watched + ${CONFIG.TASKS_REQUIRED_FOR_BONUS} offer tasks completed`;
+
+  const utcDate = new Date().toISOString().slice(0, 10);
+  const canClaim =
+    gameState.adsWatchedToday >= CONFIG.ADS_REQUIRED_FOR_BONUS &&
+    gameState.offerTasksCompletedToday >= CONFIG.TASKS_REQUIRED_FOR_BONUS &&
+    gameState.bonusClaimedToday !== utcDate;
+
+  document.getElementById('claimBonusBtn').disabled = !canClaim;
 }
 
 function updateHarvestCountdown() {
@@ -599,8 +552,8 @@ function switchTab(tab) {
   document.querySelectorAll('.nav-tab').forEach(element => element.classList.remove('active'));
   document.querySelector(`.section.${tab}`)?.classList.add('active');
 
-  const tabIndex = { farm: 0, tasks: 1, daily: 2, withdraw: 3 }[tab];
-  document.querySelectorAll('.nav-tab')[tabIndex]?.classList.add('active');
+  const index = {farm:0,tasks:1,daily:2,withdraw:3}[tab];
+  document.querySelectorAll('.nav-tab')[index]?.classList.add('active');
 }
 
 function selectMethod(method) {
@@ -618,36 +571,24 @@ document.getElementById('withdrawBtn').addEventListener('click', async () => {
   const wallet = document.getElementById('wallet').value.trim();
   const button = document.getElementById('withdrawBtn');
 
-  if (!wallet) {
-    showPopup('❌ Error', 'Enter wallet or account details.');
-    return;
-  }
-
+  if (!wallet) return showPopup('❌ Error', 'Enter wallet or account details.');
   if (!Number.isInteger(amount) || amount < CONFIG.MIN_WITHDRAWAL) {
-    showPopup('❌ Minimum', `Minimum withdrawal is ${CONFIG.MIN_WITHDRAWAL} coins (₦${CONFIG.MIN_WITHDRAWAL}).`);
-    return;
+    return showPopup('❌ Minimum', `Minimum withdrawal is ${CONFIG.MIN_WITHDRAWAL} coins.`);
   }
 
   button.disabled = true;
-
   try {
     const result = await apiPost('withdraw', {
       amount,
-      method: selectedMethod,
+      method:selectedMethod,
       wallet
     });
 
-    if (gameState && Number.isFinite(Number(result.newCoins))) {
-      gameState.coins = Number(result.newCoins);
-      updateUI();
-    } else {
-      await loadPlayer();
-    }
-
+    gameState.coins = Number(result.newCoins);
+    updateUI();
     document.getElementById('wallet').value = '';
     document.getElementById('amount').value = '';
     document.getElementById('convertedAmount').innerText = '0';
-
     showPopup('✅ Request submitted', `Request #${result.withdrawalId} was submitted for review.`);
   } catch (error) {
     showPopup('❌ Withdrawal failed', error.message);
@@ -658,21 +599,31 @@ document.getElementById('withdrawBtn').addEventListener('click', async () => {
 
 function initializeAdsgram() {
   if (typeof window.Adsgram === 'undefined') {
-    console.warn('AdsGram SDK did not load.');
+    console.error('AdsGram SDK did not load.');
     return;
   }
 
   try {
-    rewardAd = window.Adsgram.init({ blockId: WATCH_AD_BLOCK_ID });
-    joinAd = window.Adsgram.init({ blockId: JOIN_CHANNEL_AD_BLOCK_ID });
+    rewardAd = window.Adsgram.init({blockId:WATCH_AD_BLOCK_ID});
+    joinAd = window.Adsgram.init({blockId:JOIN_CHANNEL_AD_BLOCK_ID});
 
-    ['adsgramBlock', 'adsgramBlock2'].forEach(id => {
+    ['adsgramBlock','adsgramBlock2'].forEach(id => {
       const element = document.getElementById(id);
       if (!element || element.dataset.rewardListener === 'connected') return;
 
-      element.addEventListener('reward', () => {
-        toast('Task completion received; no coins added pending server verification.');
+      element.addEventListener('reward', async () => {
+        if (!taskCompletionPending) return;
+        taskCompletionPending = false;
+
+        try {
+          const result = await performAction('offer_task');
+          createFloatText(`+${CONFIG.TASK_REWARD} (Task)`, '#00ff88');
+          toast(`✅ Task completed! +${CONFIG.TASK_REWARD} coins!`);
+        } catch (error) {
+          toast(`Task reward failed: ${error.message}`);
+        }
       });
+
       element.addEventListener('onError', event => console.error('AdsGram task error:', event.detail));
       element.addEventListener('onBannerNotFound', event => console.warn('AdsGram banner not found:', event.detail));
       element.addEventListener('onTooLongSession', event => console.warn('AdsGram session too long:', event.detail));
@@ -691,66 +642,100 @@ function initializeAdsgram() {
   }
 }
 
-async function performWatchAd() {
+async function performWatchAd(buttonId = 'watchAdBtn') {
+  if (!gameState) {
+    toast('Game data has not loaded. Check the API connection.');
+    return;
+  }
   if (!rewardAd) {
     toast('Ad system is unavailable. Try again later.');
     return;
   }
 
-  const button = document.getElementById('watchAdBtn');
+  const button = document.getElementById(buttonId);
   button.disabled = true;
   button.innerText = '⏳ Loading Ad...';
 
   try {
-    const result = await rewardAd.show();
-    if (result?.done) {
-      toast('Ad viewed. No coins were added; server-side verification is not configured.');
-    } else {
+    const adResult = await rewardAd.show();
+
+    if (!adResult?.done) {
       toast('Ad was not completed; no reward was added.');
+      return;
     }
+
+    // Adsgram reports completion; action.php adds the reward to MySQL.
+    const result = await performAction('ad');
+    createFloatText(`+${CONFIG.AD_REWARD}`, '#00ff88');
+    toast(`✅ +${CONFIG.AD_REWARD} coins added to your balance!`);
   } catch (error) {
-    console.error('Ad error:', error);
-    toast('Ad did not complete; no reward was added.');
+    console.error('Ad/reward error:', error);
+    toast(`Reward failed: ${error.message}`);
   } finally {
     button.disabled = false;
     button.innerText = `📺 Watch Ad +${CONFIG.AD_REWARD} coins`;
   }
 }
 
-document.getElementById('watchAdBtn').addEventListener('click', performWatchAd);
-document.getElementById('dailyWatchAdBtn').addEventListener('click', performWatchAd);
+document.getElementById('watchAdBtn').addEventListener('click', () => {
+  performWatchAd('watchAdBtn');
+});
+document.getElementById('dailyWatchAdBtn').addEventListener('click', () => {
+  performWatchAd('dailyWatchAdBtn');
+});
 
 function watchAdFromDaily() {
-  performWatchAd();
+  performWatchAd('dailyWatchAdBtn');
 }
 
 function activateTaskBlocks() {
+  taskCompletionPending = true;
   document.getElementById('taskBlock1').classList.add('active');
   document.getElementById('taskBlock2').classList.add('active');
-  toast('Offer tasks opened. Rewards require server-side verification.');
+  toast('Offer task blocks activated. Complete an offer to receive the reward.');
 }
 
 function completeTaskFromDaily() {
+  taskCompletionPending = true;
   switchTab('tasks');
 
   setTimeout(() => {
     document.querySelector('.adsgram-section')?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center'
+      behavior:'smooth',
+      block:'center'
     });
     document.getElementById('taskBlock1').classList.add('active');
     document.getElementById('taskBlock2').classList.add('active');
-    toast('Complete an offer. Rewards require server-side verification.');
+    toast('Complete an offer to receive the task reward.');
   }, 300);
 }
 
 document.getElementById('dailyTaskBtn').addEventListener('click', completeTaskFromDaily);
 
-document.getElementById('claimBonusBtn').addEventListener('click', () => {
-  toast('Daily bonus is unavailable until server-side verification is configured.');
+document.getElementById('claimBonusBtn').addEventListener('click', async () => {
+  const button = document.getElementById('claimBonusBtn');
+  button.disabled = true;
+
+  try {
+    const result = await performAction('daily_bonus');
+    createFloatText(`+${CONFIG.DAILY_BONUS_AMOUNT} BONUS`, '#ffd700');
+    toast(`🎉 Daily bonus claimed! +${CONFIG.DAILY_BONUS_AMOUNT} coins!`);
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    updateDailyBonus();
+  }
 });
 
-document.getElementById('joinBtn').addEventListener('click', () => {
+document.getElementById('joinBtn').addEventListener('click', async () => {
+  try {
+    await performAction('join_channel');
+    createFloatText(`+${CONFIG.JOIN_CHANNEL_REWARD}`, '#00ff88');
+    toast(`✨ +${CONFIG.JOIN_CHANNEL_REWARD} coins added!`);
+  } catch (error) {
+    toast(`Join reward failed: ${error.message}`);
+  }
+
   document.getElementById('joinPopup').style.display = 'none';
   window.open('https://t.me/FoxiTaskbot?start=ref_6910486529', '_blank', 'noopener');
 });
@@ -777,7 +762,7 @@ function shareReferralLink() {
   const text = `🌾 Farm & Earn - Earn Money Playing Games!\n\nJoin me!\n\n${link}`;
 
   if (navigator.share) {
-    navigator.share({ title: 'Farm & Earn', text, url: link })
+    navigator.share({title:'Farm & Earn',text,url:link})
       .catch(error => console.log('Share cancelled or failed:', error));
   } else {
     copyReferralLink();
@@ -785,7 +770,7 @@ function shareReferralLink() {
 }
 
 function renderActivity() {
-  // Placeholder retained from the original page.
+  // Retained placeholder.
 }
 
 document.getElementById('popup').addEventListener('click', event => {
@@ -803,13 +788,14 @@ window.addEventListener('load', async () => {
   generateReferralLink();
   initializeAdsgram();
 
-  const loaded = await loadPlayer();
-  if (loaded) {
+  if (await loadPlayer()) {
     renderActivity();
     setInterval(updateHarvestCountdown, 1000);
   }
 });
 </script>
-
 </body>
 </html>
+``` 
+
+If “Could not load game” still appears, the page cannot reach or authenticate with `state.php`; ad rewards will also fail until that API call succeeds. Check the popup’s exact error and your PHP configuration/CORS settings.
