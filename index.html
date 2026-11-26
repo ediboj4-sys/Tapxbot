@@ -6,41 +6,31 @@
 <title>Farm & Earn</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<!-- ✅ ADSGRAM SDK - Required for all ad features -->
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box}
 
 body{
-  background: linear-gradient(180deg, #2d5a3d 0%, #1a3a24 100%);
+  background:linear-gradient(180deg,#2d5a3d 0%,#1a3a24 100%);
   color:white;
-  font-family:'Arial', sans-serif;
+  font-family:Arial,sans-serif;
   padding:10px;
   overflow-x:hidden;
   padding-bottom:100px;
 }
 
-/* HEADER */
 .header{
   display:flex;
   justify-content:space-between;
   align-items:center;
   padding:12px;
-  background:rgba(0,0,0,0.3);
+  background:rgba(0,0,0,.3);
   border-radius:12px;
   margin-bottom:12px;
 }
 
-.logo{
-  font-size:20px;
-  font-weight:bold;
-  color:#00ff88;
-}
+.logo{font-size:20px;font-weight:bold;color:#00ff88}
 
 .level-badge{
   background:#ff6b00;
@@ -50,29 +40,25 @@ body{
   font-weight:bold;
 }
 
-/* FARM CANVAS */
 .farm-container{
   position:relative;
   width:100%;
   height:280px;
-  background: linear-gradient(180deg, #4a7c59 0%, #2d5a3d 100%);
+  background:linear-gradient(180deg,#4a7c59 0%,#2d5a3d 100%);
   border-radius:16px;
   overflow:hidden;
   margin-bottom:12px;
   border:2px solid #00ff88;
-  box-shadow:0 4px 15px rgba(0,255,136,0.2);
+  box-shadow:0 4px 15px rgba(0,255,136,.2);
 }
 
 .farm-background{
   position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
+  inset:0;
   background-image:
-    repeating-linear-gradient(90deg, #3a6a4a 0px, #3a6a4a 40px, transparent 40px, transparent 80px),
-    repeating-linear-gradient(0deg, #3a6a4a 0px, #3a6a4a 40px, transparent 40px, transparent 80px);
-  opacity:0.5;
+    repeating-linear-gradient(90deg,#3a6a4a 0 40px,transparent 40px 80px),
+    repeating-linear-gradient(0deg,#3a6a4a 0 40px,transparent 40px 80px);
+  opacity:.5;
 }
 
 .farm-content{
@@ -89,28 +75,28 @@ body{
 .tap-zone{
   width:100px;
   height:100px;
-  background:radial-gradient(circle, #ffeb3b, #ffc107);
+  background:radial-gradient(circle,#ffeb3b,#ffc107);
   border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:50px;
   cursor:pointer;
-  box-shadow:0 8px 20px rgba(255,235,59,0.4);
-  transition:all 0.1s;
+  box-shadow:0 8px 20px rgba(255,235,59,.4);
+  transition:.1s;
   user-select:none;
 }
 
 .tap-zone:active{
-  transform:scale(0.85);
-  box-shadow:0 3px 10px rgba(255,235,59,0.2);
+  transform:scale(.85);
+  box-shadow:0 3px 10px rgba(255,235,59,.2);
 }
 
 .tap-count{
   position:absolute;
   top:10px;
   left:10px;
-  background:rgba(0,0,0,0.6);
+  background:rgba(0,0,0,.6);
   padding:8px 14px;
   border-radius:20px;
   font-size:12px;
@@ -120,7 +106,7 @@ body{
   position:absolute;
   bottom:10px;
   left:10px;
-  background:linear-gradient(135deg, #0066ff, #00ccff);
+  background:linear-gradient(135deg,#0066ff,#00ccff);
   padding:8px 14px;
   border-radius:12px;
   font-size:12px;
@@ -136,24 +122,15 @@ body{
   font-size:24px;
 }
 
-.crop{
-  animation:sway 3s ease-in-out infinite;
-}
-
-.crop:nth-child(2){
-  animation-delay:0.5s;
-}
-
-.crop:nth-child(3){
-  animation-delay:1s;
-}
+.crop{animation:sway 3s ease-in-out infinite}
+.crop:nth-child(2){animation-delay:.5s}
+.crop:nth-child(3){animation-delay:1s}
 
 @keyframes sway{
-  0%, 100%{ transform:rotate(0deg); }
-  50%{ transform:rotate(3deg); }
+  0%,100%{transform:rotate(0)}
+  50%{transform:rotate(3deg)}
 }
 
-/* STATS GRID */
 .stats-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -162,7 +139,7 @@ body{
 }
 
 .stat-card{
-  background:rgba(0,0,0,0.4);
+  background:rgba(0,0,0,.4);
   border:1px solid #00ff88;
   padding:14px;
   border-radius:12px;
@@ -171,7 +148,7 @@ body{
 
 .stat-card h3{
   font-size:11px;
-  opacity:0.7;
+  opacity:.7;
   margin-bottom:6px;
 }
 
@@ -181,15 +158,10 @@ body{
   color:#00ff88;
 }
 
-.stat-card .sub{
-  font-size:10px;
-  opacity:0.6;
-  margin-top:4px;
-}
+.stat-card .sub{font-size:10px;opacity:.6;margin-top:4px}
 
-/* PROGRESS */
 .progress-section{
-  background:rgba(0,0,0,0.4);
+  background:rgba(0,0,0,.4);
   border:1px solid #00ff88;
   padding:12px;
   border-radius:12px;
@@ -206,24 +178,23 @@ body{
 .progress-bar{
   width:100%;
   height:8px;
-  background:rgba(255,255,255,0.1);
+  background:rgba(255,255,255,.1);
   border-radius:10px;
   overflow:hidden;
 }
 
 .progress-fill{
   height:100%;
-  background:linear-gradient(90deg, #00ff88, #00ccff);
-  width:0%;
-  transition:width 0.3s;
+  background:linear-gradient(90deg,#00ff88,#00ccff);
+  width:0;
+  transition:width .3s;
 }
 
-/* NAVIGATION TABS */
 .nav-tabs{
   display:flex;
   gap:8px;
   margin-bottom:12px;
-  background:rgba(0,0,0,0.3);
+  background:rgba(0,0,0,.3);
   padding:8px;
   border-radius:12px;
   overflow-x:auto;
@@ -240,26 +211,20 @@ body{
   cursor:pointer;
   font-size:12px;
   font-weight:bold;
-  transition:all 0.3s;
+  transition:.3s;
   white-space:nowrap;
 }
 
 .nav-tab.active{
-  background:linear-gradient(135deg, #00ff88, #00ccff);
+  background:linear-gradient(135deg,#00ff88,#00ccff);
   color:#000;
 }
 
-/* SECTIONS */
-.section{
-  display:none;
-}
-
-.section.active{
-  display:block;
-}
+.section{display:none}
+.section.active{display:block}
 
 .section-content{
-  background:rgba(0,0,0,0.4);
+  background:rgba(0,0,0,.4);
   border:1px solid #00ff88;
   padding:14px;
   border-radius:12px;
@@ -279,78 +244,60 @@ body{
   padding:12px;
   border:none;
   border-radius:10px;
-  background:linear-gradient(135deg, #00ff88, #00ccff);
+  background:linear-gradient(135deg,#00ff88,#00ccff);
   color:#000;
   font-weight:bold;
   cursor:pointer;
   font-size:13px;
-  transition:all 0.2s;
+  transition:.2s;
   margin-top:10px;
 }
 
-.btn:active{
-  transform:scale(0.95);
-}
+.btn:active{transform:scale(.95)}
 
-.btn:disabled{
-  opacity:0.5;
-  cursor:not-allowed;
-}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 
-input, select{
+input,select{
   width:100%;
   padding:10px;
   border:none;
   border-radius:8px;
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,.5);
   color:white;
   margin-top:8px;
   border:1px solid #00ff88;
   font-size:12px;
 }
 
-input::placeholder{
-  color:rgba(255,255,255,0.5);
-}
+input::placeholder{color:rgba(255,255,255,.5)}
 
-.input-group{
-  margin-bottom:8px;
-}
+.input-group{margin-bottom:8px}
 
 .label{
   font-size:11px;
-  opacity:0.7;
+  opacity:.7;
   display:block;
   margin-bottom:4px;
 }
 
-/* EARNINGS CARD */
 .earnings-card{
-  background:linear-gradient(135deg, #ff6b00, #ff8f00);
+  background:linear-gradient(135deg,#ff6b00,#ff8f00);
   padding:16px;
   border-radius:12px;
   margin-bottom:12px;
   text-align:center;
 }
 
-.earnings-card .label{
-  opacity:0.9;
-  color:white;
-}
+.earnings-card .label{opacity:.9;color:white}
 
 .earnings-card .value{
   font-size:32px;
   font-weight:bold;
-  color:white;
   margin:8px 0;
 }
 
-.earnings-card .sub{
-  font-size:11px;
-  opacity:0.8;
-}
+.earnings-card .sub{font-size:11px;opacity:.8}
 
-/* WITHDRAWAL OPTIONS */
 .withdraw-options{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -359,34 +306,28 @@ input::placeholder{
 }
 
 .withdraw-option{
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,.5);
   border:2px solid #00ff88;
   padding:12px;
   border-radius:10px;
   text-align:center;
   cursor:pointer;
-  transition:all 0.2s;
+  transition:.2s;
   font-size:12px;
 }
 
 .withdraw-option.selected{
-  background:linear-gradient(135deg, #00ff88, #00ccff);
+  background:linear-gradient(135deg,#00ff88,#00ccff);
   color:#000;
   font-weight:bold;
 }
 
-.withdraw-option:active{
-  transform:scale(0.95);
-}
+.withdraw-option:active{transform:scale(.95)}
 
-/* POPUP */
 #popup{
   position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.9);
+  inset:0;
+  background:rgba(0,0,0,.9);
   display:none;
   justify-content:center;
   align-items:center;
@@ -395,30 +336,24 @@ input::placeholder{
 }
 
 .popup-content{
-  background:linear-gradient(135deg, #1a3a24, #2d5a3d);
+  background:linear-gradient(135deg,#1a3a24,#2d5a3d);
   border:2px solid #00ff88;
   border-radius:16px;
   padding:20px;
   max-width:90%;
   text-align:center;
-  box-shadow:0 0 30px rgba(0,255,136,0.3);
+  box-shadow:0 0 30px rgba(0,255,136,.3);
 }
 
-.popup-content h2{
-  margin-bottom:12px;
-  color:#00ff88;
-}
+.popup-content h2{margin-bottom:12px;color:#00ff88}
 
 .popup-content p{
   font-size:13px;
   margin-bottom:16px;
-  opacity:0.9;
+  opacity:.9;
 }
 
-.popup-buttons{
-  display:flex;
-  gap:8px;
-}
+.popup-buttons{display:flex;gap:8px}
 
 .popup-buttons button{
   flex:1;
@@ -431,26 +366,25 @@ input::placeholder{
 }
 
 .popup-buttons .confirm{
-  background:linear-gradient(135deg, #00ff88, #00ccff);
+  background:linear-gradient(135deg,#00ff88,#00ccff);
   color:#000;
 }
 
 .popup-buttons .cancel{
-  background:rgba(255,255,255,0.1);
+  background:rgba(255,255,255,.1);
   color:white;
 }
 
-/* DAILY BONUS */
 .daily-slots{
   display:grid;
-  grid-template-columns:repeat(4, 1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:8px;
   margin-bottom:12px;
 }
 
 .daily-slot{
   aspect-ratio:1;
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,.5);
   border:2px solid #00ff88;
   border-radius:8px;
   display:flex;
@@ -461,36 +395,33 @@ input::placeholder{
 }
 
 .daily-slot.completed{
-  background:linear-gradient(135deg, #00ff88, #00ccff);
+  background:linear-gradient(135deg,#00ff88,#00ccff);
   color:#000;
 }
 
-/* DISCLAIMER */
 .disclaimer{
-  background:rgba(255,165,0,0.2);
+  background:rgba(255,165,0,.2);
   border:1px solid #ffa500;
   padding:8px 10px;
   border-radius:8px;
   font-size:10px;
-  opacity:0.85;
+  opacity:.85;
   margin-top:10px;
   line-height:1.4;
 }
 
-/* ANIMATIONS */
 @keyframes floatUp{
-  0%{ opacity:1; transform:translateY(0); }
-  100%{ opacity:0; transform:translateY(-40px); }
+  0%{opacity:1;transform:translate(-50%,0)}
+  100%{opacity:0;transform:translate(-50%,-40px)}
 }
 
 .float-text{
   animation:floatUp 1s ease-out forwards;
 }
 
-/* BONUS CHALLENGE SECTION */
 .bonus-challenge{
-  background:linear-gradient(135deg, rgba(242,169,59,0.15), rgba(34,195,166,0.15));
-  border:1px solid rgba(255,165,0,0.5);
+  background:linear-gradient(135deg,rgba(242,169,59,.15),rgba(34,195,166,.15));
+  border:1px solid rgba(255,165,0,.5);
   border-radius:12px;
   padding:14px;
   margin-bottom:12px;
@@ -500,7 +431,6 @@ input::placeholder{
   color:#f2a93b;
   margin-bottom:12px;
   font-size:13px;
-  font-weight:bold;
 }
 
 .bonus-stats{
@@ -511,7 +441,7 @@ input::placeholder{
 }
 
 .bonus-stat{
-  background:rgba(0,0,0,0.4);
+  background:rgba(0,0,0,.4);
   border:1px solid #00ff88;
   padding:8px;
   border-radius:8px;
@@ -519,10 +449,7 @@ input::placeholder{
   font-size:11px;
 }
 
-.bonus-stat .label{
-  opacity:0.7;
-  margin-bottom:4px;
-}
+.bonus-stat .label{opacity:.7;margin-bottom:4px}
 
 .bonus-stat .value{
   font-size:16px;
@@ -533,29 +460,28 @@ input::placeholder{
 .bonus-progress-bar{
   width:100%;
   height:6px;
-  background:rgba(0,0,0,0.3);
+  background:rgba(0,0,0,.3);
   border-radius:10px;
   overflow:hidden;
   margin-bottom:10px;
 }
 
-.bonus-progress-bar > div{
+.bonus-progress-bar>div{
   height:100%;
-  width:0%;
-  background:linear-gradient(90deg, #f2a93b, #22c3a6);
-  transition:width 0.3s;
+  width:0;
+  background:linear-gradient(90deg,#f2a93b,#22c3a6);
+  transition:.3s;
 }
 
 .bonus-note{
   font-size:10px;
   color:#f2a93b;
-  opacity:0.8;
+  opacity:.8;
   margin-bottom:8px;
 }
 
-/* ADSGRAM BLOCK */
 .adsgram-section{
-  background:rgba(0,0,0,0.4);
+  background:rgba(0,0,0,.4);
   border:1px solid #00ff88;
   padding:12px;
   border-radius:12px;
@@ -570,53 +496,33 @@ input::placeholder{
 
 .adsgram-block-id{
   font-size:9px;
-  color:rgba(255,255,255,0.5);
+  color:rgba(255,255,255,.5);
   margin-top:8px;
 }
 
-/* WATCH AD BTN */
-.watch-ad-btn{
-  background:linear-gradient(135deg, #ff6b00, #ff8f00);
-  margin-bottom:8px;
-}
+.watch-ad-btn{background:linear-gradient(135deg,#ff6b00,#ff8f00);margin-bottom:8px}
+.task-btn{background:linear-gradient(135deg,#6b00ff,#00a8ff);margin-bottom:8px}
+.task-tap-btn{background:linear-gradient(135deg,#00ccff,#00ff88);margin-bottom:8px}
+.referral-btn{background:linear-gradient(135deg,#9c27b0,#e91e63);margin-bottom:8px}
 
-.task-btn{
-  background:linear-gradient(135deg, #6b00ff, #00a8ff);
-  margin-bottom:8px;
-}
-
-.task-tap-btn{
-  background:linear-gradient(135deg, #00ccff, #00ff88);
-  margin-bottom:8px;
-}
-
-.referral-btn{
-  background:linear-gradient(135deg, #9c27b0, #e91e63);
-  margin-bottom:8px;
-}
-
-/* TASK BLOCK CONTAINER */
 .task-block-container{
   display:none;
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,.5);
   border:1px solid #00ccff;
   padding:12px;
   border-radius:10px;
   margin-bottom:12px;
 }
 
-.task-block-container.active{
-  display:block;
-}
+.task-block-container.active{display:block}
 
-/* AD MILESTONE REWARDS */
 .ad-milestone{
   display:none;
   margin-top:10px;
   padding:10px;
   border:1px solid #00ff88;
   border-radius:8px;
-  background:rgba(0,0,0,0.35);
+  background:rgba(0,0,0,.35);
   font-size:11px;
   text-align:center;
 }
@@ -626,14 +532,14 @@ input::placeholder{
   padding:9px 12px;
   border:0;
   border-radius:8px;
-  background:linear-gradient(135deg, #00ff88, #00ccff);
+  background:linear-gradient(135deg,#00ff88,#00ccff);
   color:#000;
   font-weight:bold;
   cursor:pointer;
 }
 
 .ad-milestone button:disabled{
-  opacity:0.5;
+  opacity:.5;
   cursor:not-allowed;
 }
 
@@ -642,16 +548,13 @@ input::placeholder{
   margin-top:8px;
   color:#ffd700;
   font-weight:bold;
+  word-break:break-word;
 }
 
-/* JOIN POPUP */
 #joinPopup{
   position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.85);
+  inset:0;
+  background:rgba(0,0,0,.85);
   display:none;
   justify-content:center;
   align-items:center;
@@ -661,27 +564,21 @@ input::placeholder{
   padding:20px;
 }
 
-#joinPopup h2{
-  color:#00ff88;
-  font-size:24px;
-}
+#joinPopup h2{color:#00ff88;font-size:24px}
 
 #joinPopup button{
   padding:14px 20px;
   border:none;
   border-radius:12px;
-  background:linear-gradient(135deg, #00ff88, #00ccff);
+  background:linear-gradient(135deg,#00ff88,#00ccff);
   color:#000;
   font-weight:bold;
   cursor:pointer;
   font-size:16px;
 }
 
-#joinPopup button:active{
-  transform:scale(0.96);
-}
+#joinPopup button:active{transform:scale(.96)}
 
-/* TOAST */
 .toast{
   position:fixed;
   left:50%;
@@ -696,11 +593,12 @@ input::placeholder{
   font-weight:600;
   opacity:0;
   pointer-events:none;
-  transition:all 0.25s ease;
+  transition:.25s;
   z-index:999;
-  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
   max-width:88%;
   text-align:center;
+  white-space:pre-line;
 }
 
 .toast.show{
@@ -708,7 +606,6 @@ input::placeholder{
   transform:translateX(-50%) translateY(0);
 }
 
-/* BUTTON ROW FOR DAILY BONUS */
 .bonus-button-row{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -723,29 +620,21 @@ input::placeholder{
   font-weight:bold;
   cursor:pointer;
   font-size:12px;
-  transition:all 0.2s;
+  transition:.2s;
 }
 
-.bonus-button-row button:active{
-  transform:scale(0.95);
-}
-
-.bonus-button-row button:disabled{
-  opacity:0.5;
-  cursor:not-allowed;
-}
+.bonus-button-row button:active{transform:scale(.95)}
+.bonus-button-row button:disabled{opacity:.5;cursor:not-allowed}
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="logo">🌾 Farm & Earn</div>
   <div class="level-badge">Lv. <span id="level">1</span></div>
 </div>
 
-<!-- FARM GAME -->
 <div class="farm-container">
   <div class="farm-background"></div>
   <div class="farm-content">
@@ -757,20 +646,18 @@ input::placeholder{
       <div class="crop">🌿</div>
     </div>
     <div class="farm-level">
-      <div style="font-size:10px; opacity:0.8;">Farm Level</div>
-      <div style="font-size:18px;"><span id="farmLevel">1</span>/60</div>
+      <div style="font-size:10px;opacity:.8">Farm Level</div>
+      <div style="font-size:18px"><span id="farmLevel">1</span>/60</div>
     </div>
   </div>
 </div>
 
-<!-- EARNINGS DISPLAY -->
 <div class="earnings-card">
   <div class="label">💎 Total Coins Earned</div>
   <div class="value" id="coins">0</div>
   <div class="sub">~₦<span id="coinsNGN">0</span></div>
 </div>
 
-<!-- STATS GRID -->
 <div class="stats-grid">
   <div class="stat-card">
     <h3>👆 Total Taps</h3>
@@ -784,7 +671,6 @@ input::placeholder{
   </div>
 </div>
 
-<!-- PROGRESS BAR -->
 <div class="progress-section">
   <h3>
     <span>Farm Progress</span>
@@ -795,7 +681,6 @@ input::placeholder{
   </div>
 </div>
 
-<!-- NAVIGATION TABS -->
 <div class="nav-tabs">
   <button class="nav-tab active" onclick="switchTab('farm')">🎮 Farm</button>
   <button class="nav-tab" onclick="switchTab('tasks')">✅ Tasks</button>
@@ -803,7 +688,6 @@ input::placeholder{
   <button class="nav-tab" onclick="switchTab('withdraw')">💳 Withdraw</button>
 </div>
 
-<!-- FARM SECTION -->
 <div class="section farm active">
   <div class="section-content">
     <h2>🌾 Farm System</h2>
@@ -811,7 +695,7 @@ input::placeholder{
     <button class="btn" id="plantBtn">Plant Crop +5 (Costs 10 coins)</button>
     <button class="btn" id="harvestBtn">Harvest Farm +50</button>
     
-    <div class="progress-section" style="margin-top:12px; background:rgba(0,0,0,0.3); border:1px solid #00ccff;">
+    <div class="progress-section" style="margin-top:12px;background:rgba(0,0,0,.3);border:1px solid #00ccff">
       <h3>
         <span>Next Harvest</span>
         <span id="harvestTime">--:--</span>
@@ -823,12 +707,10 @@ input::placeholder{
   </div>
 </div>
 
-<!-- TASKS SECTION (Ads + Offer Tasks) -->
 <div class="section tasks">
   <div class="section-content">
     <h2>✅ Earn & Complete Tasks</h2>
 
-    <!-- BONUS CHALLENGE INFO -->
     <div class="bonus-challenge">
       <h3>🎯 Daily Bonus Challenge</h3>
       <div class="bonus-stats">
@@ -847,14 +729,12 @@ input::placeholder{
       <div class="bonus-note" id="bonusNoteText">⭐ Complete to unlock daily bonus: +500 coins</div>
     </div>
 
-    <!-- WATCH AD SECTION -->
-    <div style="margin-bottom:12px;">
+    <div style="margin-bottom:12px">
       <button class="btn watch-ad-btn" id="watchAdBtn">📺 Watch Ad +20 coins</button>
-      <p style="font-size:10px; margin-top:6px; opacity:0.6; text-align:center;">
+      <p style="font-size:10px;margin-top:6px;opacity:.6;text-align:center">
         ⏱️ Cooldown: 30 sec | Unlimited daily
       </p>
 
-      <!-- SEPARATE AD MILESTONE REWARDS -->
       <div id="adMilestone5" class="ad-milestone">
         🎉 You watched 5 ads today! You have an extra 50 points available.
         <br>
@@ -877,78 +757,68 @@ input::placeholder{
       </div>
     </div>
 
-    <!-- OFFER TASKS BLOCK (Adsgram) - TAP TO ACTIVATE -->
     <div class="adsgram-section">
       <h3>🎁 Offer Tasks - Earn 30 coins each!</h3>
-      <p style="font-size:10px; opacity:0.7; margin-bottom:10px;">
-        Tap below to activate task block, then complete unlimited offers with 30-second cooldown. Each completion = +30 coins
+      <p style="font-size:10px;opacity:.7;margin-bottom:10px">
+        Tap below to activate task block, then complete unlimited offers with 30-second cooldown.
       </p>
-      <!-- TAP BUTTON TO SHOW TASK BLOCKS -->
+
       <button class="btn task-tap-btn" id="activateTasksBtn" onclick="activateTaskBlocks()">📋 Activate Offer Tasks</button>
       
-      <!-- TASK BLOCK 1 - Hidden until tapped -->
       <div class="task-block-container" id="taskBlock1">
-        <p style="font-size:10px; opacity:0.7; margin-bottom:8px;">📊 Task Block 1 - Complete offers</p>
+        <p style="font-size:10px;opacity:.7;margin-bottom:8px">📊 Task Block 1 - Complete offers</p>
         <adsgram-task id="adsgramBlock" data-block-id="task-38707"></adsgram-task>
         <div class="adsgram-block-id">📋 Block ID: task-38707</div>
       </div>
 
-      <!-- TASK BLOCK 2 - Hidden until tapped (randomly shown) -->
       <div class="task-block-container" id="taskBlock2">
-        <p style="font-size:10px; opacity:0.7; margin-bottom:8px;">📊 Task Block 2 - Complete more offers</p>
+        <p style="font-size:10px;opacity:.7;margin-bottom:8px">📊 Task Block 2 - Complete more offers</p>
         <adsgram-task id="adsgramBlock2" data-block-id="task-38713"></adsgram-task>
         <div class="adsgram-block-id">📋 Block ID: task-38713</div>
       </div>
     </div>
 
     <div class="disclaimer">
-      ⚠️ <strong>DISCLAIMER:</strong> Watching ads and completing tasks is completely optional. You can earn coins through farming without any ads. Ad rewards are bonus opportunities only.
+      ⚠️ <strong>DISCLAIMER:</strong> Watching ads and completing tasks is optional.
     </div>
   </div>
 </div>
 
-<!-- DAILY SECTION -->
 <div class="section daily">
   <div class="section-content">
     <h2>🎁 Daily Bonus</h2>
-    <p style="font-size:11px; opacity:0.7; margin-bottom:12px;" id="dailyBonusDesc">Complete 5 ads + 5 offer tasks to claim 500 bonus coins!</p>
+    <p style="font-size:11px;opacity:.7;margin-bottom:12px" id="dailyBonusDesc">
+      Complete 5 ads + 5 offer tasks to claim 500 bonus coins!
+    </p>
     
     <div class="daily-slots">
-      <div class="daily-slot" id="dailySlot0">
-        <span id="daily0">1️⃣</span>
-      </div>
-      <div class="daily-slot" id="dailySlot1">
-        <span id="daily1">2️⃣</span>
-      </div>
-      <div class="daily-slot" id="dailySlot2">
-        <span id="daily2">3️⃣</span>
-      </div>
-      <div class="daily-slot" id="dailySlot3">
-        <span id="daily3">4️⃣</span>
-      </div>
+      <div class="daily-slot" id="dailySlot0"><span id="daily0">1️⃣</span></div>
+      <div class="daily-slot" id="dailySlot1"><span id="daily1">2️⃣</span></div>
+      <div class="daily-slot" id="dailySlot2"><span id="daily2">3️⃣</span></div>
+      <div class="daily-slot" id="dailySlot3"><span id="daily3">4️⃣</span></div>
     </div>
 
-    <div class="progress-bar" style="margin-bottom:12px;">
+    <div class="progress-bar" style="margin-bottom:12px">
       <div class="progress-fill" id="dailyProgress"></div>
     </div>
 
-    <!-- QUICK ACTION BUTTONS IN DAILY SECTION -->
     <div class="bonus-button-row">
       <button class="btn watch-ad-btn" id="dailyWatchAdBtn" onclick="watchAdFromDaily()">📺 Watch Ad +20</button>
       <button class="btn task-btn" id="dailyTaskBtn" onclick="completeTaskFromDaily()">🎁 Do Task +30</button>
     </div>
 
     <button class="btn" id="claimBonusBtn" disabled>Claim 500 Bonus Coins</button>
-    <p style="font-size:10px; margin-top:10px; opacity:0.6;" id="dailyReqText">Requirements: 5 ads watched + 5 offer tasks completed</p>
+    <p style="font-size:10px;margin-top:10px;opacity:.6" id="dailyReqText">
+      Requirements: 5 ads watched + 5 offer tasks completed
+    </p>
   </div>
 </div>
 
-<!-- WITHDRAW SECTION -->
 <div class="section withdraw">
   <div class="section-content">
     <h2>💳 Withdraw Earnings</h2>
     
-    <p style="font-size:12px; margin:12px 0; opacity:0.8;">
+    <p style="font-size:12px;margin:12px 0;opacity:.8">
       💰 <strong id="withdrawBalance">0</strong> coins available
     </p>
 
@@ -972,36 +842,30 @@ input::placeholder{
       <input id="amount" placeholder="Enter amount" type="number" min="15000">
     </div>
 
-    <div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; margin-bottom:12px; font-size:11px;">
+    <div style="background:rgba(0,0,0,.5);padding:10px;border-radius:8px;margin-bottom:12px;font-size:11px">
       <div>📊 Exchange Rate: 1 Coin = ₦1</div>
-      <div style="margin-top:4px;">You'll receive: ₦<span id="convertedAmount">0</span></div>
+      <div style="margin-top:4px">You'll receive: ₦<span id="convertedAmount">0</span></div>
     </div>
 
     <button class="btn" id="withdrawBtn">WITHDRAW NOW</button>
-
-    <p style="font-size:10px; margin-top:12px; opacity:0.6; text-align:center;">
+    <p style="font-size:10px;margin-top:12px;opacity:.6;text-align:center">
       ✅ Instant withdrawal | No fees
     </p>
 
     <div class="disclaimer">
-      ⚠️ <strong>DISCLAIMER:</strong> Withdrawal terms and conditions apply. All withdrawals are processed according to our payment policy. Please ensure your wallet address is correct before submission. We are not responsible for loss of funds due to incorrect wallet addresses.
+      ⚠️ <strong>DISCLAIMER:</strong> Withdrawal terms apply. Ensure the wallet address is correct.
     </div>
 
-    <!-- REFERRAL SECTION -->
-    <div style="margin-top:16px; padding-top:16px; border-top:1px solid rgba(0,255,136,0.2);">
-      <h2 style="font-size:14px; margin-bottom:12px; color:#00ff88;">👥 Invite Friends</h2>
-      <p style="font-size:11px; opacity:0.7; margin-bottom:12px;">Earn 50 coins for each friend who joins!</p>
-      <input id="refLink" readonly type="text" style="margin-bottom:8px;" value="">
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(0,255,136,.2)">
+      <h2 style="font-size:14px;margin-bottom:12px;color:#00ff88">👥 Invite Friends</h2>
+      <p style="font-size:11px;opacity:.7;margin-bottom:12px">Earn 50 coins for each friend who joins!</p>
+      <input id="refLink" readonly type="text" style="margin-bottom:8px" value="">
       <button class="btn referral-btn" id="copyRefBtn" onclick="copyReferralLink()">📋 Copy Referral Link</button>
-      <button class="btn referral-btn" id="shareRefBtn" onclick="shareReferralLink()" style="background:linear-gradient(135deg, #ff6b00, #ff8f00);">📤 Share Referral Link</button>
-      <div class="disclaimer" style="margin-top:10px;">
-        ⚠️ <strong>DISCLAIMER:</strong> Referral rewards are subject to verification. Fraudulent referrals or artificial account creation will result in disqualification and account suspension. Earn rewards legitimately only.
-      </div>
+      <button class="btn referral-btn" id="shareRefBtn" onclick="shareReferralLink()">📤 Share Referral Link</button>
     </div>
   </div>
 </div>
 
-<!-- POPUP -->
 <div id="popup">
   <div class="popup-content">
     <h2 id="popupTitle">Message</h2>
@@ -1013,7 +877,6 @@ input::placeholder{
   </div>
 </div>
 
-<!-- JOIN POPUP (for Adsgram join channel) -->
 <div id="joinPopup">
   <h2>Join Our Channel</h2>
   <button id="joinBtn">Join Channel +5 coins</button>
@@ -1022,187 +885,141 @@ input::placeholder{
 <div class="toast" id="toast"></div>
 
 <script>
-// ╔════════════════════════════════════════════════════════════════╗
-// ║          🎛️  CONFIGURATION - EDIT HERE  🎛️                 ║
-// ╚════════════════════════════════════════════════════════════════╝
-
-const CONFIG = {
-  // 📊 AD REWARDS & REQUIREMENTS
-  AD_REWARD: 20,                    // 💰 Coins earned per ad watched
-  ADS_REQUIRED_FOR_BONUS: 5,        // 🎯 Number of ads needed for daily bonus
-  AD_COOLDOWN_SEC: 30,              // ⏱️  Seconds between ads
-  AD_DAILY_CAP: 999,                // 🔒 Max ads per day (Unlimited = 999)
-
-  // 📋 OFFER TASK REWARDS & REQUIREMENTS
-  TASK_REWARD: 30,                  // 💰 Coins earned per task completed
-  TASKS_REQUIRED_FOR_BONUS: 5,      // 🎯 Number of tasks needed for daily bonus
-  TASK_COOLDOWN_SEC: 30,            // ⏱️  Seconds between tasks
-  TASK_DAILY_CAP: 999,              // 🔒 Max tasks per day (Unlimited = 999)
-
-  // 🎁 BONUS REWARDS
-  DAILY_BONUS_AMOUNT: 500,          // 💰 Bonus coins when all requirements met
-  JOIN_CHANNEL_REWARD: 5,           // 💰 Coins for joining channel
-  REFERRAL_REWARD: 50,              // 💰 Coins per referral
-
-  // 🏦 WITHDRAWAL
-  MIN_WITHDRAWAL: 15000,            // 💰 Minimum coins to withdraw
-  EXCHANGE_RATE: 1,                 // 💱 1 Coin = X NGN
-
-  // 🌾 FARM REWARDS
-  TAP_REWARD: 1,                    // 💰 Coins per tap
-  PLANT_COST: 10,                   // 💰 Cost to plant crop
-  PLANT_REWARD: 5,                  // 💰 Bonus from planting
-  HARVEST_REWARD: 50,               // 💰 Coins per harvest
-  HARVEST_COOLDOWN_MS: 300000       // ⏱️  5 minutes in milliseconds
+const CONFIG={
+  AD_REWARD:20,
+  ADS_REQUIRED_FOR_BONUS:5,
+  AD_COOLDOWN_SEC:30,
+  AD_DAILY_CAP:999,
+  TASK_REWARD:30,
+  TASKS_REQUIRED_FOR_BONUS:5,
+  TASK_COOLDOWN_SEC:30,
+  TASK_DAILY_CAP:999,
+  DAILY_BONUS_AMOUNT:500,
+  JOIN_CHANNEL_REWARD:5,
+  REFERRAL_REWARD:50,
+  MIN_WITHDRAWAL:15000,
+  EXCHANGE_RATE:1,
+  TAP_REWARD:1,
+  PLANT_COST:10,
+  PLANT_REWARD:5,
+  HARVEST_REWARD:50,
+  HARVEST_COOLDOWN_MS:300000
 };
 
-console.log('✅ CONFIG LOADED:', CONFIG);
+const tg=(window.Telegram&&window.Telegram.WebApp)?window.Telegram.WebApp:null;
 
-// ╔════════════════════════════════════════════════════════════════╗
-// ║                      APP CODE BELOW                           ║
-// ╚════════════════════════════════════════════════════════════════╝
-
-// =================== TELEGRAM MINI APP DETECTION ===================
-const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-const isTelegramWebApp = !!(tg && (tg.initData || tg.initDataUnsafe?.user));
-
-if (tg) {
-  try {
+if(tg){
+  try{
     tg.ready();
     tg.expand();
-    if (typeof tg.setBackgroundColor === 'function') tg.setBackgroundColor('#1a3a24');
-    if (typeof tg.setHeaderColor === 'function') tg.setHeaderColor('#1a3a24');
-    console.log('✅ Telegram WebApp detected', {
-      platform: tg.platform,
-      version: tg.version,
-      userAvailable: !!tg.initDataUnsafe?.user,
-      initDataAvailable: !!tg.initData
-    });
-  } catch (telegramError) {
-    console.warn('Telegram WebApp setup warning:', telegramError);
+    if(typeof tg.setBackgroundColor==='function')tg.setBackgroundColor('#1a3a24');
+    if(typeof tg.setHeaderColor==='function')tg.setHeaderColor('#1a3a24');
+  }catch(error){
+    console.warn('Telegram WebApp setup warning:',error);
   }
-} else {
-  console.warn('Telegram WebApp not detected. Open this page using the bot Menu Button or an inline KeyboardButton with web_app.');
 }
 
-// =================== ADSGRAM CONFIG ===================
-const WATCH_AD_BLOCK_ID = '38705';
-const ADSGRAM_TASK_BLOCK_IDS = ['task-38707', 'task-38713'];
-const JOIN_CHANNEL_AD_BLOCK_ID = '38706';
+const WATCH_AD_BLOCK_ID='38705';
+const ADSGRAM_TASK_BLOCK_IDS=['task-38707','task-38713'];
+const JOIN_CHANNEL_AD_BLOCK_ID='38706';
 
-// GAME STATE
-let gameState = {
-  coins: parseInt(localStorage.getItem('coins') || '0'),
-  totalTaps: parseInt(localStorage.getItem('totalTaps') || '0'),
-  farmLevel: parseInt(localStorage.getItem('farmLevel') || '1'),
-  lastHarvest: parseInt(localStorage.getItem('lastHarvest') || Date.now()),
-  dailyProgress: JSON.parse(localStorage.getItem('dailyProgress') || '[false,false,false,false]'),
-  lastDaily: parseInt(localStorage.getItem('lastDaily') || '0'),
-  selectedMethod: localStorage.getItem('selectedMethod') || 'usdt',
-  
-  // Ads & Tasks tracking with 24-hour reset
-  adsWatchedToday: parseInt(localStorage.getItem('adsWatchedToday') || '0'),
-  offerTasksCompletedToday: parseInt(localStorage.getItem('offerTasksCompletedToday') || '0'),
-  lastAdTime: parseInt(localStorage.getItem('lastAdTime') || '0'),
-  lastTaskTime: parseInt(localStorage.getItem('lastTaskTime') || '0'),
-  bonusClaimedToday: localStorage.getItem('bonusClaimedToday') || '',
-  adMilestoneClaims: JSON.parse(localStorage.getItem('adMilestoneClaims') || '{}'),
-  
-  // 24-hour tracking
-  requirementsLastReset: parseInt(localStorage.getItem('requirementsLastReset') || '0'),
-  referralCount: parseInt(localStorage.getItem('referralCount') || '0'),
-  
-  // Task completion tracking
-  taskCompletionPending: false
+let gameState={
+  coins:parseInt(localStorage.getItem('coins')||'0'),
+  totalTaps:parseInt(localStorage.getItem('totalTaps')||'0'),
+  farmLevel:parseInt(localStorage.getItem('farmLevel')||'1'),
+  lastHarvest:parseInt(localStorage.getItem('lastHarvest')||Date.now()),
+  dailyProgress:JSON.parse(localStorage.getItem('dailyProgress')||'[false,false,false,false]'),
+  lastDaily:parseInt(localStorage.getItem('lastDaily')||'0'),
+  selectedMethod:localStorage.getItem('selectedMethod')||'usdt',
+  adsWatchedToday:parseInt(localStorage.getItem('adsWatchedToday')||'0'),
+  offerTasksCompletedToday:parseInt(localStorage.getItem('offerTasksCompletedToday')||'0'),
+  lastAdTime:parseInt(localStorage.getItem('lastAdTime')||'0'),
+  lastTaskTime:parseInt(localStorage.getItem('lastTaskTime')||'0'),
+  bonusClaimedToday:localStorage.getItem('bonusClaimedToday')||'',
+  adMilestoneClaims:JSON.parse(localStorage.getItem('adMilestoneClaims')||'{}'),
+  requirementsLastReset:parseInt(localStorage.getItem('requirementsLastReset')||'0'),
+  referralCount:parseInt(localStorage.getItem('referralCount')||'0'),
+  taskCompletionPending:false
 };
 
-let harvestCountdown = null;
-let adCooldown = {};
-let currentDailyTaskBlockId = null;
+let currentDailyTaskBlockId=null;
+let rewardAd=null;
+let joinAd=null;
+let toastTimer=null;
 
-// Adsgram instances
-let rewardAd = null;
-let joinAd = null;
+let appUserId=(tg?.initDataUnsafe?.user?.id)
+  ?String(tg.initDataUnsafe.user.id)
+  :(localStorage.getItem('th_guestId')||null);
 
-// =================== USER ID ===================
-let appUserId = (tg?.initDataUnsafe?.user?.id) ? String(tg.initDataUnsafe.user.id) : (localStorage.getItem('th_guestId') || null);
-if (!appUserId) {
-  appUserId = 'guest_' + Math.random().toString(36).slice(2,10);
-  localStorage.setItem('th_guestId', appUserId);
+if(!appUserId){
+  appUserId='guest_'+Math.random().toString(36).slice(2,10);
+  localStorage.setItem('th_guestId',appUserId);
 }
 
-// =================== REFERRAL LINK ===================
-function generateReferralLink() {
-  const baseUrl = 'https://t.me/Promoteaffibot?start=';
-  const refLink = baseUrl + appUserId;
-  document.getElementById('refLink').value = refLink;
+function generateReferralLink(){
+  document.getElementById('refLink').value=
+    'https://t.me/Promoteaffibot?start='+appUserId;
 }
 
-// =================== 24 HOUR RESET CHECK ===================
-function check24HourReset() {
-  const now = Date.now();
-  const lastReset = gameState.requirementsLastReset || 0;
-  const HOURS_24_MS = 24 * 60 * 60 * 1000;
-  
-  if (now - lastReset > HOURS_24_MS) {
-    gameState.adsWatchedToday = 0;
-    gameState.offerTasksCompletedToday = 0;
-    gameState.bonusClaimedToday = '';
-    gameState.adMilestoneClaims = {};
-    gameState.requirementsLastReset = now;
-    console.log('✅ 24-hour reset triggered');
+function check24HourReset(){
+  const now=Date.now();
+  const lastReset=gameState.requirementsLastReset||0;
+
+  if(now-lastReset>24*60*60*1000){
+    gameState.adsWatchedToday=0;
+    gameState.offerTasksCompletedToday=0;
+    gameState.bonusClaimedToday='';
+    gameState.adMilestoneClaims={};
+    gameState.requirementsLastReset=now;
   }
 }
 
-// =================== ADSGRAM SDK INIT ===================
-function connectAdsgramTaskEvents() {
-  const taskElements = [
+function connectAdsgramTaskEvents(){
+  const taskElements=[
     document.getElementById('adsgramBlock'),
     document.getElementById('adsgramBlock2')
   ];
 
-  taskElements.forEach(task => {
-    if (!task || task.dataset.rewardListener === 'connected') return;
+  taskElements.forEach(task=>{
+    if(!task||task.dataset.rewardListener==='connected')return;
 
-    task.addEventListener('reward', event => {
-      console.log('AdsGram task reward event:', event.detail);
+    task.addEventListener('reward',event=>{
+      console.log('AdsGram task reward event:',event.detail);
       window.onOfferTaskCompleted();
     });
-    task.addEventListener('onError', event => console.error('AdsGram task error:', event.detail));
-    task.addEventListener('onBannerNotFound', event => console.warn('AdsGram task banner not found:', event.detail));
-    task.addEventListener('onTooLongSession', event => console.warn('AdsGram task session too long:', event.detail));
-    task.dataset.rewardListener = 'connected';
+
+    task.addEventListener('onError',event=>console.error('AdsGram task error:',event.detail));
+    task.addEventListener('onBannerNotFound',()=>console.warn('AdsGram banner not found'));
+    task.addEventListener('onTooLongSession',()=>console.warn('AdsGram session too long'));
+    task.dataset.rewardListener='connected';
   });
 }
 
-function initializeAdsgram() {
-  if (typeof window.Adsgram === 'undefined') {
-    console.error('❌ AdsGram SDK not loaded');
-    toast('Ads system could not load. Check your connection and try again.');
+function initializeAdsgram(){
+  if(typeof window.Adsgram==='undefined'){
+    toast('Ads system could not load.');
     return;
   }
 
-  try {
-    rewardAd = window.Adsgram.init({ blockId: WATCH_AD_BLOCK_ID });
-    console.log('✅ Watch Ad initialized');
-    joinAd = window.Adsgram.init({ blockId: JOIN_CHANNEL_AD_BLOCK_ID });
-    console.log('✅ Join Channel Ad initialized');
+  try{
+    rewardAd=window.Adsgram.init({blockId:WATCH_AD_BLOCK_ID});
+    joinAd=window.Adsgram.init({blockId:JOIN_CHANNEL_AD_BLOCK_ID});
 
     Promise.resolve(joinAd.show())
-      .catch(error => console.warn('Automatic join ad did not complete:', error))
-      .finally(() => {
-        document.getElementById('joinPopup').style.display = 'flex';
+      .catch(error=>console.warn('Automatic join ad did not complete:',error))
+      .finally(()=>{
+        document.getElementById('joinPopup').style.display='flex';
       });
-  } catch (error) {
-    console.error('AdsGram initialization error:', error);
-    rewardAd = null;
-    joinAd = null;
+  }catch(error){
+    console.error('AdsGram initialization error:',error);
+    rewardAd=null;
+    joinAd=null;
   }
 }
 
-window.onload = () => {
-  const telegramUserId = tg?.initDataUnsafe?.user?.id;
-  if (telegramUserId) appUserId = String(telegramUserId);
+window.onload=()=>{
+  const telegramUserId=tg?.initDataUnsafe?.user?.id;
+  if(telegramUserId)appUserId=String(telegramUserId);
 
   check24HourReset();
   saveState();
@@ -1210,227 +1027,238 @@ window.onload = () => {
   connectAdsgramTaskEvents();
   initializeAdsgram();
 
-  document.querySelectorAll('.withdraw-option').forEach(el => {
-    const method = el.getAttribute('onclick')?.match(/selectMethod\('([^']+)'\)/)?.[1];
-    el.classList.toggle('selected', method === gameState.selectedMethod);
+  document.querySelectorAll('.withdraw-option').forEach(el=>{
+    const method=el.getAttribute('onclick')?.match(/selectMethod\('([^']+)'\)/)?.[1];
+    el.classList.toggle('selected',method===gameState.selectedMethod);
   });
 
   updateDailyBonus();
   updateAdMilestones();
   updateUI();
-  renderActivity();
-  setInterval(() => updateUI(), 1000);
-  setInterval(() => {
+
+  setInterval(updateUI,1000);
+  setInterval(()=>{
     check24HourReset();
     updateDailyBonus();
     updateAdMilestones();
     saveState();
-  }, 60000);
+  },60000);
 };
 
-// =================== ACTIVATE TASK BLOCKS ===================
-function activateTaskBlocks() {
-  gameState.taskCompletionPending = true;
-  const block1 = document.getElementById('taskBlock1');
-  const block2 = document.getElementById('taskBlock2');
-  
-  block1.classList.add('active');
-  
-  if (Math.random() > 0.5) {
-    block2.classList.add('active');
+function activateTaskBlocks(){
+  gameState.taskCompletionPending=true;
+
+  document.getElementById('taskBlock1').classList.add('active');
+
+  if(Math.random()>.5){
+    document.getElementById('taskBlock2').classList.add('active');
   }
-  
-  const btn = document.getElementById('activateTasksBtn');
-  btn.disabled = true;
-  btn.innerText = '✅ Task Blocks Activated';
-  
+
+  const button=document.getElementById('activateTasksBtn');
+  button.disabled=true;
+  button.innerText='✅ Task Blocks Activated';
   toast('🎯 Offer task blocks activated!');
-  
-  setTimeout(() => {
-    btn.disabled = false;
-    btn.innerText = '📋 Activate Offer Tasks';
-  }, 2000);
+
+  setTimeout(()=>{
+    button.disabled=false;
+    button.innerText='📋 Activate Offer Tasks';
+  },2000);
 }
 
-// =================== COMPLETE TASK FROM DAILY SECTION ===================
-function completeTaskFromDaily() {
-  const now = Date.now();
-  const sinceLast = now - gameState.lastTaskTime;
-  
-  if (sinceLast < CONFIG.TASK_COOLDOWN_SEC * 1000) {
-    toast(`⏳ Wait ${Math.ceil((CONFIG.TASK_COOLDOWN_SEC * 1000 - sinceLast) / 1000)}s before next task`);
+function completeTaskFromDaily(){
+  const now=Date.now();
+  const sinceLast=now-gameState.lastTaskTime;
+
+  if(sinceLast<CONFIG.TASK_COOLDOWN_SEC*1000){
+    toast(`⏳ Wait ${Math.ceil((CONFIG.TASK_COOLDOWN_SEC*1000-sinceLast)/1000)}s`);
     return;
   }
-  
-  currentDailyTaskBlockId = ADSGRAM_TASK_BLOCK_IDS[Math.floor(Math.random() * ADSGRAM_TASK_BLOCK_IDS.length)];
+
+  currentDailyTaskBlockId=
+    ADSGRAM_TASK_BLOCK_IDS[
+      Math.floor(Math.random()*ADSGRAM_TASK_BLOCK_IDS.length)
+    ];
+
   switchTab('tasks');
-  
-  setTimeout(() => {
-    const adSection = document.querySelector('.adsgram-section');
-    if (adSection) {
-      adSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    
-    const block1 = document.getElementById('taskBlock1');
-    const block2 = document.getElementById('taskBlock2');
-    
+
+  setTimeout(()=>{
+    document.querySelector('.adsgram-section')?.scrollIntoView({
+      behavior:'smooth',
+      block:'center'
+    });
+
+    const block1=document.getElementById('taskBlock1');
+    const block2=document.getElementById('taskBlock2');
+
     block1.classList.remove('active');
     block2.classList.remove('active');
-    
-    if (currentDailyTaskBlockId === ADSGRAM_TASK_BLOCK_IDS[0]) {
+
+    if(currentDailyTaskBlockId===ADSGRAM_TASK_BLOCK_IDS[0]){
       block1.classList.add('active');
-    } else {
+    }else{
       block2.classList.add('active');
     }
-    
-    gameState.taskCompletionPending = true;
+
+    gameState.taskCompletionPending=true;
     toast('📋 Complete this offer task to earn 30 coins!');
-  }, 300);
+  },300);
 }
 
-// =================== TOAST ===================
-let toastTimer;
-function toast(msg){
-  const el = document.getElementById('toast');
-  el.innerText = msg;
+function toast(msg,duration=2600){
+  const el=document.getElementById('toast');
+  el.innerText=msg;
   el.classList.add('show');
+
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+  toastTimer=setTimeout(()=>{
+    el.classList.remove('show');
+  },duration);
 }
 
-// =================== WATCH AD ===================
-document.getElementById('watchAdBtn').addEventListener('click', performWatchAd);
+document.getElementById('watchAdBtn').addEventListener('click',performWatchAd);
 
-function performWatchAd() {
-  if (!rewardAd) {
+function performWatchAd(){
+  if(!rewardAd){
     toast('⏳ Ad system loading...');
     return;
   }
-  
-  const btn = document.getElementById('watchAdBtn');
-  const now = Date.now();
-  const sinceLast = now - gameState.lastAdTime;
-  
-  if (gameState.adsWatchedToday >= CONFIG.AD_DAILY_CAP) {
-    toast(`⚠️ Daily ad limit reached (${CONFIG.AD_DAILY_CAP} max)`);
+
+  const button=document.getElementById('watchAdBtn');
+  const now=Date.now();
+  const sinceLast=now-gameState.lastAdTime;
+
+  if(gameState.adsWatchedToday>=CONFIG.AD_DAILY_CAP){
+    toast(`⚠️ Daily ad limit reached (${CONFIG.AD_DAILY_CAP})`);
     return;
   }
-  
-  if (sinceLast < CONFIG.AD_COOLDOWN_SEC * 1000) {
-    toast(`⏳ Wait ${Math.ceil((CONFIG.AD_COOLDOWN_SEC * 1000 - sinceLast) / 1000)}s before next ad`);
+
+  if(sinceLast<CONFIG.AD_COOLDOWN_SEC*1000){
+    toast(`⏳ Wait ${Math.ceil((CONFIG.AD_COOLDOWN_SEC*1000-sinceLast)/1000)}s`);
     return;
   }
-  
-  btn.disabled = true;
-  btn.innerText = '⏳ Loading Ad...';
-  
-  try {
-    rewardAd.show().then(res => {
-      if (res?.done) {
-        gameState.coins += CONFIG.AD_REWARD;
-        gameState.adsWatchedToday++;
-        gameState.lastAdTime = Date.now();
 
-        updateAdMilestones();
-        [5, 20, 100].forEach(milestone => {
-          if (gameState.adsWatchedToday === milestone) {
-            toast(`🎉 You watched ${milestone} ads today! Claim your extra 50 coins.`);
-          }
-        });
+  button.disabled=true;
+  button.innerText='⏳ Loading Ad...';
 
-        createFloatText(`+${CONFIG.AD_REWARD}`, '#00ff88');
-        updateDailyBonus();
-        saveState();
-        updateUI();
-      } else {
-        toast('⚠️ Ad skipped - no reward');
-      }
-    }).catch(error => {
-      console.error('Ad error:', error);
-      toast('⚠️ Ad closed - no reward');
-    }).finally(() => {
-      btn.disabled = false;
-      btn.innerText = `📺 Watch Ad +${CONFIG.AD_REWARD} coins`;
-    });
-  } catch (error) {
-    console.error('Ad error:', error);
-    toast('⚠️ Ad error - no reward');
-    btn.disabled = false;
-    btn.innerText = `📺 Watch Ad +${CONFIG.AD_REWARD} coins`;
+  try{
+    rewardAd.show()
+      .then(res=>{
+        if(res?.done){
+          gameState.coins+=CONFIG.AD_REWARD;
+          gameState.adsWatchedToday++;
+          gameState.lastAdTime=Date.now();
+
+          [5,20,100].forEach(milestone=>{
+            if(gameState.adsWatchedToday===milestone){
+              toast(`🎉 You watched ${milestone} ads today!\nClaim your extra 50 coins.`);
+            }
+          });
+
+          updateAdMilestones();
+          updateDailyBonus();
+          createFloatText(`+${CONFIG.AD_REWARD}`,'#00ff88');
+          saveState();
+          updateUI();
+        }else{
+          toast('⚠️ Ad skipped - no reward');
+        }
+      })
+      .catch(error=>{
+        console.error('Ad error:',error);
+        toast('⚠️ Ad closed - no reward');
+      })
+      .finally(()=>{
+        button.disabled=false;
+        button.innerText=`📺 Watch Ad +${CONFIG.AD_REWARD} coins`;
+      });
+  }catch(error){
+    console.error('Ad error:',error);
+    toast('⚠️ Ad error');
+    button.disabled=false;
+    button.innerText=`📺 Watch Ad +${CONFIG.AD_REWARD} coins`;
   }
 }
 
-// =================== AD MILESTONE REWARDS ===================
-function updateAdMilestones() {
-  [5, 20, 100].forEach(milestone => {
-    const box = document.getElementById(`adMilestone${milestone}`);
-    if (!box) return;
+function updateAdMilestones(){
+  [5,20,100].forEach(milestone=>{
+    const box=document.getElementById(`adMilestone${milestone}`);
+    const button=document.getElementById(`adMilestoneBtn${milestone}`);
+    if(!box||!button)return;
 
-    const claimed = !!gameState.adMilestoneClaims[milestone];
-    box.style.display =
-      gameState.adsWatchedToday >= milestone && !claimed ? 'block' : 'none';
+    const claimed=!!gameState.adMilestoneClaims[milestone];
+    box.style.display=
+      gameState.adsWatchedToday>=milestone&&!claimed?'block':'none';
+
+    if(claimed){
+      button.disabled=true;
+      button.innerText='Reward claimed';
+    }
   });
 }
 
-function claimAdMilestone(milestone) {
-  if (![5, 20, 100].includes(milestone)) return;
+function claimAdMilestone(milestone){
+  if(![5,20,100].includes(milestone))return;
 
-  if (gameState.adsWatchedToday < milestone) {
+  if(gameState.adsWatchedToday<milestone){
     toast(`Watch ${milestone} ads first.`);
     return;
   }
 
-  if (gameState.adMilestoneClaims[milestone]) {
+  if(gameState.adMilestoneClaims[milestone]){
     toast('You have already claimed this reward.');
     return;
   }
 
-  const box = document.getElementById(`adMilestone${milestone}`);
-  const button = document.getElementById(`adMilestoneBtn${milestone}`);
-  const codeElement = document.getElementById(`adMilestoneCode${milestone}`);
-  const code = `FARM-${milestone}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+  const box=document.getElementById(`adMilestone${milestone}`);
+  const button=document.getElementById(`adMilestoneBtn${milestone}`);
+  const codeElement=document.getElementById(`adMilestoneCode${milestone}`);
+  const code=`FARM-${milestone}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
 
-  gameState.adMilestoneClaims[milestone] = true;
-  gameState.coins += 50;
+  gameState.adMilestoneClaims[milestone]=true;
+  gameState.coins+=50;
 
-  button.disabled = true;
-  button.innerText = 'Reward claimed';
-  codeElement.innerText = `Your code: ${code} — visible for 30 seconds`;
-  codeElement.style.display = 'block';
-  box.style.display = 'block';
+  button.disabled=true;
+  button.innerText='Reward claimed';
 
-  createFloatText('+50 MILESTONE', '#ffd700');
-  toast('🎉 You received 50 extra coins!');
+  codeElement.innerText=`Your code: ${code}`;
+  codeElement.style.display='block';
+  box.style.display='block';
+
+  createFloatText('+50 MILESTONE','#ffd700');
   saveState();
   updateUI();
 
-  setTimeout(() => {
-    codeElement.innerText = '';
-    codeElement.style.display = 'none';
-    box.style.display = 'none';
-  }, 30000);
+  toast(
+    `🎉 You received 50 extra coins!\nYour code: ${code}`,
+    40000
+  );
+
+  setTimeout(()=>{
+    codeElement.innerText='';
+    codeElement.style.display='none';
+  },30000);
 }
 
-// =================== WATCH AD FROM DAILY SECTION ===================
-function watchAdFromDaily() {
+function watchAdFromDaily(){
   performWatchAd();
 }
 
-// =================== OFFER TASK COMPLETION (Auto-reward on task done) ===================
-window.onOfferTaskCompleted = function(){
-  if (gameState.taskCompletionPending && gameState.offerTasksCompletedToday < CONFIG.TASK_DAILY_CAP) {
-    const now = Date.now();
-    const sinceLast = now - gameState.lastTaskTime;
-    
-    if (sinceLast >= CONFIG.TASK_COOLDOWN_SEC * 1000) {
+window.onOfferTaskCompleted=function(){
+  if(
+    gameState.taskCompletionPending &&
+    gameState.offerTasksCompletedToday<CONFIG.TASK_DAILY_CAP
+  ){
+    const now=Date.now();
+    const sinceLast=now-gameState.lastTaskTime;
+
+    if(sinceLast>=CONFIG.TASK_COOLDOWN_SEC*1000){
       gameState.offerTasksCompletedToday++;
-      gameState.coins += CONFIG.TASK_REWARD;
-      gameState.lastTaskTime = now;
-      gameState.taskCompletionPending = false;
-      
-      createFloatText(`+${CONFIG.TASK_REWARD} (Task)`, '#00ff88');
+      gameState.coins+=CONFIG.TASK_REWARD;
+      gameState.lastTaskTime=now;
+      gameState.taskCompletionPending=false;
+
+      createFloatText(`+${CONFIG.TASK_REWARD} (Task)`,'#00ff88');
       toast(`✅ Task completed! +${CONFIG.TASK_REWARD} coins!`);
-      
       updateDailyBonus();
       saveState();
       updateUI();
@@ -1438,296 +1266,354 @@ window.onOfferTaskCompleted = function(){
   }
 };
 
-// =================== DAILY BONUS ===================
 function updateDailyBonus(){
-  const adsReq = CONFIG.ADS_REQUIRED_FOR_BONUS;
-  const tasksReq = CONFIG.TASKS_REQUIRED_FOR_BONUS;
-  
-  document.getElementById('adsWatchedCount').innerText = `${gameState.adsWatchedToday}/${adsReq}`;
-  document.getElementById('offerTasksCount').innerText = `${gameState.offerTasksCompletedToday}/${tasksReq}`;
-  
-  document.getElementById('bonusNoteText').innerText = `⭐ Complete to unlock daily bonus: +${CONFIG.DAILY_BONUS_AMOUNT} coins`;
-  document.getElementById('claimBonusBtn').innerText = `Claim ${CONFIG.DAILY_BONUS_AMOUNT} Bonus Coins`;
-  document.getElementById('dailyBonusDesc').innerText = `Complete ${adsReq} ads + ${tasksReq} offer tasks to claim ${CONFIG.DAILY_BONUS_AMOUNT} bonus coins!`;
-  document.getElementById('dailyReqText').innerText = `Requirements: ${adsReq} ads watched + ${tasksReq} offer tasks completed`;
-  
-  const canClaimBonus = 
-    gameState.adsWatchedToday >= adsReq && 
-    gameState.offerTasksCompletedToday >= tasksReq && 
-    gameState.bonusClaimedToday !== new Date().toDateString();
-  
-  const totalRequired = adsReq + tasksReq;
-  const completed = gameState.adsWatchedToday + gameState.offerTasksCompletedToday;
-  const progress = Math.min(100, (completed / totalRequired) * 100);
-  document.getElementById('bonusProgressBar').style.width = progress + '%';
-  
-  document.getElementById('claimBonusBtn').disabled = !canClaimBonus;
+  const adsReq=CONFIG.ADS_REQUIRED_FOR_BONUS;
+  const tasksReq=CONFIG.TASKS_REQUIRED_FOR_BONUS;
+
+  document.getElementById('adsWatchedCount').innerText=
+    `${gameState.adsWatchedToday}/${adsReq}`;
+
+  document.getElementById('offerTasksCount').innerText=
+    `${gameState.offerTasksCompletedToday}/${tasksReq}`;
+
+  document.getElementById('bonusNoteText').innerText=
+    `⭐ Complete to unlock daily bonus: +${CONFIG.DAILY_BONUS_AMOUNT} coins`;
+
+  document.getElementById('claimBonusBtn').innerText=
+    `Claim ${CONFIG.DAILY_BONUS_AMOUNT} Bonus Coins`;
+
+  document.getElementById('dailyBonusDesc').innerText=
+    `Complete ${adsReq} ads + ${tasksReq} offer tasks to claim ${CONFIG.DAILY_BONUS_AMOUNT} bonus coins!`;
+
+  document.getElementById('dailyReqText').innerText=
+    `Requirements: ${adsReq} ads watched + ${tasksReq} offer tasks completed`;
+
+  const canClaim=
+    gameState.adsWatchedToday>=adsReq &&
+    gameState.offerTasksCompletedToday>=tasksReq &&
+    gameState.bonusClaimedToday!==new Date().toDateString();
+
+  const totalRequired=adsReq+tasksReq;
+  const completed=gameState.adsWatchedToday+gameState.offerTasksCompletedToday;
+  const progress=Math.min(100,(completed/totalRequired)*100);
+
+  document.getElementById('bonusProgressBar').style.width=progress+'%';
+  document.getElementById('claimBonusBtn').disabled=!canClaim;
 }
 
-document.getElementById('claimBonusBtn').addEventListener('click', () => {
-  const eligible = gameState.adsWatchedToday >= CONFIG.ADS_REQUIRED_FOR_BONUS &&
-    gameState.offerTasksCompletedToday >= CONFIG.TASKS_REQUIRED_FOR_BONUS &&
-    gameState.bonusClaimedToday !== new Date().toDateString();
-  if (!eligible) { toast('Complete the daily requirements first.'); return; }
-  gameState.coins += CONFIG.DAILY_BONUS_AMOUNT;
-  gameState.bonusClaimedToday = new Date().toDateString();
-  createFloatText(`+${CONFIG.DAILY_BONUS_AMOUNT} BONUS`, '#ffd700');
+document.getElementById('claimBonusBtn').addEventListener('click',()=>{
+  const eligible=
+    gameState.adsWatchedToday>=CONFIG.ADS_REQUIRED_FOR_BONUS &&
+    gameState.offerTasksCompletedToday>=CONFIG.TASKS_REQUIRED_FOR_BONUS &&
+    gameState.bonusClaimedToday!==new Date().toDateString();
+
+  if(!eligible){
+    toast('Complete the daily requirements first.');
+    return;
+  }
+
+  gameState.coins+=CONFIG.DAILY_BONUS_AMOUNT;
+  gameState.bonusClaimedToday=new Date().toDateString();
+
+  createFloatText(`+${CONFIG.DAILY_BONUS_AMOUNT} BONUS`,'#ffd700');
   toast(`🎉 Daily bonus claimed! +${CONFIG.DAILY_BONUS_AMOUNT} coins!`);
-  document.getElementById('claimBonusBtn').disabled = true;
+
+  document.getElementById('claimBonusBtn').disabled=true;
   saveState();
   updateUI();
 });
 
-// =================== JOIN CHANNEL ===================
-document.getElementById('joinBtn').onclick = () => {
-  gameState.coins += CONFIG.JOIN_CHANNEL_REWARD;
-  createFloatText(`+${CONFIG.JOIN_CHANNEL_REWARD}`, '#00ff88');
-  document.getElementById("joinPopup").style.display = "none";
+document.getElementById('joinBtn').onclick=()=>{
+  gameState.coins+=CONFIG.JOIN_CHANNEL_REWARD;
+  createFloatText(`+${CONFIG.JOIN_CHANNEL_REWARD}`,'#00ff88');
+  document.getElementById('joinPopup').style.display='none';
   toast(`✨ +${CONFIG.JOIN_CHANNEL_REWARD} coins for joining!`);
-  window.open('https://t.me/FoxiTaskbot?start=ref_6910486529', "_blank");
+  window.open('https://t.me/FoxiTaskbot?start=ref_6910486529','_blank');
   saveState();
   updateUI();
 };
 
-// =================== REFERRAL FUNCTIONS ===================
-function copyReferralLink() {
-  let link = document.getElementById('refLink');
+function copyReferralLink(){
+  const link=document.getElementById('refLink');
   link.select();
   document.execCommand('copy');
-  showPopup('✅ Copied!', 'Referral link copied to clipboard');
+  showPopup('✅ Copied!','Referral link copied to clipboard');
 }
 
-function shareReferralLink() {
-  const link = document.getElementById('refLink').value;
-  const text = `🌾 Farm & Earn - Earn Money Playing Games!\n\nJoin me and earn 50 coins per referral!\n\n${link}`;
-  
-  if (navigator.share) {
-    navigator.share({
-      title: 'Farm & Earn',
-      text: text,
-      url: link
-    }).catch(err => console.log('Share error:', err));
-  } else {
+function shareReferralLink(){
+  const link=document.getElementById('refLink').value;
+  const text=`🌾 Farm & Earn\n\nJoin and earn 50 coins per referral!\n\n${link}`;
+
+  if(navigator.share){
+    navigator.share({title:'Farm & Earn',text,url:link})
+      .catch(error=>console.log('Share error:',error));
+  }else{
     copyReferralLink();
   }
 }
 
-// =================== FARM ACTIONS ===================
-function updateUI() {
-  document.getElementById('coins').innerText = gameState.coins;
-  document.getElementById('coinsNGN').innerText = gameState.coins * CONFIG.EXCHANGE_RATE;
-  document.getElementById('totalTaps').innerText = gameState.totalTaps;
-  document.getElementById('farmLevel').innerText = gameState.farmLevel;
-  document.getElementById('farmTaps').innerText = gameState.totalTaps % 10;
-  
-  let level = Math.floor(gameState.coins / 500) + 1;
-  document.getElementById('level').innerText = level;
-  
-  let ranks = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
-  let rankIndex = Math.min(Math.floor(gameState.coins / 5000), ranks.length - 1);
-  document.getElementById('rank').innerText = ranks[rankIndex];
-  
-  let progress = (gameState.farmLevel % 10) / 10 * 100;
-  document.getElementById('progressFill').style.width = progress + '%';
-  document.getElementById('progressPercent').innerText = Math.round(progress) + '%';
-  
-  document.getElementById('withdrawBalance').innerText = gameState.coins;
-  
+function updateUI(){
+  document.getElementById('coins').innerText=gameState.coins;
+  document.getElementById('coinsNGN').innerText=
+    gameState.coins*CONFIG.EXCHANGE_RATE;
+
+  document.getElementById('totalTaps').innerText=gameState.totalTaps;
+  document.getElementById('farmLevel').innerText=gameState.farmLevel;
+  document.getElementById('farmTaps').innerText=gameState.totalTaps%10;
+
+  const level=Math.floor(gameState.coins/500)+1;
+  document.getElementById('level').innerText=level;
+
+  const ranks=['Bronze','Silver','Gold','Platinum','Diamond'];
+  const rankIndex=Math.min(
+    Math.floor(gameState.coins/5000),
+    ranks.length-1
+  );
+
+  document.getElementById('rank').innerText=ranks[rankIndex];
+
+  const progress=(gameState.farmLevel%10)/10*100;
+  document.getElementById('progressFill').style.width=progress+'%';
+  document.getElementById('progressPercent').innerText=
+    Math.round(progress)+'%';
+
+  document.getElementById('withdrawBalance').innerText=gameState.coins;
+
   updateDailyUI();
   updateDailyBonus();
   updateHarvestCountdown();
+  updateAdMilestones();
   saveState();
 }
 
-function updateDailyUI() {
-  let completed = gameState.dailyProgress.filter(x => x).length;
-  let percent = (completed / 4) * 100;
-  document.getElementById('dailyProgress').style.width = percent + '%';
-  
-  gameState.dailyProgress.forEach((done, i) => {
-    let slot = document.getElementById(`daily${i}`);
-    let parent = slot.parentElement;
-    if (done) {
+function updateDailyUI(){
+  const completed=gameState.dailyProgress.filter(done=>done).length;
+  const percent=(completed/4)*100;
+  document.getElementById('dailyProgress').style.width=percent+'%';
+
+  gameState.dailyProgress.forEach((done,index)=>{
+    const slot=document.getElementById(`daily${index}`);
+    const parent=slot.parentElement;
+
+    if(done){
       parent.classList.add('completed');
-      slot.innerText = '✅';
-    } else {
+      slot.innerText='✅';
+    }else{
       parent.classList.remove('completed');
-      slot.innerText = (i + 1) + '️⃣';
+      slot.innerText=(index+1)+'️⃣';
     }
   });
 }
 
-function updateHarvestCountdown() {
-  let elapsed = Date.now() - gameState.lastHarvest;
-  let remaining = Math.max(0, CONFIG.HARVEST_COOLDOWN_MS - elapsed);
-  
-  let mins = Math.floor(remaining / 60000);
-  let secs = Math.floor((remaining % 60000) / 1000);
-  
-  document.getElementById('harvestTime').innerText = `${mins}:${secs.toString().padStart(2, '0')}`;
-  
-  let percent = (elapsed / CONFIG.HARVEST_COOLDOWN_MS) * 100;
-  document.getElementById('harvestProgress').style.width = Math.min(percent, 100) + '%';
+function updateHarvestCountdown(){
+  const elapsed=Date.now()-gameState.lastHarvest;
+  const remaining=Math.max(
+    0,
+    CONFIG.HARVEST_COOLDOWN_MS-elapsed
+  );
+
+  const mins=Math.floor(remaining/60000);
+  const secs=Math.floor((remaining%60000)/1000);
+
+  document.getElementById('harvestTime').innerText=
+    `${mins}:${secs.toString().padStart(2,'0')}`;
+
+  const percent=
+    elapsed/CONFIG.HARVEST_COOLDOWN_MS*100;
+
+  document.getElementById('harvestProgress').style.width=
+    Math.min(percent,100)+'%';
 }
 
-document.getElementById('tapBtn').onclick = () => {
-  gameState.coins += CONFIG.TAP_REWARD;
-  gameState.totalTaps += CONFIG.TAP_REWARD;
-  createFloatText(`+${CONFIG.TAP_REWARD}`, '#00ff88');
+document.getElementById('tapBtn').onclick=()=>{
+  gameState.coins+=CONFIG.TAP_REWARD;
+  gameState.totalTaps+=CONFIG.TAP_REWARD;
+  createFloatText(`+${CONFIG.TAP_REWARD}`,'#00ff88');
   updateUI();
 };
 
-document.getElementById('tapZone').addEventListener('click', () => {
+document.getElementById('tapZone').addEventListener('click',()=>{
   document.getElementById('tapBtn').click();
 });
 
-document.getElementById('plantBtn').onclick = () => {
-  if (gameState.coins >= CONFIG.PLANT_COST) {
-    gameState.coins -= CONFIG.PLANT_COST;
-    gameState.farmLevel += 1;
-    gameState.coins += CONFIG.PLANT_REWARD;
-    createFloatText(`-${CONFIG.PLANT_COST} +${CONFIG.PLANT_REWARD}`, '#ff6b00');
+document.getElementById('plantBtn').onclick=()=>{
+  if(gameState.coins>=CONFIG.PLANT_COST){
+    gameState.coins-=CONFIG.PLANT_COST;
+    gameState.farmLevel++;
+    gameState.coins+=CONFIG.PLANT_REWARD;
+
+    createFloatText(
+      `-${CONFIG.PLANT_COST} +${CONFIG.PLANT_REWARD}`,
+      '#ff6b00'
+    );
+
     updateUI();
-    showPopup('🌱 Planted!', 'Your crop is growing!');
-  } else {
-    showPopup('❌ Not Enough', `You need ${CONFIG.PLANT_COST} coins`);
+    showPopup('🌱 Planted!','Your crop is growing!');
+  }else{
+    showPopup('❌ Not Enough',`You need ${CONFIG.PLANT_COST} coins`);
   }
 };
 
-document.getElementById('harvestBtn').onclick = () => {
-  let elapsed = Date.now() - gameState.lastHarvest;
-  if (elapsed < CONFIG.HARVEST_COOLDOWN_MS) {
-    let remaining = Math.ceil((CONFIG.HARVEST_COOLDOWN_MS - elapsed) / 1000);
-    showPopup('⏳ Not Ready', `Harvest ready in ${remaining}s`);
+document.getElementById('harvestBtn').onclick=()=>{
+  const elapsed=Date.now()-gameState.lastHarvest;
+
+  if(elapsed<CONFIG.HARVEST_COOLDOWN_MS){
+    const remaining=Math.ceil(
+      (CONFIG.HARVEST_COOLDOWN_MS-elapsed)/1000
+    );
+
+    showPopup('⏳ Not Ready',`Harvest ready in ${remaining}s`);
     return;
   }
-  gameState.coins += CONFIG.HARVEST_REWARD;
-  gameState.lastHarvest = Date.now();
-  createFloatText(`+${CONFIG.HARVEST_REWARD}`, '#00ff88');
+
+  gameState.coins+=CONFIG.HARVEST_REWARD;
+  gameState.lastHarvest=Date.now();
+
+  createFloatText(`+${CONFIG.HARVEST_REWARD}`,'#00ff88');
   updateUI();
-  showPopup('🎉 Harvested!', `+${CONFIG.HARVEST_REWARD} coins earned!`);
+  showPopup(
+    '🎉 Harvested!',
+    `+${CONFIG.HARVEST_REWARD} coins earned!`
+  );
 };
 
-// WITHDRAW
-function selectMethod(method) {
-  gameState.selectedMethod = method;
-  document.querySelectorAll('.withdraw-option').forEach(el => {
-    const optionMethod = el.getAttribute('onclick')?.match(/selectMethod\('([^']+)'\)/)?.[1];
-    el.classList.toggle('selected', optionMethod === method);
+function selectMethod(method){
+  gameState.selectedMethod=method;
+
+  document.querySelectorAll('.withdraw-option').forEach(el=>{
+    const optionMethod=
+      el.getAttribute('onclick')?.match(/selectMethod\('([^']+)'\)/)?.[1];
+
+    el.classList.toggle('selected',optionMethod===method);
   });
+
   saveState();
 }
 
-document.getElementById('amount').oninput = () => {
-  let amount = parseInt(document.getElementById('amount').value) || 0;
-  document.getElementById('convertedAmount').innerText = amount * CONFIG.EXCHANGE_RATE;
+document.getElementById('amount').oninput=()=>{
+  const amount=parseInt(
+    document.getElementById('amount').value
+  )||0;
+
+  document.getElementById('convertedAmount').innerText=
+    amount*CONFIG.EXCHANGE_RATE;
 };
 
-document.getElementById('withdrawBtn').onclick = () => {
-  let amount = parseInt(document.getElementById('amount').value);
-  let wallet = document.getElementById('wallet').value;
-  let method = gameState.selectedMethod;
-  
-  if (!wallet) {
-    showPopup('❌ Error', 'Enter wallet address');
+document.getElementById('withdrawBtn').onclick=()=>{
+  const amount=parseInt(document.getElementById('amount').value);
+  const wallet=document.getElementById('wallet').value;
+  const method=gameState.selectedMethod;
+
+  if(!wallet){
+    showPopup('❌ Error','Enter wallet address');
     return;
   }
-  
-  if (!amount || amount < CONFIG.MIN_WITHDRAWAL) {
-    showPopup('❌ Minimum', `Minimum ${CONFIG.MIN_WITHDRAWAL} coins (₦${CONFIG.MIN_WITHDRAWAL * CONFIG.EXCHANGE_RATE})`);
+
+  if(!amount||amount<CONFIG.MIN_WITHDRAWAL){
+    showPopup(
+      '❌ Minimum',
+      `Minimum ${CONFIG.MIN_WITHDRAWAL} coins`
+    );
     return;
   }
-  
-  if (gameState.coins < amount) {
-    showPopup('❌ Insufficient', 'Not enough coins');
+
+  if(gameState.coins<amount){
+    showPopup('❌ Insufficient','Not enough coins');
     return;
   }
-  
-  gameState.coins -= amount;
+
+  gameState.coins-=amount;
   updateUI();
-  
-  document.getElementById('wallet').value = '';
-  document.getElementById('amount').value = '';
-  
-  showPopup('✅ Request Saved Locally', `${amount} coins → ₦${amount * CONFIG.EXCHANGE_RATE}\nMethod: ${method.toUpperCase()}\n\nThis request is stored only on this device. It has not been sent for payment processing.`);
+
+  document.getElementById('wallet').value='';
+  document.getElementById('amount').value='';
+  document.getElementById('convertedAmount').innerText='0';
+
+  showPopup(
+    '✅ Request Saved Locally',
+    `${amount} coins → ₦${amount*CONFIG.EXCHANGE_RATE}\n`+
+    `Method: ${method.toUpperCase()}\n\n`+
+    'This is a local demo request.'
+  );
 };
 
-// UTILS
-function switchTab(tab) {
-  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-  
-  document.querySelector('.section.' + tab).classList.add('active');
-  const tabs = document.querySelectorAll('.nav-tab');
-  tabs.forEach(t => {
-    if (t.onclick && t.onclick.toString().includes(`'${tab}'`)) {
-      t.classList.add('active');
-    }
+function switchTab(tab){
+  document.querySelectorAll('.section').forEach(el=>{
+    el.classList.remove('active');
   });
-  
-  const tabBtn = Array.from(tabs).find(t => t.textContent.toLowerCase().includes(tab === 'farm' ? 'farm' : tab === 'tasks' ? 'tasks' : tab === 'daily' ? 'daily' : 'withdraw'));
-  if (tabBtn) tabBtn.classList.add('active');
+
+  document.querySelectorAll('.nav-tab').forEach(el=>{
+    el.classList.remove('active');
+  });
+
+  document.querySelector('.section.'+tab)?.classList.add('active');
+
+  const tabs=document.querySelectorAll('.nav-tab');
+  const tabBtn=Array.from(tabs).find(t=>{
+    const text=t.textContent.toLowerCase();
+    return text.includes(tab);
+  });
+
+  if(tabBtn)tabBtn.classList.add('active');
 }
 
-function showPopup(title, message) {
-  document.getElementById('popupTitle').innerText = title;
-  document.getElementById('popupMessage').innerText = message;
-  document.getElementById('popup').style.display = 'flex';
+function showPopup(title,message){
+  document.getElementById('popupTitle').innerText=title;
+  document.getElementById('popupMessage').innerText=message;
+  document.getElementById('popup').style.display='flex';
 }
 
-function closePopup() {
-  document.getElementById('popup').style.display = 'none';
+function closePopup(){
+  document.getElementById('popup').style.display='none';
 }
 
-function createFloatText(text, color) {
-  let el = document.createElement('div');
-  el.innerText = text;
-  el.className = 'float-text';
-  el.style.color = color;
-  el.style.position = 'fixed';
-  el.style.left = '50%';
-  el.style.top = '50%';
-  el.style.transform = 'translateX(-50%)';
-  el.style.fontSize = '20px';
-  el.style.fontWeight = 'bold';
-  el.style.pointerEvents = 'none';
-  el.style.zIndex = '999';
-  document.body.appendChild(el);
-  
-  setTimeout(() => el.remove(), 1000);
+function createFloatText(text,color){
+  const element=document.createElement('div');
+
+  element.innerText=text;
+  element.className='float-text';
+  element.style.color=color;
+  element.style.position='fixed';
+  element.style.left='50%';
+  element.style.top='50%';
+  element.style.transform='translateX(-50%)';
+  element.style.fontSize='20px';
+  element.style.fontWeight='bold';
+  element.style.pointerEvents='none';
+  element.style.zIndex='999';
+
+  document.body.appendChild(element);
+  setTimeout(()=>element.remove(),1000);
 }
 
-function saveState() {
-  localStorage.setItem('coins', gameState.coins);
-  localStorage.setItem('totalTaps', gameState.totalTaps);
-  localStorage.setItem('farmLevel', gameState.farmLevel);
-  localStorage.setItem('lastHarvest', gameState.lastHarvest);
-  localStorage.setItem('dailyProgress', JSON.stringify(gameState.dailyProgress));
-  localStorage.setItem('lastDaily', gameState.lastDaily);
-  localStorage.setItem('selectedMethod', gameState.selectedMethod);
-  localStorage.setItem('adsWatchedToday', gameState.adsWatchedToday);
-  localStorage.setItem('offerTasksCompletedToday', gameState.offerTasksCompletedToday);
-  localStorage.setItem('lastAdTime', gameState.lastAdTime);
-  localStorage.setItem('lastTaskTime', gameState.lastTaskTime);
-  localStorage.setItem('bonusClaimedToday', gameState.bonusClaimedToday);
-  localStorage.setItem('requirementsLastReset', gameState.requirementsLastReset);
-  localStorage.setItem('referralCount', gameState.referralCount);
-  localStorage.setItem('adMilestoneClaims', JSON.stringify(gameState.adMilestoneClaims));
+function saveState(){
+  localStorage.setItem('coins',gameState.coins);
+  localStorage.setItem('totalTaps',gameState.totalTaps);
+  localStorage.setItem('farmLevel',gameState.farmLevel);
+  localStorage.setItem('lastHarvest',gameState.lastHarvest);
+  localStorage.setItem('dailyProgress',JSON.stringify(gameState.dailyProgress));
+  localStorage.setItem('lastDaily',gameState.lastDaily);
+  localStorage.setItem('selectedMethod',gameState.selectedMethod);
+  localStorage.setItem('adsWatchedToday',gameState.adsWatchedToday);
+  localStorage.setItem('offerTasksCompletedToday',gameState.offerTasksCompletedToday);
+  localStorage.setItem('lastAdTime',gameState.lastAdTime);
+  localStorage.setItem('lastTaskTime',gameState.lastTaskTime);
+  localStorage.setItem('bonusClaimedToday',gameState.bonusClaimedToday);
+  localStorage.setItem('requirementsLastReset',gameState.requirementsLastReset);
+  localStorage.setItem('referralCount',gameState.referralCount);
+  localStorage.setItem(
+    'adMilestoneClaims',
+    JSON.stringify(gameState.adMilestoneClaims)
+  );
 }
 
-function renderActivity() {
-  // Placeholder for activity rendering
-}
-
-// Close popup on outside click
-document.getElementById('popup').onclick = (e) => {
-  if (e.target.id === 'popup') closePopup();
+document.getElementById('popup').onclick=e=>{
+  if(e.target.id==='popup')closePopup();
 };
 
-// Close join popup on outside click
-document.getElementById('joinPopup').onclick = (e) => {
-  if (e.target.id === 'joinPopup') {
-    document.getElementById('joinPopup').style.display = 'none';
+document.getElementById('joinPopup').onclick=e=>{
+  if(e.target.id==='joinPopup'){
+    document.getElementById('joinPopup').style.display='none';
   }
 };
 </script>
